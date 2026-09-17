@@ -233,6 +233,7 @@ INSERT INTO public.orders (
   id,
   restaurant_id,
   table_id,
+  table_number,
   order_number,
   customer_name,
   customer_mobile,
@@ -240,14 +241,16 @@ INSERT INTO public.orders (
   order_status,
   payment_status,
   payment_method,
-  subtotal,
-  tax_amount,
   total_amount,
+  tax_amount,
+  discount_amount,
+  grand_total,
   created_at
 ) VALUES (
   'e1111111-1111-1111-1111-111111111111',
   'd3b07384-d113-4678-bb56-9a2c270c5387',
   'a1111111-1111-1111-1111-111111111111',
+  'T1',
   'ORD-101',
   'Rahul Sharma',
   '9876500001',
@@ -257,12 +260,13 @@ INSERT INTO public.orders (
   'upi',
   665.00,
   33.25,
+  0.00,
   698.25,
   now() - interval '12 minutes'
 ) ON CONFLICT (id) DO NOTHING;
 
-INSERT INTO public.order_items (order_id, menu_item_id, item_name, quantity, unit_price, total_price) VALUES
-  ('e1111111-1111-1111-1111-111111111111', 'b1111111-1111-1111-1111-111111111111', 'Paneer Tikka Angara', 1, 280.00, 280.00),
-  ('e1111111-1111-1111-1111-111111111111', 'b3333333-3333-3333-3333-333333333333', 'Butter Paneer Masala', 1, 320.00, 320.00),
-  ('e1111111-1111-1111-1111-111111111111', 'b6666666-6666-6666-6666-666666666666', 'Garlic Butter Naan', 1, 65.00, 65.00)
+INSERT INTO public.order_items (order_id, menu_item_id, item_name, quantity, unit_price, total_price, food_type) VALUES
+  ('e1111111-1111-1111-1111-111111111111', 'b1111111-1111-1111-1111-111111111111', 'Paneer Tikka Angara', 1, 280.00, 280.00, 'veg'),
+  ('e1111111-1111-1111-1111-111111111111', 'b3333333-3333-3333-3333-333333333333', 'Butter Paneer Masala', 1, 320.00, 320.00, 'veg'),
+  ('e1111111-1111-1111-1111-111111111111', 'b6666666-6666-6666-6666-666666666666', 'Garlic Butter Naan', 1, 65.00, 65.00, 'veg')
 ON CONFLICT DO NOTHING;
