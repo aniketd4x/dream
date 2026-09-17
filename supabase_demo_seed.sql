@@ -1,4 +1,4 @@
-﻿-- ==============================================================================
+-- ==============================================================================
 -- DISHGAZE / RESTO: DEMO DATABASE SEED & RLS POLICIES
 -- Run this in your Supabase SQL Editor:
 -- https://supabase.com/dashboard/project/tsivosarqlonmssuebwl/sql/new
@@ -218,14 +218,14 @@ ON CONFLICT (id) DO NOTHING;
 
 -- 7. INSERT DELICIOUS MENU ITEMS
 INSERT INTO public.menu_items (id, restaurant_id, category_id, name, description, price, food_type, preparation_time, is_available, is_featured, is_recommended, image_url) VALUES
-  ('m1111111-1111-1111-1111-111111111111', 'd3b07384-d113-4678-bb56-9a2c270c5387', 'c1111111-1111-1111-1111-111111111111', 'Paneer Tikka Angara', 'Smoked cottage cheese cubes marinated in Kashmiri red chili, hung curd, and stone-ground spices.', 280.00, 'veg', 15, true, true, true, 'https://images.unsplash.com/photo-1599488615731-7e5c2823ff28?w=500&q=80'),
-  ('m2222222-2222-2222-2222-222222222222', 'd3b07384-d113-4678-bb56-9a2c270c5387', 'c1111111-1111-1111-1111-111111111111', 'Crispy Corn & Water Chestnut', 'Golden tossed crispy sweet corn kernels seasoned with scallions and crushed black pepper.', 220.00, 'veg', 12, true, false, false, 'https://images.unsplash.com/photo-1540420773420-3366772f4999?w=500&q=80'),
-  ('m3333333-3333-3333-3333-333333333333', 'd3b07384-d113-4678-bb56-9a2c270c5387', 'c2222222-2222-2222-2222-222222222222', 'Butter Paneer Masala', 'Velvety slow-simmered tomato gravy infused with aromatic fenugreek and organic artisanal butter.', 320.00, 'veg', 18, true, true, true, 'https://images.unsplash.com/photo-1631452180519-c014fe946bc7?w=500&q=80'),
-  ('m4444444-4444-4444-4444-444444444444', 'd3b07384-d113-4678-bb56-9a2c270c5387', 'c2222222-2222-2222-2222-222222222222', 'Dal Makhani Royal', 'Black lentils slow-cooked overnight over charcoal, finished with churned white butter.', 260.00, 'veg', 20, true, true, false, 'https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=500&q=80'),
-  ('m5555555-5555-5555-5555-555555555555', 'd3b07384-d113-4678-bb56-9a2c270c5387', 'c3333333-3333-3333-3333-333333333333', 'Hyderabadi Dum Biryani', 'Long-grain royal Basmati layered with seasonal vegetables, caramelized onions, saffron & mint.', 310.00, 'veg', 25, true, true, true, 'https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=500&q=80'),
-  ('m6666666-6666-6666-6666-666666666666', 'd3b07384-d113-4678-bb56-9a2c270c5387', 'c4444444-4444-4444-4444-444444444444', 'Garlic Butter Naan', 'Fluffy clay-oven flatbread topped with toasted garlic flakes and brushed with golden butter.', 65.00, 'veg', 8, true, false, false, 'https://images.unsplash.com/photo-1565557623262-b51c2513a641?w=500&q=80'),
-  ('m7777777-7777-7777-7777-777777777777', 'd3b07384-d113-4678-bb56-9a2c270c5387', 'c5555555-5555-5555-5555-555555555555', 'Fresh Mint Mojito', 'Crushed fresh garden mint, zesty Key lime, sparkling mineral water, and raw cane sugar.', 140.00, 'veg', 5, true, true, false, 'https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?w=500&q=80'),
-  ('m8888888-8888-8888-8888-888888888888', 'd3b07384-d113-4678-bb56-9a2c270c5387', 'c6666666-6666-6666-6666-666666666666', 'Gulab Jamun with Rabdi', 'Warm saffron-scented milk dough dumplings dipped in cardamom syrup, topped with rich rabdi.', 150.00, 'veg', 5, true, true, true, 'https://images.unsplash.com/photo-1601050690597-df0568f70950?w=500&q=80')
+  ('b1111111-1111-1111-1111-111111111111', 'd3b07384-d113-4678-bb56-9a2c270c5387', 'c1111111-1111-1111-1111-111111111111', 'Paneer Tikka Angara', 'Smoked cottage cheese cubes marinated in Kashmiri red chili, hung curd, and stone-ground spices.', 280.00, 'veg', 15, true, true, true, 'https://images.unsplash.com/photo-1599488615731-7e5c2823ff28?w=500&q=80'),
+  ('b2222222-2222-2222-2222-222222222222', 'd3b07384-d113-4678-bb56-9a2c270c5387', 'c1111111-1111-1111-1111-111111111111', 'Crispy Corn & Water Chestnut', 'Golden tossed crispy sweet corn kernels seasoned with scallions and crushed black pepper.', 220.00, 'veg', 12, true, false, false, 'https://images.unsplash.com/photo-1540420773420-3366772f4999?w=500&q=80'),
+  ('b3333333-3333-3333-3333-333333333333', 'd3b07384-d113-4678-bb56-9a2c270c5387', 'c2222222-2222-2222-2222-222222222222', 'Butter Paneer Masala', 'Velvety slow-simmered tomato gravy infused with aromatic fenugreek and organic artisanal butter.', 320.00, 'veg', 18, true, true, true, 'https://images.unsplash.com/photo-1631452180519-c014fe946bc7?w=500&q=80'),
+  ('b4444444-4444-4444-4444-444444444444', 'd3b07384-d113-4678-bb56-9a2c270c5387', 'c2222222-2222-2222-2222-222222222222', 'Dal Makhani Royal', 'Black lentils slow-cooked overnight over charcoal, finished with churned white butter.', 260.00, 'veg', 20, true, true, false, 'https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=500&q=80'),
+  ('b5555555-5555-5555-5555-555555555555', 'd3b07384-d113-4678-bb56-9a2c270c5387', 'c3333333-3333-3333-3333-333333333333', 'Hyderabadi Dum Biryani', 'Long-grain royal Basmati layered with seasonal vegetables, caramelized onions, saffron & mint.', 310.00, 'veg', 25, true, true, true, 'https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=500&q=80'),
+  ('b6666666-6666-6666-6666-666666666666', 'd3b07384-d113-4678-bb56-9a2c270c5387', 'c4444444-4444-4444-4444-444444444444', 'Garlic Butter Naan', 'Fluffy clay-oven flatbread topped with toasted garlic flakes and brushed with golden butter.', 65.00, 'veg', 8, true, false, false, 'https://images.unsplash.com/photo-1565557623262-b51c2513a641?w=500&q=80'),
+  ('b7777777-7777-7777-7777-777777777777', 'd3b07384-d113-4678-bb56-9a2c270c5387', 'c5555555-5555-5555-5555-555555555555', 'Fresh Mint Mojito', 'Crushed fresh garden mint, zesty Key lime, sparkling mineral water, and raw cane sugar.', 140.00, 'veg', 5, true, true, false, 'https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?w=500&q=80'),
+  ('b8888888-8888-8888-8888-888888888888', 'd3b07384-d113-4678-bb56-9a2c270c5387', 'c6666666-6666-6666-6666-666666666666', 'Gulab Jamun with Rabdi', 'Warm saffron-scented milk dough dumplings dipped in cardamom syrup, topped with rich rabdi.', 150.00, 'veg', 5, true, true, true, 'https://images.unsplash.com/photo-1601050690597-df0568f70950?w=500&q=80')
 ON CONFLICT (id) DO NOTHING;
 
 -- 8. SAMPLE LIVE ORDERS (FOR KITCHEN DASHBOARD)
@@ -245,7 +245,7 @@ INSERT INTO public.orders (
   total_amount,
   created_at
 ) VALUES (
-  'o1111111-1111-1111-1111-111111111111',
+  'e1111111-1111-1111-1111-111111111111',
   'd3b07384-d113-4678-bb56-9a2c270c5387',
   'a1111111-1111-1111-1111-111111111111',
   'ORD-101',
@@ -262,7 +262,7 @@ INSERT INTO public.orders (
 ) ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO public.order_items (order_id, menu_item_id, item_name, quantity, unit_price, total_price) VALUES
-  ('o1111111-1111-1111-1111-111111111111', 'm1111111-1111-1111-1111-111111111111', 'Paneer Tikka Angara', 1, 280.00, 280.00),
-  ('o1111111-1111-1111-1111-111111111111', 'm3333333-3333-3333-3333-333333333333', 'Butter Paneer Masala', 1, 320.00, 320.00),
-  ('o1111111-1111-1111-1111-111111111111', 'm6666666-6666-6666-6666-666666666666', 'Garlic Butter Naan', 1, 65.00, 65.00)
+  ('e1111111-1111-1111-1111-111111111111', 'b1111111-1111-1111-1111-111111111111', 'Paneer Tikka Angara', 1, 280.00, 280.00),
+  ('e1111111-1111-1111-1111-111111111111', 'b3333333-3333-3333-3333-333333333333', 'Butter Paneer Masala', 1, 320.00, 320.00),
+  ('e1111111-1111-1111-1111-111111111111', 'b6666666-6666-6666-6666-666666666666', 'Garlic Butter Naan', 1, 65.00, 65.00)
 ON CONFLICT DO NOTHING;
