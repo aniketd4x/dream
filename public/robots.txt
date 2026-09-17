@@ -1,0 +1,6 @@
+# Robots.txt for Dishgaze
+User-agent: *
+Allow: /
+
+# Sitemaps
+Sitemap: https://dishgaze.com/sitemap.xml

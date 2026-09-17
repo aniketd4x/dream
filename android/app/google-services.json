@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "220789587154",
+    "project_id": "fast-order-5ec53",
+    "storage_bucket": "fast-order-5ec53.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:220789587154:android:5e8088f843445d4393410b",
+        "android_client_info": {
+          "package_name": "com.dishgaze.admin"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDHHnGm-KZeTyGUVombdOIAiocNpAvj-Q4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
