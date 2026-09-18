@@ -24,6 +24,7 @@ import CategoryPage from '@/components/admin/CategoryPage';
 import MenuItemPage from '@/components/admin/MenuItemPage';
 import SettingsPage from '@/pages/admin/SettingsPage';
 import ReportsPage from '@/pages/admin/ReportsPage';
+import SuperAdminPage from '@/pages/admin/SuperAdminPage';
 
 function AdminApp() {
   const { loading, restaurant } = useAuth();
@@ -32,6 +33,7 @@ function AdminApp() {
 
   // Map route pathname to AdminLayout active tab string
   const getActiveFromPath = (pathname: string): string => {
+    if (pathname.includes('/admin/restaurants') || pathname.includes('/admin/super')) return 'super:restaurants';
     if (pathname.includes('/admin/categories')) return 'table:categories';
     if (pathname.includes('/admin/menu')) return 'table:menu_items';
     if (pathname.includes('/admin/tables')) return 'table:dining_tables';
@@ -53,6 +55,8 @@ function AdminApp() {
   const handleNavigate = (newSection: string) => {
     if (newSection === 'dashboard') {
       navigate('/admin');
+    } else if (newSection === 'super:restaurants') {
+      navigate('/admin/restaurants');
     } else if (newSection === 'reports') {
       navigate('/admin/reports');
     } else if (newSection === 'table:categories') {
@@ -129,6 +133,7 @@ function AdminApp() {
   useEffect(() => {
     const titles: Record<string, string> = {
       dashboard: 'Dashboard',
+      'super:restaurants': 'All Restaurants (Super Admin)',
       'table:orders': 'Orders',
       reports: 'Reports & Analytics',
       'table:dining_tables': 'Dining Tables',
@@ -157,6 +162,7 @@ function AdminApp() {
     <>
       <AdminLayout active={active} onNavigate={handleNavigate}>
         {active === 'dashboard' && <Dashboard onNavigate={handleNavigate} />}
+        {active === 'super:restaurants' && <SuperAdminPage />}
         {active === 'table:orders' && <CrudPage table="orders" />}
         {active === 'reports' && <ReportsPage />}
         {active === 'table:categories' && <CategoryPage />}

@@ -61,7 +61,7 @@ type Row = Record<string, unknown>;
 
 export default function CrudPage({ table }: CrudPageProps) {
   const config = TABLE_MAP[table];
-  const { restaurant, loading: authLoading } = useAuth();
+  const { restaurant, loading: authLoading, isSuperAdmin } = useAuth();
   const currencySymbol = restaurant?.currency_symbol || restaurant?.currency || 'AED';
   const [rows, setRows] = useState<Row[]>([]);
   const [loading, setLoading] = useState(true);
@@ -225,7 +225,7 @@ export default function CrudPage({ table }: CrudPageProps) {
     const restaurantIdField = getRestaurantIdField();
     if (restaurant && restaurantIdField && config.name !== 'restaurants') {
       query = query.eq(restaurantIdField, restaurant.id);
-    } else if (restaurant && config.name === 'restaurants') {
+    } else if (restaurant && config.name === 'restaurants' && !isSuperAdmin) {
       query = query.eq('id', restaurant.id);
     }
 

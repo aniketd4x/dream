@@ -12,6 +12,10 @@ interface AuthContextValue {
   resetPassword: (email: string, newPassword: string) => Promise<{ error: string | null; restaurantName?: string }>;
   restaurant: { id: string; name: string; slug?: string; currency?: string; currency_symbol?: string; logo_url?: string; theme_color?: string } | null;
   refetchRestaurant: () => Promise<void>;
+  isSuperAdmin: boolean;
+  isManagingDifferentRestaurant: boolean;
+  switchRestaurant: (restaurantId: string) => Promise<void>;
+  resetToSuperAdmin: () => Promise<void>;
 }
 
 interface User {
@@ -40,6 +44,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [restaurant, setRestaurant] = useState<{ id: string; name: string; slug?: string; currency?: string; currency_symbol?: string; logo_url?: string; theme_color?: string } | null>(null);
+  const [activeRestaurantId, setActiveRestaurantId] = useState<string | null>(() => {
+    return sessionStorage.getItem('superadmin_active_restaurant');
+  });
+
+  const isSuperAdmin = Boolean(
+    user?.email?.toLowerCase() === 'admin@resto.com' ||
+    user?.email?.toLowerCase().startsWith('admin@') ||
+    (user as any)?.role === 'superadmin'
+  );
+
+  const isManagingDifferentRestaurant = Boolean(
+    isSuperAdmin && activeRestaurantId && user && activeRestaurantId !== user.id
+  );
 
   useEffect(() => {
     // Check localStorage for existing session
@@ -48,7 +65,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       try {
         const userData = JSON.parse(storedUser);
         setUser(userData);
-        fetchRestaurant(userData.id);
+        const savedManagedId = sessionStorage.getItem('superadmin_active_restaurant');
+        if (savedManagedId) {
+          fetchRestaurant(savedManagedId);
+        } else {
+          fetchRestaurant(userData.id);
+        }
       } catch (e) {
         localStorage.removeItem('user');
       }
@@ -373,10 +395,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }
 
+  async function switchRestaurant(restaurantId: string) {
+    setActiveRestaurantId(restaurantId);
+    sessionStorage.setItem('superadmin_active_restaurant', restaurantId);
+    await fetchRestaurant(restaurantId);
+  }
+
+  async function resetToSuperAdmin() {
+    sessionStorage.removeItem('superadmin_active_restaurant');
+    setActiveRestaurantId(null);
+    if (user) {
+      await fetchRestaurant(user.id);
+    }
+  }
+
   async function signOut() {
     setUser(null);
     setRestaurant(null);
+    setActiveRestaurantId(null);
     localStorage.removeItem('user');
+    sessionStorage.removeItem('superadmin_active_restaurant');
   }
 
   return (
@@ -388,6 +426,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       signUp,
       resetPassword,
       restaurant,
+      isSuperAdmin,
+      isManagingDifferentRestaurant,
+      switchRestaurant,
+      resetToSuperAdmin,
       refetchRestaurant: async () => {
         if (restaurant?.id) {
           await fetchRestaurant(restaurant.id);
