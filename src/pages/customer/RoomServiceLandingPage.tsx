@@ -144,8 +144,8 @@ export function RoomServiceLandingPage() {
   if (loading) {
     return (
       <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-4 text-slate-800 font-sans">
-        <div className="w-16 h-16 rounded-3xl bg-white border border-slate-200/80 shadow-md flex items-center justify-center mb-4">
-          <Loader2 className="w-8 h-8 animate-spin text-amber-500" />
+        <div className="w-16 h-16 rounded-3xl bg-white border border-slate-200/80 shadow-sm flex items-center justify-center mb-4">
+          <Loader2 className="w-8 h-8 animate-spin text-emerald-600" />
         </div>
         <p className="text-sm font-bold text-slate-700">Connecting to Room Services...</p>
         <p className="text-xs text-slate-400 mt-1">Please wait a moment</p>
@@ -165,7 +165,7 @@ export function RoomServiceLandingPage() {
         </p>
         <button
           onClick={() => navigate('/')}
-          className="px-6 py-2.5 bg-amber-500 hover:bg-amber-600 text-white rounded-xl font-bold text-xs shadow-md active:scale-95 transition"
+          className="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold text-xs shadow-md active:scale-95 transition"
         >
           Open QR Scanner
         </button>
@@ -176,19 +176,19 @@ export function RoomServiceLandingPage() {
   const frontDeskPhone = servicesConfig.reception_phone || hotel?.mobile || '';
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 font-sans pb-20 selection:bg-amber-100 selection:text-amber-900">
+    <div className="min-h-screen bg-slate-50 text-slate-900 font-sans pb-20 selection:bg-emerald-100 selection:text-emerald-900">
       {/* Top Ambient Image / Hero Section */}
-      <div className="relative h-60 sm:h-68 w-full overflow-hidden bg-slate-900 shadow-sm">
+      <div className="relative h-60 sm:h-68 w-full overflow-hidden bg-slate-950 shadow-sm">
         <img
           src={room.image_url || 'https://images.unsplash.com/photo-1618773928121-c32242e63f39?w=1200&q=80'}
           alt={`Room ${room.room_number}`}
-          className="w-full h-full object-cover opacity-60 scale-105 filter saturate-105"
+          className="w-full h-full object-cover opacity-65 scale-105 filter saturate-105"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/40 to-black/25" />
 
         {/* Top Header Controls */}
         <div className="absolute top-4 left-4 right-4 flex items-center justify-between z-10">
-          <div className="flex items-center gap-2 bg-white/90 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/40 shadow-sm">
+          <div className="flex items-center gap-2 bg-white/95 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/40 shadow-xs">
             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
             <span className="text-[11px] font-bold tracking-wide uppercase text-slate-800">
               Live Room Service
@@ -198,9 +198,9 @@ export function RoomServiceLandingPage() {
           {servicesConfig.view_bill !== false && (
             <button
               onClick={() => handleOpenBill()}
-              className="flex items-center gap-1.5 bg-white/90 hover:bg-white text-slate-800 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-white/40 text-xs font-bold shadow-sm transition active:scale-95"
+              className="flex items-center gap-1.5 bg-white/95 hover:bg-white text-slate-800 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-white/40 text-xs font-bold shadow-xs transition active:scale-95"
             >
-              <Receipt className="w-3.5 h-3.5 text-amber-600" />
+              <Receipt className="w-3.5 h-3.5 text-emerald-700" />
               <span>View Bill</span>
             </button>
           )}
@@ -219,7 +219,7 @@ export function RoomServiceLandingPage() {
           </div>
           <h1 className="text-3xl sm:text-4xl font-black text-white tracking-tight flex items-center gap-3">
             <span>Room {room.room_number}</span>
-            <span className="text-xs font-black uppercase tracking-wider bg-amber-400 text-slate-950 px-2.5 py-0.5 rounded-full shadow-md">
+            <span className="text-xs font-extrabold uppercase tracking-wider bg-white/20 backdrop-blur-md border border-white/30 text-white px-3 py-0.5 rounded-full shadow-xs">
               {room.room_type}
             </span>
           </h1>
@@ -246,19 +246,19 @@ export function RoomServiceLandingPage() {
               triggerHaptic('medium');
               navigate(`/menu/${qrToken}`);
             }}
-            className="relative overflow-hidden cursor-pointer rounded-2xl p-5 bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 text-white shadow-lg shadow-orange-500/15 border border-amber-400/40 group active:scale-[0.98] transition-all"
+            className="relative overflow-hidden cursor-pointer rounded-2xl p-5 bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 text-white shadow-lg shadow-emerald-950/15 border border-emerald-500/30 group active:scale-[0.98] transition-all"
           >
             <div className="relative z-10 flex items-center justify-between">
               <div className="space-y-1">
-                <span className="inline-flex items-center gap-1.5 bg-white/25 backdrop-blur-md text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full tracking-wider text-white">
+                <span className="inline-flex items-center gap-1.5 bg-white/20 backdrop-blur-md text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full tracking-wider text-white">
                   <UtensilsCrossed className="w-3 h-3" /> In-Room Dining
                 </span>
                 <h2 className="text-xl font-black text-white">Order Food to Room</h2>
-                <p className="text-xs text-amber-50 max-w-[220px] leading-relaxed">
+                <p className="text-xs text-emerald-50 max-w-[220px] leading-relaxed">
                   Fresh chef specials, drinks, and snacks delivered to Room {room.room_number}.
                 </p>
               </div>
-              <div className="w-12 h-12 rounded-2xl bg-white text-orange-600 flex items-center justify-center shadow-md group-hover:scale-105 transition-transform shrink-0">
+              <div className="w-12 h-12 rounded-2xl bg-white text-emerald-700 flex items-center justify-center shadow-md group-hover:scale-105 transition-transform shrink-0">
                 <ArrowRight className="w-6 h-6" />
               </div>
             </div>
@@ -283,14 +283,14 @@ export function RoomServiceLandingPage() {
                   setActiveModal('WATER');
                   setSelectedQuickItem('2 Fresh Bottled Water (1 Litre)');
                 }}
-                className="p-4 rounded-2xl bg-white hover:bg-slate-50/80 border border-slate-200/90 text-left space-y-2.5 transition-all shadow-sm hover:shadow active:scale-95 group"
+                className="p-4 rounded-2xl bg-white hover:bg-slate-50/90 border border-slate-200/90 hover:border-slate-300 text-left space-y-2.5 transition-all shadow-xs hover:shadow-sm active:scale-95 group"
               >
-                <div className="w-10 h-10 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center group-hover:scale-105 transition-transform">
+                <div className="w-10 h-10 rounded-xl bg-sky-50 text-sky-700 border border-sky-100/80 flex items-center justify-center group-hover:scale-105 transition-transform">
                   <Droplets className="w-5 h-5" />
                 </div>
                 <div>
-                  <p className="text-sm font-bold text-slate-900 group-hover:text-amber-600 transition-colors leading-tight">Request Water</p>
-                  <p className="text-[11px] text-slate-500">Packaged drinking bottles</p>
+                  <p className="text-sm font-bold text-slate-900 group-hover:text-emerald-700 transition-colors leading-tight">Request Water</p>
+                  <p className="text-[11px] text-slate-500 mt-0.5">Packaged drinking bottles</p>
                 </div>
               </button>
             )}
@@ -303,14 +303,14 @@ export function RoomServiceLandingPage() {
                   setActiveModal('HOUSEKEEPING');
                   setSelectedQuickItem('Complete Room Cleaning');
                 }}
-                className="p-4 rounded-2xl bg-white hover:bg-slate-50/80 border border-slate-200/90 text-left space-y-2.5 transition-all shadow-sm hover:shadow active:scale-95 group"
+                className="p-4 rounded-2xl bg-white hover:bg-slate-50/90 border border-slate-200/90 hover:border-slate-300 text-left space-y-2.5 transition-all shadow-xs hover:shadow-sm active:scale-95 group"
               >
-                <div className="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center group-hover:scale-105 transition-transform">
+                <div className="w-10 h-10 rounded-xl bg-amber-50 text-amber-700 border border-amber-100/80 flex items-center justify-center group-hover:scale-105 transition-transform">
                   <Sparkles className="w-5 h-5" />
                 </div>
                 <div>
-                  <p className="text-sm font-bold text-slate-900 group-hover:text-amber-600 transition-colors leading-tight">Housekeeping</p>
-                  <p className="text-[11px] text-slate-500">Cleaning & linen change</p>
+                  <p className="text-sm font-bold text-slate-900 group-hover:text-emerald-700 transition-colors leading-tight">Housekeeping</p>
+                  <p className="text-[11px] text-slate-500 mt-0.5">Cleaning & linen change</p>
                 </div>
               </button>
             )}
@@ -323,14 +323,14 @@ export function RoomServiceLandingPage() {
                   setActiveModal('TOWEL');
                   setSelectedQuickItem('Set of 2 Fresh Bath Towels');
                 }}
-                className="p-4 rounded-2xl bg-white hover:bg-slate-50/80 border border-slate-200/90 text-left space-y-2.5 transition-all shadow-sm hover:shadow active:scale-95 group"
+                className="p-4 rounded-2xl bg-white hover:bg-slate-50/90 border border-slate-200/90 hover:border-slate-300 text-left space-y-2.5 transition-all shadow-xs hover:shadow-sm active:scale-95 group"
               >
-                <div className="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center group-hover:scale-105 transition-transform">
+                <div className="w-10 h-10 rounded-xl bg-teal-50 text-teal-700 border border-teal-100/80 flex items-center justify-center group-hover:scale-105 transition-transform">
                   <Bed className="w-5 h-5" />
                 </div>
                 <div>
-                  <p className="text-sm font-bold text-slate-900 group-hover:text-amber-600 transition-colors leading-tight">Fresh Towels</p>
-                  <p className="text-[11px] text-slate-500">Bath & hand towels</p>
+                  <p className="text-sm font-bold text-slate-900 group-hover:text-emerald-700 transition-colors leading-tight">Fresh Towels</p>
+                  <p className="text-[11px] text-slate-500 mt-0.5">Bath & hand towels</p>
                 </div>
               </button>
             )}
@@ -343,14 +343,14 @@ export function RoomServiceLandingPage() {
                   setActiveModal('LAUNDRY');
                   setSelectedQuickItem('Laundry Bag Pickup');
                 }}
-                className="p-4 rounded-2xl bg-white hover:bg-slate-50/80 border border-slate-200/90 text-left space-y-2.5 transition-all shadow-sm hover:shadow active:scale-95 group"
+                className="p-4 rounded-2xl bg-white hover:bg-slate-50/90 border border-slate-200/90 hover:border-slate-300 text-left space-y-2.5 transition-all shadow-xs hover:shadow-sm active:scale-95 group"
               >
-                <div className="w-10 h-10 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center group-hover:scale-105 transition-transform">
+                <div className="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-700 border border-indigo-100/80 flex items-center justify-center group-hover:scale-105 transition-transform">
                   <Shirt className="w-5 h-5" />
                 </div>
                 <div>
-                  <p className="text-sm font-bold text-slate-900 group-hover:text-amber-600 transition-colors leading-tight">Laundry</p>
-                  <p className="text-[11px] text-slate-500">Wash & steam press</p>
+                  <p className="text-sm font-bold text-slate-900 group-hover:text-emerald-700 transition-colors leading-tight">Laundry</p>
+                  <p className="text-[11px] text-slate-500 mt-0.5">Wash & steam press</p>
                 </div>
               </button>
             )}
@@ -363,14 +363,14 @@ export function RoomServiceLandingPage() {
                   setActiveModal('MAINTENANCE');
                   setSelectedQuickItem('AC Temperature / Cooling Issue');
                 }}
-                className="p-4 rounded-2xl bg-white hover:bg-slate-50/80 border border-slate-200/90 text-left space-y-2.5 transition-all shadow-sm hover:shadow active:scale-95 group"
+                className="p-4 rounded-2xl bg-white hover:bg-slate-50/90 border border-slate-200/90 hover:border-slate-300 text-left space-y-2.5 transition-all shadow-xs hover:shadow-sm active:scale-95 group"
               >
-                <div className="w-10 h-10 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center group-hover:scale-105 transition-transform">
+                <div className="w-10 h-10 rounded-xl bg-rose-50 text-rose-700 border border-rose-100/80 flex items-center justify-center group-hover:scale-105 transition-transform">
                   <Wrench className="w-5 h-5" />
                 </div>
                 <div>
-                  <p className="text-sm font-bold text-slate-900 group-hover:text-amber-600 transition-colors leading-tight">Maintenance</p>
-                  <p className="text-[11px] text-slate-500">AC, TV, Wi-Fi, plumbing</p>
+                  <p className="text-sm font-bold text-slate-900 group-hover:text-emerald-700 transition-colors leading-tight">Maintenance</p>
+                  <p className="text-[11px] text-slate-500 mt-0.5">AC, TV, Wi-Fi, plumbing</p>
                 </div>
               </button>
             )}
@@ -383,14 +383,14 @@ export function RoomServiceLandingPage() {
                   setActiveModal('WAKE_UP_CALL');
                   setSelectedQuickItem('Wake-up call tomorrow at 7:00 AM');
                 }}
-                className="p-4 rounded-2xl bg-white hover:bg-slate-50/80 border border-slate-200/90 text-left space-y-2.5 transition-all shadow-sm hover:shadow active:scale-95 group"
+                className="p-4 rounded-2xl bg-white hover:bg-slate-50/90 border border-slate-200/90 hover:border-slate-300 text-left space-y-2.5 transition-all shadow-xs hover:shadow-sm active:scale-95 group"
               >
-                <div className="w-10 h-10 rounded-xl bg-yellow-50 text-yellow-600 flex items-center justify-center group-hover:scale-105 transition-transform">
+                <div className="w-10 h-10 rounded-xl bg-amber-50 text-amber-700 border border-amber-100/80 flex items-center justify-center group-hover:scale-105 transition-transform">
                   <AlarmClock className="w-5 h-5" />
                 </div>
                 <div>
-                  <p className="text-sm font-bold text-slate-900 group-hover:text-amber-600 transition-colors leading-tight">Wake-up Call</p>
-                  <p className="text-[11px] text-slate-500">Morning reminder</p>
+                  <p className="text-sm font-bold text-slate-900 group-hover:text-emerald-700 transition-colors leading-tight">Wake-up Call</p>
+                  <p className="text-[11px] text-slate-500 mt-0.5">Morning reminder</p>
                 </div>
               </button>
             )}
@@ -403,14 +403,14 @@ export function RoomServiceLandingPage() {
                   setActiveModal('TAXI');
                   setSelectedQuickItem('Taxi to Airport / Station');
                 }}
-                className="p-4 rounded-2xl bg-white hover:bg-slate-50/80 border border-slate-200/90 text-left space-y-2.5 transition-all shadow-sm hover:shadow active:scale-95 group"
+                className="p-4 rounded-2xl bg-white hover:bg-slate-50/90 border border-slate-200/90 hover:border-slate-300 text-left space-y-2.5 transition-all shadow-xs hover:shadow-sm active:scale-95 group"
               >
-                <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center group-hover:scale-105 transition-transform">
+                <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-700 border border-emerald-100/80 flex items-center justify-center group-hover:scale-105 transition-transform">
                   <Car className="w-5 h-5" />
                 </div>
                 <div>
-                  <p className="text-sm font-bold text-slate-900 group-hover:text-amber-600 transition-colors leading-tight">Taxi / Cab</p>
-                  <p className="text-[11px] text-slate-500">Airport & local travel</p>
+                  <p className="text-sm font-bold text-slate-900 group-hover:text-emerald-700 transition-colors leading-tight">Taxi / Cab</p>
+                  <p className="text-[11px] text-slate-500 mt-0.5">Airport & local travel</p>
                 </div>
               </button>
             )}
@@ -423,14 +423,14 @@ export function RoomServiceLandingPage() {
                   setActiveModal('ROOM_SERVICE');
                   setSelectedQuickItem('General In-Room Staff Assistance');
                 }}
-                className="p-4 rounded-2xl bg-white hover:bg-slate-50/80 border border-slate-200/90 text-left space-y-2.5 transition-all shadow-sm hover:shadow active:scale-95 group"
+                className="p-4 rounded-2xl bg-white hover:bg-slate-50/90 border border-slate-200/90 hover:border-slate-300 text-left space-y-2.5 transition-all shadow-xs hover:shadow-sm active:scale-95 group"
               >
-                <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center group-hover:scale-105 transition-transform">
+                <div className="w-10 h-10 rounded-xl bg-teal-50 text-teal-700 border border-teal-100/80 flex items-center justify-center group-hover:scale-105 transition-transform">
                   <BellRing className="w-5 h-5" />
                 </div>
                 <div>
-                  <p className="text-sm font-bold text-slate-900 group-hover:text-amber-600 transition-colors leading-tight">Room Service</p>
-                  <p className="text-[11px] text-slate-500">Call room attendant</p>
+                  <p className="text-sm font-bold text-slate-900 group-hover:text-emerald-700 transition-colors leading-tight">Room Service</p>
+                  <p className="text-[11px] text-slate-500 mt-0.5">Call room attendant</p>
                 </div>
               </button>
             )}
@@ -449,14 +449,14 @@ export function RoomServiceLandingPage() {
                   alert('Front desk phone number has not been set yet.');
                 }
               }}
-              className="flex items-center gap-3 p-3.5 rounded-2xl bg-white hover:bg-slate-50 border border-slate-200/90 text-left transition active:scale-95 shadow-sm"
+              className="flex items-center gap-3 p-3.5 rounded-2xl bg-white hover:bg-slate-50 border border-slate-200/90 text-left transition active:scale-95 shadow-xs"
             >
-              <div className="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
+              <div className="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-700 border border-emerald-100/80 flex items-center justify-center shrink-0">
                 <PhoneCall className="w-4 h-4" />
               </div>
               <div className="min-w-0">
                 <p className="text-xs font-bold text-slate-900 truncate">Reception</p>
-                <p className="text-[10px] text-slate-500 truncate">
+                <p className="text-[10px] text-slate-500 truncate mt-0.5">
                   {frontDeskPhone ? 'Dial Front Desk' : 'Call Front Desk'}
                 </p>
               </div>
@@ -470,21 +470,21 @@ export function RoomServiceLandingPage() {
                 triggerHaptic('light');
                 setActiveModal('FEEDBACK');
               }}
-              className="flex items-center gap-3 p-3.5 rounded-2xl bg-white hover:bg-slate-50 border border-slate-200/90 text-left transition active:scale-95 shadow-sm"
+              className="flex items-center gap-3 p-3.5 rounded-2xl bg-white hover:bg-slate-50 border border-slate-200/90 text-left transition active:scale-95 shadow-xs"
             >
-              <div className="w-9 h-9 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center shrink-0">
+              <div className="w-9 h-9 rounded-xl bg-amber-50 text-amber-700 border border-amber-100/80 flex items-center justify-center shrink-0">
                 <Star className="w-4 h-4" />
               </div>
               <div className="min-w-0">
                 <p className="text-xs font-bold text-slate-900 truncate">Feedback</p>
-                <p className="text-[10px] text-slate-500">Rate your stay</p>
+                <p className="text-[10px] text-slate-500 mt-0.5">Rate your stay</p>
               </div>
             </button>
           )}
         </div>
 
         {/* Room Info Card */}
-        <div className="p-4 rounded-2xl bg-white border border-slate-200/90 text-xs space-y-2.5 text-slate-600 shadow-sm">
+        <div className="p-4 rounded-2xl bg-white border border-slate-200/90 text-xs space-y-2.5 text-slate-600 shadow-xs">
           <div className="flex items-center justify-between">
             <span className="font-medium text-slate-500">Room Type & Bed</span>
             <span className="text-slate-900 font-bold">{room.room_type} • {room.bed_type}</span>
@@ -508,7 +508,7 @@ export function RoomServiceLandingPage() {
           <div className="bg-white border border-slate-200 rounded-t-3xl sm:rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto text-slate-900">
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <div className="flex items-center gap-2">
-                <span className="w-2.5 h-2.5 rounded-full bg-amber-500" />
+                <span className="w-2.5 h-2.5 rounded-full bg-emerald-600" />
                 <h3 className="text-base font-black text-slate-900 capitalize">
                   {activeModal === 'FEEDBACK' ? 'Guest Stay Feedback' : `${activeModal.replace(/_/g, ' ')} Request`}
                 </h3>
@@ -552,7 +552,7 @@ export function RoomServiceLandingPage() {
                   <select
                     value={selectedQuickItem}
                     onChange={(e) => setSelectedQuickItem(e.target.value)}
-                    className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 focus:bg-white focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 outline-none"
+                    className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 focus:bg-white focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/20 outline-none"
                   >
                     {activeModal === 'WATER' && (
                       <>
@@ -632,7 +632,7 @@ export function RoomServiceLandingPage() {
                       ? 'Tell us what you loved or how we can improve...'
                       : 'e.g. Please ring bell twice, deliver around 4 PM...'
                   }
-                  className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 focus:bg-white focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 outline-none resize-none"
+                  className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 focus:bg-white focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/20 outline-none resize-none"
                 />
               </div>
 
@@ -645,7 +645,7 @@ export function RoomServiceLandingPage() {
                     value={guestName}
                     onChange={(e) => setGuestName(e.target.value)}
                     placeholder="Guest Name"
-                    className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 focus:bg-white focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 outline-none"
+                    className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 focus:bg-white focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/20 outline-none"
                   />
                 </div>
                 <div>
@@ -655,7 +655,7 @@ export function RoomServiceLandingPage() {
                     value={guestMobile}
                     onChange={(e) => setGuestMobile(e.target.value)}
                     placeholder="+91..."
-                    className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 focus:bg-white focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 outline-none"
+                    className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 focus:bg-white focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/20 outline-none"
                   />
                 </div>
               </div>
@@ -671,7 +671,7 @@ export function RoomServiceLandingPage() {
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="px-5 py-2.5 bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs rounded-xl flex items-center gap-1.5 shadow-md active:scale-95 disabled:opacity-50 transition"
+                  className="px-5 py-2.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs rounded-xl flex items-center gap-1.5 shadow-md active:scale-95 disabled:opacity-50 transition"
                 >
                   {submitting ? (
                     <Loader2 className="w-3.5 h-3.5 animate-spin" />
@@ -692,7 +692,7 @@ export function RoomServiceLandingPage() {
           <div className="bg-white border border-slate-200 rounded-t-3xl sm:rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-4 max-h-[85vh] overflow-y-auto text-slate-900">
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <div className="flex items-center gap-2">
-                <div className="w-7 h-7 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center">
+                <div className="w-7 h-7 rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-100/80 flex items-center justify-center">
                   <Receipt className="w-4 h-4" />
                 </div>
                 <h3 className="text-base font-black text-slate-900">
@@ -709,7 +709,7 @@ export function RoomServiceLandingPage() {
 
             {billLoading ? (
               <div className="py-8 flex flex-col items-center justify-center text-slate-500">
-                <Loader2 className="w-6 h-6 animate-spin text-amber-500 mb-2" />
+                <Loader2 className="w-6 h-6 animate-spin text-emerald-600 mb-2" />
                 <p className="text-xs font-medium">Calculating room stay and order charges...</p>
               </div>
             ) : billData ? (
@@ -732,7 +732,7 @@ export function RoomServiceLandingPage() {
                 </div>
 
                 {/* Bill Breakdown */}
-                <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-2 text-xs">
+                <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-2 text-xs">
                   <div className="flex justify-between text-slate-600">
                     <span>Subtotal</span>
                     <span className="font-mono font-semibold text-slate-800">
@@ -747,7 +747,7 @@ export function RoomServiceLandingPage() {
                   </div>
                   <div className="pt-2 border-t border-slate-200 flex justify-between text-sm font-black text-slate-900">
                     <span>Total Amount Payable</span>
-                    <span className="font-mono text-amber-600">
+                    <span className="font-mono text-emerald-700 font-black">
                       {hotel?.currency_symbol || '₹'}{billData.grand_total.toLocaleString()}
                     </span>
                   </div>

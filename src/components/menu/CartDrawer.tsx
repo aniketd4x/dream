@@ -149,15 +149,29 @@ export function CartDrawer(props: Props) {
                 <div className="space-y-4">
                   {/* Hotel Room Delivery Banner */}
                   {(mode === "room" || (table?.table_number && /^room/i.test(table.table_number.trim()))) && (
-                    <div className="flex items-center gap-3 rounded-2xl bg-amber-500/10 border border-amber-500/20 p-3.5 text-amber-900 dark:text-amber-200">
-                      <div className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-amber-500/20 text-lg font-bold">
+                    <div
+                      className="flex items-center gap-3 rounded-2xl border p-3.5"
+                      style={{
+                        backgroundColor: "color-mix(in srgb, var(--brand) 8%, var(--card))",
+                        borderColor: "color-mix(in srgb, var(--brand) 25%, transparent)",
+                      }}
+                    >
+                      <div
+                        className="flex size-9 shrink-0 items-center justify-center rounded-xl text-lg font-bold"
+                        style={{
+                          backgroundColor: "color-mix(in srgb, var(--brand) 16%, var(--card))",
+                        }}
+                      >
                         🏨
                       </div>
                       <div className="min-w-0 flex-1">
-                        <div className="text-[11px] font-bold uppercase tracking-wider text-amber-700 dark:text-amber-300">
+                        <div
+                          className="text-[11px] font-bold uppercase tracking-wider"
+                          style={{ color: "var(--brand)" }}
+                        >
                           In-Room Dining
                         </div>
-                        <div className="text-sm font-black">
+                        <div className="text-sm font-black text-foreground">
                           Delivering to {table?.table_number?.replace(/^room\s*/i, 'Room ') || 'your Room'}
                         </div>
                       </div>

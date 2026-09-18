@@ -362,7 +362,7 @@ export async function getRoomByQrToken(qrToken: string): Promise<{
     if (!roomErr && room) {
       const { data: restaurant } = await supabase
         .from('restaurants')
-        .select('id, name, slug, currency, currency_symbol, logo_url, phone_code, mobile, address, city')
+        .select('id, name, slug, currency, currency_symbol, logo_url, phone_code, mobile, address, city, primary_color')
         .eq('id', room.restaurant_id)
         .maybeSingle();
 
