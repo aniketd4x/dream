@@ -95,6 +95,11 @@ export function ScannerLandingPage() {
               navigate(`/menu/${decodeURIComponent(match[1])}`);
               return;
             }
+            const roomMatch = url.pathname.match(/^\/room\/([^/]+)\/?$/i);
+            if (roomMatch?.[1]) {
+              navigate(`/room/${decodeURIComponent(roomMatch[1])}`);
+              return;
+            }
             if (url.origin === window.location.origin) {
               window.location.href = url.href;
               return;
@@ -112,7 +117,17 @@ export function ScannerLandingPage() {
             return;
           }
 
+          const roomPathMatch = scanned.match(/^\/?room\/([^/]+)\/?$/i);
+          if (roomPathMatch?.[1]) {
+            navigate(`/room/${decodeURIComponent(roomPathMatch[1])}`);
+            return;
+          }
+
           const cleanToken = scanned.replace(/^\/+/, "").replace(/\/+$/, "").trim();
+          if (cleanToken.toUpperCase().startsWith("RM-") || cleanToken.toUpperCase().startsWith("ROOM-")) {
+            navigate(`/room/${cleanToken}`);
+            return;
+          }
           if (cleanToken.length >= 3 && cleanToken.length <= 200) {
             navigate(`/menu/${cleanToken}`);
             return;
