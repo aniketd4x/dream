@@ -74,11 +74,20 @@ export interface MenuItem {
   variants: ItemVariant[];
 }
 
-export type OrderType = "dine_in" | "takeaway" | "counter";
+export type OrderType =
+  | "dine_in"
+  | "takeaway"
+  | "counter"
+  | "room_service"
+  | "DINE_IN"
+  | "ROOM_SERVICE"
+  | "TAKEAWAY"
+  | "DELIVERY";
 
 export interface MenuPayload {
   table: DiningTable | null;
-  mode: "table" | "direct";
+  room?: any | null;
+  mode: "table" | "direct" | "room";
   availableTables?: DiningTable[];
   restaurant: Restaurant;
   settings: RestaurantSettings | null;

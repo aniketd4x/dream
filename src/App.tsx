@@ -14,12 +14,15 @@ import { DashboardSkeleton } from '@/components/admin/Skeleton';
 import { ScannerLandingPage } from '@/pages/customer/ScannerLandingPage';
 import { QRMenuPage } from '@/pages/customer/QRMenuPage';
 import { OrderStatusPage } from '@/pages/customer/OrderStatusPage';
+import { RoomServiceLandingPage } from '@/pages/customer/RoomServiceLandingPage';
 
 // Admin Components & Pages
 import AdminLogin from '@/pages/admin/Login';
 import AdminLayout from '@/components/admin/AdminLayout';
 import Dashboard from '@/pages/admin/Dashboard';
 import CrudPage from '@/components/admin/CrudPage';
+import TablesAndRoomsPage from '@/pages/admin/TablesAndRoomsPage';
+import RoomServiceStaffPage from '@/pages/admin/RoomServiceStaffPage';
 import CategoryPage from '@/components/admin/CategoryPage';
 import MenuItemPage from '@/components/admin/MenuItemPage';
 import SettingsPage from '@/pages/admin/SettingsPage';
@@ -35,7 +38,8 @@ function AdminApp() {
   const getActiveFromPath = (pathname: string): string => {
     if (pathname.includes('/admin/categories')) return 'table:categories';
     if (pathname.includes('/admin/menu')) return 'table:menu_items';
-    if (pathname.includes('/admin/tables')) return 'table:dining_tables';
+    if (pathname.includes('/admin/tables') || pathname.includes('/admin/rooms')) return 'table:dining_tables';
+    if (pathname.includes('/admin/room-service')) return 'operations:room_service';
     if (pathname.includes('/admin/orders')) return 'table:orders';
     if (pathname.includes('/admin/reports')) return 'reports';
     if (pathname.includes('/admin/settings')) return 'table:restaurant_settings';
@@ -62,6 +66,8 @@ function AdminApp() {
       navigate('/admin/menu');
     } else if (newSection === 'table:dining_tables') {
       navigate('/admin/tables');
+    } else if (newSection === 'operations:room_service') {
+      navigate('/admin/room-service');
     } else if (newSection === 'table:orders') {
       navigate('/admin/orders');
     } else if (newSection === 'table:restaurant_settings') {
@@ -132,7 +138,8 @@ function AdminApp() {
       dashboard: 'Dashboard',
       'table:orders': 'Orders',
       reports: 'Reports & Analytics',
-      'table:dining_tables': 'Dining Tables',
+      'table:dining_tables': 'Tables & Rooms',
+      'operations:room_service': 'Room Service & Housekeeping',
       'table:menu_items': 'Menu Items',
       'table:categories': 'Categories',
       'table:restaurant_settings': 'Settings',
@@ -162,7 +169,8 @@ function AdminApp() {
         {active === 'reports' && <ReportsPage />}
         {active === 'table:categories' && <CategoryPage />}
         {active === 'table:menu_items' && <MenuItemPage />}
-        {active === 'table:dining_tables' && <CrudPage table="dining_tables" />}
+        {active === 'table:dining_tables' && <TablesAndRoomsPage />}
+        {active === 'operations:room_service' && <RoomServiceStaffPage />}
         {active === 'table:restaurant_settings' && <SettingsPage />}
         {active.startsWith('table:') &&
           active !== 'table:categories' &&
@@ -291,6 +299,7 @@ export default function App() {
           element={isNative ? <Navigate to="/admin" replace /> : <ScannerLandingPage />}
         />
         <Route path="/menu/:qrToken" element={<QRMenuPage />} />
+        <Route path="/room/:qrToken" element={<RoomServiceLandingPage />} />
         <Route path="/order/:orderId" element={<OrderStatusPage />} />
 
         {/* Separate Dedicated Super Admin Routes */}

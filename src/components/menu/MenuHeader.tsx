@@ -8,7 +8,7 @@ interface Props {
   restaurant: Restaurant;
   settings: RestaurantSettings | null;
   table: DiningTable | null;
-  mode?: "table" | "direct";
+  mode?: "table" | "direct" | "room";
   items?: MenuItem[];
   categories?: Category[];
   onSearchResults?: (results: MenuItem[]) => void;

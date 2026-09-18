@@ -13,6 +13,7 @@ import type {
   Restaurant,
   RestaurantSettings,
 } from '@/types/menu';
+import { getRoomByQrToken } from './hotelService';
 
 export class MenuError extends Error {
   code: string;
@@ -269,6 +270,68 @@ export async function resolveContext(identifier: string) {
     };
   }
 
+  // Step A2: Check if identifier is a Hotel Room QR Token
+  let room: any = null;
+  try {
+    const { data: roomData, error: roomErr } = await supabase
+      .from('hotel_rooms')
+      .select('*')
+      .eq('qr_token', cleanIdentifier)
+      .eq('is_active', true)
+      .limit(1)
+      .maybeSingle();
+
+    if (!roomErr && roomData) {
+      room = roomData;
+    }
+  } catch (_) {
+    room = null;
+  }
+
+  // Also check local cache or fallback for room tokens (RM-...)
+  if (!room && (cleanIdentifier.toUpperCase().startsWith('RM-') || cleanIdentifier.toUpperCase().includes('ROOM'))) {
+    const local = await getRoomByQrToken(cleanIdentifier);
+    if (local.room) {
+      room = local.room;
+    }
+  }
+
+  if (room) {
+    const { data: restaurant } = await supabase
+      .from('restaurants')
+      .select(RESTAURANT_COLS)
+      .eq('id', room.restaurant_id)
+      .eq('is_active', true)
+      .limit(1)
+      .maybeSingle();
+
+    const rest = restaurant || DEMO_RESTAURANT;
+
+    const { data: settings } = await supabase
+      .from('restaurant_settings')
+      .select(SETTINGS_COLS)
+      .eq('restaurant_id', room.restaurant_id)
+      .limit(1)
+      .maybeSingle();
+
+    return {
+      mode: 'room' as const,
+      table: {
+        id: room.id,
+        restaurant_id: room.restaurant_id,
+        table_number: `Room ${room.room_number}`,
+        table_name: room.room_name || `Floor ${room.floor_number}`,
+        capacity: room.capacity || 2,
+        is_active: true,
+        qr_token: room.qr_token,
+      } as unknown as DiningTable,
+      room,
+      availableTables: [] as DiningTable[],
+      restaurant: rest as unknown as Restaurant,
+      settings: (settings ?? null) as RestaurantSettings | null,
+    };
+  }
+
   // Step B: Check if identifier is a Restaurant Slug or Restaurant ID
   let restQuery = supabase
     .from('restaurants')
@@ -403,6 +466,8 @@ export interface OrderInput {
   orderType?: OrderType;
   tableNumber?: string | null;
   diningTableId?: string | null;
+  roomId?: string | null;
+  roomNumber?: string | null;
   customerName: string;
   customerMobile: string;
   notes?: string;
@@ -411,20 +476,39 @@ export interface OrderInput {
 
 export async function createOrder(input: OrderInput): Promise<PlacedOrder> {
   const tokenOrSlug = input.identifier || input.qrToken || '';
-  const { mode, table, restaurant, settings, availableTables } = await resolveContext(tokenOrSlug);
+  const { mode, table, room, restaurant, settings, availableTables } = await resolveContext(tokenOrSlug);
 
   if (settings && (settings.accept_orders === false || settings.restaurant_open === false)) {
     throw new MenuError('ORDERING_DISABLED', 'Ordering is currently unavailable at this restaurant.');
   }
 
-  const requestedOrderType = input.orderType ?? (mode === 'table' ? 'dine_in' : 'dine_in');
+  const isRoomOrder = Boolean(
+    mode === 'room' ||
+    input.roomId ||
+    input.orderType === 'ROOM_SERVICE' ||
+    input.orderType === 'room_service'
+  );
+  const requestedOrderType = isRoomOrder
+    ? 'ROOM_SERVICE'
+    : (input.orderType ?? (mode === 'table' ? 'DINE_IN' : 'DINE_IN'));
+
   let tableId: string | null = null;
   let tableNumber: string | null = null;
+  let roomId: string | null = input.roomId ?? null;
+  let roomNumber: string | null = input.roomNumber ?? null;
 
-  if (mode === 'table' && table) {
+  if (mode === 'room' && (room as any)) {
+    roomId = (room as any).id;
+    roomNumber = (room as any).room_number;
+    tableId = null;
+    tableNumber = `Room ${(room as any).room_number}`;
+  } else if (mode === 'table' && table) {
     tableId = table.id;
     tableNumber = table.table_number;
-  } else if (requestedOrderType === 'dine_in') {
+  } else if (isRoomOrder) {
+    tableId = null;
+    tableNumber = roomNumber ? `Room ${roomNumber}` : 'Room Service';
+  } else if (requestedOrderType === 'dine_in' || requestedOrderType === 'DINE_IN') {
     if (input.diningTableId) {
       const match = availableTables.find((t) => t.id === input.diningTableId);
       tableId = match?.id ?? input.diningTableId;
@@ -525,7 +609,7 @@ export async function createOrder(input: OrderInput): Promise<PlacedOrder> {
 
   const basePayload: Record<string, unknown> = {
     restaurant_id: restaurant.id,
-    table_id: tableId,
+    table_id: isRoomOrder ? null : tableId,
     table_number: tableNumber,
     customer_name: input.customerName,
     customer_mobile: input.customerMobile,
@@ -540,6 +624,11 @@ export async function createOrder(input: OrderInput): Promise<PlacedOrder> {
     notes: input.notes ? input.notes : null,
   };
 
+  if (roomId) {
+    basePayload.room_id = roomId;
+    basePayload.room_number = roomNumber;
+  }
+
   let inserted: { id: string; order_number: string | null } | null = null;
   let insertError: string | null = null;
 
@@ -552,6 +641,20 @@ export async function createOrder(input: OrderInput): Promise<PlacedOrder> {
     if (!error && data) {
       inserted = data as unknown as { id: string; order_number: string | null };
       break;
+    }
+    
+    // If error is about room_id column not existing yet, retry without room_id
+    if (error && (error.message?.includes('room_id') || error.code === '42703')) {
+      const { room_id: _r, room_number: _rn, ...safePayload } = payload;
+      const { data: retryData, error: retryErr } = await supabase
+        .from('orders')
+        .insert(safePayload)
+        .select('id,order_number')
+        .single();
+      if (!retryErr && retryData) {
+        inserted = retryData as unknown as { id: string; order_number: string | null };
+        break;
+      }
     }
     insertError = error?.message ?? 'Unable to place the order.';
   }

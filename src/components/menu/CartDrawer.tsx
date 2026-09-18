@@ -13,7 +13,7 @@ interface Props {
   tableLabel?: string;
   table?: DiningTable | null;
   availableTables?: DiningTable[];
-  mode?: "table" | "direct";
+  mode?: "table" | "direct" | "room";
   canOrder: boolean;
   submitting: boolean;
   errorMessage: string | null;
@@ -46,24 +46,26 @@ export function CartDrawer(props: Props) {
     errorMessage,
   } = props;
 
+  const [name, setName] = useState(() => {
+    try {
+      return window.localStorage.getItem("dishgaze_customer_name") || "";
+    } catch {
+      return "";
+    }
+  });
+
+  const [mobile, setMobile] = useState(() => {
+    try {
+      return window.localStorage.getItem("dishgaze_customer_mobile") || "";
+    } catch {
+      return "";
+    }
+  });
+
+  const [notes, setNotes] = useState("");
   const [selectedTableId, setSelectedTableId] = useState<string>("");
   const [customTableNumber, setCustomTableNumber] = useState<string>("");
-  const [name, setName] = useState("");
-  const [mobile, setMobile] = useState("");
-  const [notes, setNotes] = useState("");
   const [touched, setTouched] = useState(false);
-
-  // Pre-fill customer details from localStorage
-  useEffect(() => {
-    try {
-      const savedName = window.localStorage.getItem("dishgaze_customer_name");
-      const savedMobile = window.localStorage.getItem("dishgaze_customer_mobile");
-      if (savedName && !name) setName(savedName);
-      if (savedMobile && !mobile) setMobile(savedMobile);
-    } catch {
-      /* ignore storage read error */
-    }
-  }, [open]);
 
   // Reset form errors when drawer opens
   useEffect(() => {
@@ -72,17 +74,17 @@ export function CartDrawer(props: Props) {
     }
   }, [open]);
 
-  const nameValid = name.trim().length > 0 && name.trim().length <= 80;
-  const mobileValid = /^[0-9+\-\s()]{6,20}$/.test(mobile.trim());
+  const nameValid = name.trim().length > 0;
+  const mobileValid = mobile.replace(/[^0-9]/g, "").length >= 7;
   const effectiveTableNumber =
-    mode === "table" && table
-      ? table.table_number ?? table.table_name ?? ""
+    mode === "table"
+      ? table?.table_number ?? table?.table_name ?? ""
       : selectedTableId
       ? availableTables.find((t) => t.id === selectedTableId)?.table_number ?? ""
       : customTableNumber.trim();
 
   const tableValid =
-    mode === "table" || availableTables.length === 0 || effectiveTableNumber.trim().length > 0;
+    mode === "table" || mode === "room" || availableTables.length === 0 || effectiveTableNumber.trim().length > 0;
 
   const handleSubmit = () => {
     setTouched(true);
@@ -103,7 +105,7 @@ export function CartDrawer(props: Props) {
       name: name.trim(),
       mobile: mobile.trim(),
       notes: notes.trim(),
-      orderType: "dine_in",
+      orderType: (mode === "room" ? "ROOM_SERVICE" : "dine_in") as OrderType,
       tableNumber: finalTableNumber,
       diningTableId: finalTableId,
     });
@@ -117,7 +119,7 @@ export function CartDrawer(props: Props) {
           <p className="text-left text-sm text-muted-foreground">
             {mode === "table" && table
               ? `Table ${table.table_number ?? table.table_name ?? "—"}`
-              : tableLabel || "Storefront / Direct Menu"}
+              : tableLabel || (mode === "room" ? "Hotel Room Service" : "Storefront / Direct Menu")}
           </p>
         </SheetHeader>
 

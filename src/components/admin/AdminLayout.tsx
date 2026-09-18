@@ -33,6 +33,7 @@ import {
   QrCode,
   Building2,
   ShieldCheck,
+  BellRing,
 } from 'lucide-react';
 import { useAuth } from '@/lib/auth';
 import { TABLES } from '@/lib/tables';
@@ -317,7 +318,8 @@ export default function AdminLayout({ active, onNavigate, children }: AdminLayou
     { key: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { key: 'table:orders', label: 'Orders', icon: ShoppingBag, badge: pendingCount },
     { key: 'reports', label: 'Reports', icon: BarChart3 },
-    { key: 'table:dining_tables', label: 'Dining Table', icon: Table2 },
+    { key: 'table:dining_tables', label: 'Tables & Rooms', icon: Table2 },
+    { key: 'operations:room_service', label: 'Room Service', icon: BellRing },
     { key: 'table:menu_items', label: 'Menu', icon: UtensilsCrossed },
     { key: 'table:categories', label: 'Categories', icon: FolderTree },
     { key: 'table:restaurant_settings', label: 'Settings', icon: Settings },
@@ -328,7 +330,7 @@ export default function AdminLayout({ active, onNavigate, children }: AdminLayou
     { key: 'dashboard', label: 'Home', icon: LayoutDashboard },
     { key: 'table:orders', label: 'Orders', icon: ShoppingBag, badge: pendingCount },
     { key: 'table:menu_items', label: 'Menu', icon: UtensilsCrossed },
-    { key: 'table:dining_tables', label: 'Tables', icon: Table2 },
+    { key: 'table:dining_tables', label: 'Tables & Rooms', icon: Table2 },
   ];
 
   const activeLabel = navItems.find((n) => n.key === active)?.label ?? 'Dashboard';
@@ -714,6 +716,26 @@ export default function AdminLayout({ active, onNavigate, children }: AdminLayou
                   <div className="text-left">
                     <p className="text-sm font-bold">Reports & Analytics</p>
                     <p className="text-xs text-slate-500 font-normal">Daily sales, orders & CSV export</p>
+                  </div>
+                </div>
+                <ChevronRight className="w-4 h-4 text-slate-400" />
+              </button>
+
+              <button
+                onClick={() => handleNav('operations:room_service')}
+                className={`w-full flex items-center justify-between p-3.5 rounded-2xl border transition native-press ${
+                  active === 'operations:room_service'
+                    ? 'bg-theme-light border-theme-light text-theme-primary font-bold'
+                    : 'bg-slate-50 hover:bg-slate-100 border-slate-200 text-slate-800'
+                }`}
+              >
+                <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 rounded-xl bg-white border border-slate-200 flex items-center justify-center text-slate-700 shadow-xs">
+                    <BellRing className="w-5 h-5 text-theme-primary" />
+                  </div>
+                  <div className="text-left">
+                    <p className="text-sm font-bold">Room Service</p>
+                    <p className="text-xs text-slate-500 font-normal">Guest requests, housekeeping & room food</p>
                   </div>
                 </div>
                 <ChevronRight className="w-4 h-4 text-slate-400" />

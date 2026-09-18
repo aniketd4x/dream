@@ -1076,7 +1076,7 @@ export default function Dashboard({ onNavigate }: { onNavigate: (key: string) =>
               {[
                 { label: 'Reports', icon: BarChart3, key: 'reports', color: 'text-blue-600' },
                 { label: 'Orders', icon: ShoppingBag, key: 'table:orders', color: 'text-emerald-600' },
-                { label: 'Tables & QR', icon: QrCode, key: 'table:dining_tables', color: 'text-cyan-600' },
+                { label: 'Tables & Rooms', icon: QrCode, key: 'table:dining_tables', color: 'text-cyan-600' },
                 { label: 'Add Item', icon: UtensilsCrossed, key: 'table:menu_items', color: 'text-purple-600' },
                 { label: 'Categories', icon: FolderTree, key: 'table:categories', color: 'text-amber-600' },
                 { label: 'Settings', icon: Store, key: 'table:restaurant_settings', color: 'text-rose-600' },
