@@ -280,7 +280,10 @@ function MenuScreen({ qrToken, data }: { qrToken: string; data: MenuPayload }) {
   }
 
   const isEmptyMenu = items.length === 0;
-  const tableLabel = table
+  const isRoomMode = mode === 'room' || (table?.table_number && /^room/i.test(table.table_number.trim()));
+  const tableLabel = isRoomMode
+    ? `Delivering to ${table?.table_number?.replace(/^room\s*/i, 'Room ') || 'Room'} · ${restaurant.name}`
+    : table
     ? `Table ${table.table_number ?? table.table_name ?? "—"} · ${restaurant.name}`
     : `Direct Digital Menu · ${restaurant.name}`;
 
@@ -292,6 +295,23 @@ function MenuScreen({ qrToken, data }: { qrToken: string; data: MenuPayload }) {
 
   return (
     <div style={brandVars} className="min-h-screen bg-background pb-28 lg:pb-10">
+      {isRoomMode && (
+        <div className="bg-amber-500/10 border-b border-amber-500/20 px-4 py-2 text-xs font-semibold text-amber-900 dark:text-amber-200">
+          <div className="max-w-5xl mx-auto flex items-center justify-between">
+            <span className="flex items-center gap-1.5 font-bold">
+              <span>🏨</span>
+              <span>In-Room Dining for <strong>{table?.table_number?.replace(/^room\s*/i, 'Room ') || 'Room'}</strong></span>
+            </span>
+            <Link
+              to={`/room/${qrToken}`}
+              className="inline-flex items-center gap-1 text-amber-700 dark:text-amber-300 font-bold hover:underline"
+            >
+              <span>Room Services</span>
+              <span>→</span>
+            </Link>
+          </div>
+        </div>
+      )}
       <MenuHeader
         restaurant={restaurant}
         settings={settings}

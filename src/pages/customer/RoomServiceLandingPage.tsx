@@ -1,5 +1,5 @@
 // src/pages/customer/RoomServiceLandingPage.tsx
-import { useState, useEffect, useId } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
   UtensilsCrossed,
@@ -19,13 +19,11 @@ import {
   X,
   Send,
   Bed,
-  Layers,
   ArrowRight,
-  Clock,
-  ShieldCheck,
 } from 'lucide-react';
 import { getRoomByQrToken, createRoomRequest, fetchRoomBill } from '@/lib/hotelService';
-import type { HotelRoom, RequestType, RoomBill } from '@/types/hotel';
+import type { HotelRoom, RequestType, RoomBill, HotelServicesConfig } from '@/types/hotel';
+import { DEFAULT_HOTEL_SERVICES_CONFIG } from '@/types/hotel';
 import { triggerHaptic } from '@/lib/haptics';
 
 export function RoomServiceLandingPage() {
@@ -36,6 +34,7 @@ export function RoomServiceLandingPage() {
   const [error, setError] = useState<string | null>(null);
   const [room, setRoom] = useState<HotelRoom | null>(null);
   const [hotel, setHotel] = useState<any | null>(null);
+  const [servicesConfig, setServicesConfig] = useState<HotelServicesConfig>(DEFAULT_HOTEL_SERVICES_CONFIG);
 
   // Modals & Popups
   const [activeModal, setActiveModal] = useState<RequestType | 'BILL' | 'FEEDBACK' | null>(null);
@@ -61,12 +60,15 @@ export function RoomServiceLandingPage() {
         return;
       }
       try {
-        const { room: foundRoom, restaurant, error: roomErr } = await getRoomByQrToken(qrToken);
+        const { room: foundRoom, restaurant, servicesConfig: cfg, error: roomErr } = await getRoomByQrToken(qrToken);
         if (roomErr || !foundRoom) {
           setError(roomErr || 'Room not found or QR token expired.');
         } else {
           setRoom(foundRoom);
           setHotel(restaurant);
+          if (cfg) {
+            setServicesConfig(cfg);
+          }
           document.title = `Room ${foundRoom.room_number} | ${restaurant?.name || 'Hotel Guest Portal'}`;
         }
       } catch (err: any) {
@@ -141,28 +143,29 @@ export function RoomServiceLandingPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center p-4 text-white">
-        <div className="w-16 h-16 rounded-3xl bg-amber-400/10 border border-amber-400/20 flex items-center justify-center mb-4">
-          <Loader2 className="w-8 h-8 animate-spin text-amber-400" />
+      <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-4 text-slate-800 font-sans">
+        <div className="w-16 h-16 rounded-3xl bg-white border border-slate-200/80 shadow-md flex items-center justify-center mb-4">
+          <Loader2 className="w-8 h-8 animate-spin text-amber-500" />
         </div>
-        <p className="text-sm font-bold text-slate-300">Connecting to Room Services...</p>
+        <p className="text-sm font-bold text-slate-700">Connecting to Room Services...</p>
+        <p className="text-xs text-slate-400 mt-1">Please wait a moment</p>
       </div>
     );
   }
 
   if (error || !room) {
     return (
-      <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center p-6 text-center text-white">
-        <div className="w-16 h-16 rounded-full bg-red-500/10 border border-red-500/30 flex items-center justify-center mb-4 text-red-400">
+      <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-6 text-center text-slate-800 font-sans">
+        <div className="w-16 h-16 rounded-full bg-rose-50 border border-rose-200 flex items-center justify-center mb-4 text-rose-500 shadow-sm">
           <AlertCircle className="w-8 h-8" />
         </div>
-        <h2 className="text-xl font-black mb-2">Room Service Unavailable</h2>
-        <p className="text-sm text-slate-400 max-w-sm mb-6 leading-relaxed">
+        <h2 className="text-xl font-black text-slate-900 mb-2">Room Service Unavailable</h2>
+        <p className="text-sm text-slate-500 max-w-sm mb-6 leading-relaxed">
           {error || 'We could not detect your room number. Please scan the QR code placed on your nightstand again.'}
         </p>
         <button
           onClick={() => navigate('/')}
-          className="px-6 py-2.5 bg-amber-400 text-slate-950 rounded-xl font-bold text-xs"
+          className="px-6 py-2.5 bg-amber-500 hover:bg-amber-600 text-white rounded-xl font-bold text-xs shadow-md active:scale-95 transition"
         >
           Open QR Scanner
         </button>
@@ -170,313 +173,349 @@ export function RoomServiceLandingPage() {
     );
   }
 
+  const frontDeskPhone = servicesConfig.reception_phone || hotel?.mobile || '';
+
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 font-sans pb-16 selection:bg-amber-400 selection:text-slate-950">
-      {/* Top Ambient Image / Banner */}
-      <div className="relative h-56 sm:h-64 w-full overflow-hidden bg-gradient-to-b from-slate-900 via-slate-900 to-slate-950">
+    <div className="min-h-screen bg-slate-50 text-slate-900 font-sans pb-20 selection:bg-amber-100 selection:text-amber-900">
+      {/* Top Ambient Image / Hero Section */}
+      <div className="relative h-60 sm:h-68 w-full overflow-hidden bg-slate-900 shadow-sm">
         <img
           src={room.image_url || 'https://images.unsplash.com/photo-1618773928121-c32242e63f39?w=1200&q=80'}
           alt={`Room ${room.room_number}`}
-          className="w-full h-full object-cover opacity-35 filter blur-xs scale-105"
+          className="w-full h-full object-cover opacity-60 scale-105 filter saturate-105"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/60 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/40 to-black/25" />
 
         {/* Top Header Controls */}
         <div className="absolute top-4 left-4 right-4 flex items-center justify-between z-10">
-          <div className="flex items-center gap-2 bg-slate-950/70 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/10">
-            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-            <span className="text-[11px] font-bold tracking-wide uppercase text-slate-300">
+          <div className="flex items-center gap-2 bg-white/90 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/40 shadow-sm">
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+            <span className="text-[11px] font-bold tracking-wide uppercase text-slate-800">
               Live Room Service
             </span>
           </div>
 
-          <button
-            onClick={() => handleOpenBill()}
-            className="flex items-center gap-1.5 bg-white/10 hover:bg-white/20 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-white/10 text-xs font-bold transition text-white active:scale-95"
-          >
-            <Receipt className="w-3.5 h-3.5 text-amber-400" />
-            <span>View Bill</span>
-          </button>
+          {servicesConfig.view_bill !== false && (
+            <button
+              onClick={() => handleOpenBill()}
+              className="flex items-center gap-1.5 bg-white/90 hover:bg-white text-slate-800 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-white/40 text-xs font-bold shadow-sm transition active:scale-95"
+            >
+              <Receipt className="w-3.5 h-3.5 text-amber-600" />
+              <span>View Bill</span>
+            </button>
+          )}
         </div>
 
         {/* Room Headline */}
-        <div className="absolute bottom-4 left-4 right-4 z-10">
+        <div className="absolute bottom-5 left-4 right-4 z-10">
           <div className="flex items-center gap-2 mb-1">
-            <span className="text-xs font-bold text-amber-400 uppercase tracking-widest">
-              {hotel?.name || 'Grand Resort & Suites'}
+            <span className="text-xs font-bold text-amber-300 uppercase tracking-widest drop-shadow-sm">
+              {hotel?.name || 'Grand Luxury Resort & Suites'}
             </span>
-            <span className="text-slate-500">•</span>
-            <span className="text-xs text-slate-300 font-medium">
+            <span className="text-white/40">•</span>
+            <span className="text-xs text-white/80 font-medium">
               Floor {room.floor_number}
             </span>
           </div>
           <h1 className="text-3xl sm:text-4xl font-black text-white tracking-tight flex items-center gap-3">
             <span>Room {room.room_number}</span>
-            <span className="text-xs font-black uppercase tracking-wider bg-amber-400 text-slate-950 px-2.5 py-0.5 rounded-full shadow-sm">
+            <span className="text-xs font-black uppercase tracking-wider bg-amber-400 text-slate-950 px-2.5 py-0.5 rounded-full shadow-md">
               {room.room_type}
             </span>
           </h1>
           {room.room_name && (
-            <p className="text-xs text-slate-300 mt-0.5">{room.room_name}</p>
+            <p className="text-xs text-white/90 mt-0.5 font-medium drop-shadow-sm">{room.room_name}</p>
           )}
         </div>
       </div>
 
       {/* Main Content Area */}
-      <div className="max-w-md mx-auto px-4 -mt-2 space-y-4">
+      <div className="max-w-md mx-auto px-4 -mt-4 space-y-4 relative z-20">
         {/* Success Alert Banner */}
         {requestSuccess && (
-          <div className="flex items-start gap-2.5 bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-xs rounded-2xl p-3.5 shadow-lg animate-in fade-in">
-            <CheckCircle2 className="w-4 h-4 mt-0.5 shrink-0 text-emerald-400" />
+          <div className="flex items-start gap-2.5 bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs rounded-2xl p-3.5 shadow-sm animate-in fade-in">
+            <CheckCircle2 className="w-4 h-4 mt-0.5 shrink-0 text-emerald-600" />
             <span className="font-semibold leading-relaxed">{requestSuccess}</span>
           </div>
         )}
 
-        {/* PRIMARY ACTION: Order Food Banner */}
-        <div
-          onClick={() => {
-            triggerHaptic('medium');
-            navigate(`/menu/${qrToken}`);
-          }}
-          className="relative overflow-hidden cursor-pointer rounded-2xl p-5 bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 text-white shadow-xl shadow-emerald-950/40 border border-emerald-500/40 group active:scale-[0.98] transition-all"
-        >
-          <div className="relative z-10 flex items-center justify-between">
-            <div className="space-y-1">
-              <span className="inline-flex items-center gap-1 bg-white/20 backdrop-blur-md text-[10px] font-black uppercase px-2 py-0.5 rounded-full tracking-wider">
-                <UtensilsCrossed className="w-3 h-3" /> In-Room Dining
-              </span>
-              <h2 className="text-xl font-black text-white">Order Food to Room</h2>
-              <p className="text-xs text-emerald-100 max-w-[220px]">
-                Fresh chef specials, drinks, and snacks delivered to Room {room.room_number}.
-              </p>
-            </div>
-            <div className="w-12 h-12 rounded-2xl bg-white text-emerald-700 flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform shrink-0">
-              <ArrowRight className="w-6 h-6" />
+        {/* PRIMARY ACTION: Order Food Banner (Decided by restaurant config) */}
+        {servicesConfig.order_food !== false && (
+          <div
+            onClick={() => {
+              triggerHaptic('medium');
+              navigate(`/menu/${qrToken}`);
+            }}
+            className="relative overflow-hidden cursor-pointer rounded-2xl p-5 bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 text-white shadow-lg shadow-orange-500/15 border border-amber-400/40 group active:scale-[0.98] transition-all"
+          >
+            <div className="relative z-10 flex items-center justify-between">
+              <div className="space-y-1">
+                <span className="inline-flex items-center gap-1.5 bg-white/25 backdrop-blur-md text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full tracking-wider text-white">
+                  <UtensilsCrossed className="w-3 h-3" /> In-Room Dining
+                </span>
+                <h2 className="text-xl font-black text-white">Order Food to Room</h2>
+                <p className="text-xs text-amber-50 max-w-[220px] leading-relaxed">
+                  Fresh chef specials, drinks, and snacks delivered to Room {room.room_number}.
+                </p>
+              </div>
+              <div className="w-12 h-12 rounded-2xl bg-white text-orange-600 flex items-center justify-center shadow-md group-hover:scale-105 transition-transform shrink-0">
+                <ArrowRight className="w-6 h-6" />
+              </div>
             </div>
           </div>
-        </div>
+        )}
 
-        {/* Guest Services Grid */}
-        <div className="space-y-2">
+        {/* Guest Services Grid (Filtered by restaurant configuration) */}
+        <div className="space-y-2.5">
           <div className="flex items-center justify-between px-1">
-            <h3 className="text-xs font-black uppercase tracking-wider text-slate-400">
+            <h3 className="text-xs font-black uppercase tracking-wider text-slate-500">
               Guest Services & Requests
             </h3>
-            <span className="text-[10px] text-slate-500 font-bold">Touch to request</span>
+            <span className="text-[10px] text-slate-400 font-semibold">Touch to request</span>
           </div>
 
           <div className="grid grid-cols-2 gap-3">
-            {/* 1. Quick Water Request */}
-            <button
-              onClick={() => {
-                triggerHaptic('light');
-                setActiveModal('WATER');
-                setSelectedQuickItem('2 Fresh Bottled Water (1 Litre)');
-              }}
-              className="p-4 rounded-2xl bg-slate-900 hover:bg-slate-800 border border-slate-800/80 text-left space-y-2.5 transition active:scale-95 group shadow-sm"
-            >
-              <div className="w-10 h-10 rounded-xl bg-cyan-500/10 text-cyan-400 flex items-center justify-center group-hover:scale-105 transition-transform">
-                <Droplets className="w-5 h-5" />
-              </div>
-              <div>
-                <p className="text-sm font-bold text-white leading-tight">Request Water</p>
-                <p className="text-[11px] text-slate-400">Packaged drinking bottles</p>
-              </div>
-            </button>
+            {/* 1. Water Service */}
+            {servicesConfig.water !== false && (
+              <button
+                onClick={() => {
+                  triggerHaptic('light');
+                  setActiveModal('WATER');
+                  setSelectedQuickItem('2 Fresh Bottled Water (1 Litre)');
+                }}
+                className="p-4 rounded-2xl bg-white hover:bg-slate-50/80 border border-slate-200/90 text-left space-y-2.5 transition-all shadow-sm hover:shadow active:scale-95 group"
+              >
+                <div className="w-10 h-10 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center group-hover:scale-105 transition-transform">
+                  <Droplets className="w-5 h-5" />
+                </div>
+                <div>
+                  <p className="text-sm font-bold text-slate-900 group-hover:text-amber-600 transition-colors leading-tight">Request Water</p>
+                  <p className="text-[11px] text-slate-500">Packaged drinking bottles</p>
+                </div>
+              </button>
+            )}
 
             {/* 2. Housekeeping */}
-            <button
-              onClick={() => {
-                triggerHaptic('light');
-                setActiveModal('HOUSEKEEPING');
-                setSelectedQuickItem('Complete Room Cleaning');
-              }}
-              className="p-4 rounded-2xl bg-slate-900 hover:bg-slate-800 border border-slate-800/80 text-left space-y-2.5 transition active:scale-95 group shadow-sm"
-            >
-              <div className="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center group-hover:scale-105 transition-transform">
-                <Sparkles className="w-5 h-5" />
-              </div>
-              <div>
-                <p className="text-sm font-bold text-white leading-tight">Housekeeping</p>
-                <p className="text-[11px] text-slate-400">Cleaning & linen change</p>
-              </div>
-            </button>
+            {servicesConfig.housekeeping !== false && (
+              <button
+                onClick={() => {
+                  triggerHaptic('light');
+                  setActiveModal('HOUSEKEEPING');
+                  setSelectedQuickItem('Complete Room Cleaning');
+                }}
+                className="p-4 rounded-2xl bg-white hover:bg-slate-50/80 border border-slate-200/90 text-left space-y-2.5 transition-all shadow-sm hover:shadow active:scale-95 group"
+              >
+                <div className="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center group-hover:scale-105 transition-transform">
+                  <Sparkles className="w-5 h-5" />
+                </div>
+                <div>
+                  <p className="text-sm font-bold text-slate-900 group-hover:text-amber-600 transition-colors leading-tight">Housekeeping</p>
+                  <p className="text-[11px] text-slate-500">Cleaning & linen change</p>
+                </div>
+              </button>
+            )}
 
-            {/* 3. Fresh Towels & Amenities */}
-            <button
-              onClick={() => {
-                triggerHaptic('light');
-                setActiveModal('TOWEL');
-                setSelectedQuickItem('Set of 2 Fresh Bath Towels');
-              }}
-              className="p-4 rounded-2xl bg-slate-900 hover:bg-slate-800 border border-slate-800/80 text-left space-y-2.5 transition active:scale-95 group shadow-sm"
-            >
-              <div className="w-10 h-10 rounded-xl bg-indigo-500/10 text-indigo-400 flex items-center justify-center group-hover:scale-105 transition-transform">
-                <Bed className="w-5 h-5" />
-              </div>
-              <div>
-                <p className="text-sm font-bold text-white leading-tight">Fresh Towels</p>
-                <p className="text-[11px] text-slate-400">Bath & hand towels</p>
-              </div>
-            </button>
+            {/* 3. Fresh Towels */}
+            {servicesConfig.room_service !== false && (
+              <button
+                onClick={() => {
+                  triggerHaptic('light');
+                  setActiveModal('TOWEL');
+                  setSelectedQuickItem('Set of 2 Fresh Bath Towels');
+                }}
+                className="p-4 rounded-2xl bg-white hover:bg-slate-50/80 border border-slate-200/90 text-left space-y-2.5 transition-all shadow-sm hover:shadow active:scale-95 group"
+              >
+                <div className="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center group-hover:scale-105 transition-transform">
+                  <Bed className="w-5 h-5" />
+                </div>
+                <div>
+                  <p className="text-sm font-bold text-slate-900 group-hover:text-amber-600 transition-colors leading-tight">Fresh Towels</p>
+                  <p className="text-[11px] text-slate-500">Bath & hand towels</p>
+                </div>
+              </button>
+            )}
 
             {/* 4. Laundry Service */}
-            <button
-              onClick={() => {
-                triggerHaptic('light');
-                setActiveModal('LAUNDRY');
-                setSelectedQuickItem('Laundry Bag Pickup');
-              }}
-              className="p-4 rounded-2xl bg-slate-900 hover:bg-slate-800 border border-slate-800/80 text-left space-y-2.5 transition active:scale-95 group shadow-sm"
-            >
-              <div className="w-10 h-10 rounded-xl bg-violet-500/10 text-violet-400 flex items-center justify-center group-hover:scale-105 transition-transform">
-                <Shirt className="w-5 h-5" />
-              </div>
-              <div>
-                <p className="text-sm font-bold text-white leading-tight">Laundry</p>
-                <p className="text-[11px] text-slate-400">Wash & steam press</p>
-              </div>
-            </button>
+            {servicesConfig.laundry !== false && (
+              <button
+                onClick={() => {
+                  triggerHaptic('light');
+                  setActiveModal('LAUNDRY');
+                  setSelectedQuickItem('Laundry Bag Pickup');
+                }}
+                className="p-4 rounded-2xl bg-white hover:bg-slate-50/80 border border-slate-200/90 text-left space-y-2.5 transition-all shadow-sm hover:shadow active:scale-95 group"
+              >
+                <div className="w-10 h-10 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center group-hover:scale-105 transition-transform">
+                  <Shirt className="w-5 h-5" />
+                </div>
+                <div>
+                  <p className="text-sm font-bold text-slate-900 group-hover:text-amber-600 transition-colors leading-tight">Laundry</p>
+                  <p className="text-[11px] text-slate-500">Wash & steam press</p>
+                </div>
+              </button>
+            )}
 
             {/* 5. Maintenance / Report Issue */}
-            <button
-              onClick={() => {
-                triggerHaptic('light');
-                setActiveModal('MAINTENANCE');
-                setSelectedQuickItem('AC Temperature / Cooling Issue');
-              }}
-              className="p-4 rounded-2xl bg-slate-900 hover:bg-slate-800 border border-slate-800/80 text-left space-y-2.5 transition active:scale-95 group shadow-sm"
-            >
-              <div className="w-10 h-10 rounded-xl bg-rose-500/10 text-rose-400 flex items-center justify-center group-hover:scale-105 transition-transform">
-                <Wrench className="w-5 h-5" />
-              </div>
-              <div>
-                <p className="text-sm font-bold text-white leading-tight">Maintenance</p>
-                <p className="text-[11px] text-slate-400">AC, TV, Wi-Fi, plumbing</p>
-              </div>
-            </button>
+            {servicesConfig.maintenance !== false && (
+              <button
+                onClick={() => {
+                  triggerHaptic('light');
+                  setActiveModal('MAINTENANCE');
+                  setSelectedQuickItem('AC Temperature / Cooling Issue');
+                }}
+                className="p-4 rounded-2xl bg-white hover:bg-slate-50/80 border border-slate-200/90 text-left space-y-2.5 transition-all shadow-sm hover:shadow active:scale-95 group"
+              >
+                <div className="w-10 h-10 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center group-hover:scale-105 transition-transform">
+                  <Wrench className="w-5 h-5" />
+                </div>
+                <div>
+                  <p className="text-sm font-bold text-slate-900 group-hover:text-amber-600 transition-colors leading-tight">Maintenance</p>
+                  <p className="text-[11px] text-slate-500">AC, TV, Wi-Fi, plumbing</p>
+                </div>
+              </button>
+            )}
 
             {/* 6. Wake-up Call */}
-            <button
-              onClick={() => {
-                triggerHaptic('light');
-                setActiveModal('WAKE_UP_CALL');
-                setSelectedQuickItem('Wake-up call tomorrow at 7:00 AM');
-              }}
-              className="p-4 rounded-2xl bg-slate-900 hover:bg-slate-800 border border-slate-800/80 text-left space-y-2.5 transition active:scale-95 group shadow-sm"
-            >
-              <div className="w-10 h-10 rounded-xl bg-yellow-500/10 text-yellow-400 flex items-center justify-center group-hover:scale-105 transition-transform">
-                <AlarmClock className="w-5 h-5" />
-              </div>
-              <div>
-                <p className="text-sm font-bold text-white leading-tight">Wake-up Call</p>
-                <p className="text-[11px] text-slate-400">Morning wake-up reminder</p>
-              </div>
-            </button>
+            {servicesConfig.wakeup !== false && (
+              <button
+                onClick={() => {
+                  triggerHaptic('light');
+                  setActiveModal('WAKE_UP_CALL');
+                  setSelectedQuickItem('Wake-up call tomorrow at 7:00 AM');
+                }}
+                className="p-4 rounded-2xl bg-white hover:bg-slate-50/80 border border-slate-200/90 text-left space-y-2.5 transition-all shadow-sm hover:shadow active:scale-95 group"
+              >
+                <div className="w-10 h-10 rounded-xl bg-yellow-50 text-yellow-600 flex items-center justify-center group-hover:scale-105 transition-transform">
+                  <AlarmClock className="w-5 h-5" />
+                </div>
+                <div>
+                  <p className="text-sm font-bold text-slate-900 group-hover:text-amber-600 transition-colors leading-tight">Wake-up Call</p>
+                  <p className="text-[11px] text-slate-500">Morning reminder</p>
+                </div>
+              </button>
+            )}
 
             {/* 7. Taxi / Cab Booking */}
-            <button
-              onClick={() => {
-                triggerHaptic('light');
-                setActiveModal('TAXI');
-                setSelectedQuickItem('Taxi to Airport / Station');
-              }}
-              className="p-4 rounded-2xl bg-slate-900 hover:bg-slate-800 border border-slate-800/80 text-left space-y-2.5 transition active:scale-95 group shadow-sm"
-            >
-              <div className="w-10 h-10 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center group-hover:scale-105 transition-transform">
-                <Car className="w-5 h-5" />
-              </div>
-              <div>
-                <p className="text-sm font-bold text-white leading-tight">Taxi / Cab</p>
-                <p className="text-[11px] text-slate-400">Airport & local travel</p>
-              </div>
-            </button>
+            {servicesConfig.taxi !== false && (
+              <button
+                onClick={() => {
+                  triggerHaptic('light');
+                  setActiveModal('TAXI');
+                  setSelectedQuickItem('Taxi to Airport / Station');
+                }}
+                className="p-4 rounded-2xl bg-white hover:bg-slate-50/80 border border-slate-200/90 text-left space-y-2.5 transition-all shadow-sm hover:shadow active:scale-95 group"
+              >
+                <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center group-hover:scale-105 transition-transform">
+                  <Car className="w-5 h-5" />
+                </div>
+                <div>
+                  <p className="text-sm font-bold text-slate-900 group-hover:text-amber-600 transition-colors leading-tight">Taxi / Cab</p>
+                  <p className="text-[11px] text-slate-500">Airport & local travel</p>
+                </div>
+              </button>
+            )}
 
-            {/* 8. Room Service Assistance */}
-            <button
-              onClick={() => {
-                triggerHaptic('light');
-                setActiveModal('ROOM_SERVICE');
-                setSelectedQuickItem('General In-Room Staff Assistance');
-              }}
-              className="p-4 rounded-2xl bg-slate-900 hover:bg-slate-800 border border-slate-800/80 text-left space-y-2.5 transition active:scale-95 group shadow-sm"
-            >
-              <div className="w-10 h-10 rounded-xl bg-blue-500/10 text-blue-400 flex items-center justify-center group-hover:scale-105 transition-transform">
-                <BellRing className="w-5 h-5" />
-              </div>
-              <div>
-                <p className="text-sm font-bold text-white leading-tight">Room Service</p>
-                <p className="text-[11px] text-slate-400">Call room attendant</p>
-              </div>
-            </button>
+            {/* 8. Room Service Attendant */}
+            {servicesConfig.room_service !== false && (
+              <button
+                onClick={() => {
+                  triggerHaptic('light');
+                  setActiveModal('ROOM_SERVICE');
+                  setSelectedQuickItem('General In-Room Staff Assistance');
+                }}
+                className="p-4 rounded-2xl bg-white hover:bg-slate-50/80 border border-slate-200/90 text-left space-y-2.5 transition-all shadow-sm hover:shadow active:scale-95 group"
+              >
+                <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center group-hover:scale-105 transition-transform">
+                  <BellRing className="w-5 h-5" />
+                </div>
+                <div>
+                  <p className="text-sm font-bold text-slate-900 group-hover:text-amber-600 transition-colors leading-tight">Room Service</p>
+                  <p className="text-[11px] text-slate-500">Call room attendant</p>
+                </div>
+              </button>
+            )}
           </div>
         </div>
 
         {/* Quick Contact & Feedback Row */}
-        <div className="grid grid-cols-2 gap-3 pt-2">
+        <div className="grid grid-cols-2 gap-3 pt-1">
           {/* Contact Reception */}
-          <a
-            href={`tel:${hotel?.mobile || '+919999999999'}`}
-            className="flex items-center gap-3 p-3.5 rounded-2xl bg-slate-900 hover:bg-slate-800 border border-slate-800 text-left transition active:scale-95"
-          >
-            <div className="w-9 h-9 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center shrink-0">
-              <PhoneCall className="w-4 h-4" />
-            </div>
-            <div className="min-w-0">
-              <p className="text-xs font-bold text-white truncate">Reception</p>
-              <p className="text-[10px] text-slate-400">Dial Front Desk</p>
-            </div>
-          </a>
+          {servicesConfig.reception !== false && (
+            <a
+              href={frontDeskPhone ? `tel:${frontDeskPhone}` : '#'}
+              onClick={(e) => {
+                if (!frontDeskPhone) {
+                  e.preventDefault();
+                  alert('Front desk phone number has not been set yet.');
+                }
+              }}
+              className="flex items-center gap-3 p-3.5 rounded-2xl bg-white hover:bg-slate-50 border border-slate-200/90 text-left transition active:scale-95 shadow-sm"
+            >
+              <div className="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
+                <PhoneCall className="w-4 h-4" />
+              </div>
+              <div className="min-w-0">
+                <p className="text-xs font-bold text-slate-900 truncate">Reception</p>
+                <p className="text-[10px] text-slate-500 truncate">
+                  {frontDeskPhone ? 'Dial Front Desk' : 'Call Front Desk'}
+                </p>
+              </div>
+            </a>
+          )}
 
           {/* Feedback */}
-          <button
-            onClick={() => {
-              triggerHaptic('light');
-              setActiveModal('FEEDBACK');
-            }}
-            className="flex items-center gap-3 p-3.5 rounded-2xl bg-slate-900 hover:bg-slate-800 border border-slate-800 text-left transition active:scale-95"
-          >
-            <div className="w-9 h-9 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center shrink-0">
-              <Star className="w-4 h-4" />
-            </div>
-            <div className="min-w-0">
-              <p className="text-xs font-bold text-white truncate">Feedback</p>
-              <p className="text-[10px] text-slate-400">Rate your stay</p>
-            </div>
-          </button>
+          {servicesConfig.feedback !== false && (
+            <button
+              onClick={() => {
+                triggerHaptic('light');
+                setActiveModal('FEEDBACK');
+              }}
+              className="flex items-center gap-3 p-3.5 rounded-2xl bg-white hover:bg-slate-50 border border-slate-200/90 text-left transition active:scale-95 shadow-sm"
+            >
+              <div className="w-9 h-9 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center shrink-0">
+                <Star className="w-4 h-4" />
+              </div>
+              <div className="min-w-0">
+                <p className="text-xs font-bold text-slate-900 truncate">Feedback</p>
+                <p className="text-[10px] text-slate-500">Rate your stay</p>
+              </div>
+            </button>
+          )}
         </div>
 
         {/* Room Info Card */}
-        <div className="p-4 rounded-2xl bg-slate-900/60 border border-slate-800 text-xs space-y-2 text-slate-400">
+        <div className="p-4 rounded-2xl bg-white border border-slate-200/90 text-xs space-y-2.5 text-slate-600 shadow-sm">
           <div className="flex items-center justify-between">
-            <span className="font-medium">Room Type & Bed</span>
-            <span className="text-white font-bold">{room.room_type} • {room.bed_type}</span>
+            <span className="font-medium text-slate-500">Room Type & Bed</span>
+            <span className="text-slate-900 font-bold">{room.room_type} • {room.bed_type}</span>
           </div>
           <div className="flex items-center justify-between">
-            <span className="font-medium">Max Occupancy</span>
-            <span className="text-white font-bold">{room.capacity} Guests</span>
+            <span className="font-medium text-slate-500">Max Occupancy</span>
+            <span className="text-slate-900 font-bold">{room.capacity} Guests</span>
           </div>
           <div className="flex items-center justify-between">
-            <span className="font-medium">Included Amenities</span>
-            <span className="text-slate-300 font-medium">Wi-Fi, AC, Smart TV</span>
+            <span className="font-medium text-slate-500">Included Amenities</span>
+            <span className="text-slate-700 font-medium truncate max-w-[200px]">
+              {room.amenities?.join(', ') || 'Wi-Fi, AC, Smart TV, Hot Water'}
+            </span>
           </div>
         </div>
       </div>
 
-      {/* SERVICE REQUEST MODAL */}
+      {/* SERVICE REQUEST MODAL (White Theme) */}
       {activeModal && activeModal !== 'BILL' && (
-        <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4 animate-in fade-in">
-          <div className="bg-slate-900 border border-slate-800 rounded-t-3xl sm:rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4 animate-in fade-in">
+          <div className="bg-white border border-slate-200 rounded-t-3xl sm:rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto text-slate-900">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <div className="flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-amber-400" />
-                <h3 className="text-base font-black text-white capitalize">
+                <span className="w-2.5 h-2.5 rounded-full bg-amber-500" />
+                <h3 className="text-base font-black text-slate-900 capitalize">
                   {activeModal === 'FEEDBACK' ? 'Guest Stay Feedback' : `${activeModal.replace(/_/g, ' ')} Request`}
                 </h3>
               </div>
               <button
                 onClick={() => setActiveModal(null)}
-                className="p-1 rounded-lg text-slate-400 hover:text-white"
+                className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -486,7 +525,7 @@ export function RoomServiceLandingPage() {
               {activeModal === 'FEEDBACK' ? (
                 /* Rating Stars */
                 <div className="text-center py-2 space-y-2">
-                  <p className="text-xs text-slate-300 font-medium">How was your stay in Room {room.room_number}?</p>
+                  <p className="text-xs text-slate-600 font-medium">How was your stay in Room {room.room_number}?</p>
                   <div className="flex items-center justify-center gap-2">
                     {[1, 2, 3, 4, 5].map((star) => (
                       <button
@@ -498,8 +537,8 @@ export function RoomServiceLandingPage() {
                         <Star
                           className={`w-7 h-7 ${
                             star <= feedbackRating
-                              ? 'text-amber-400 fill-amber-400'
-                              : 'text-slate-700'
+                              ? 'text-amber-500 fill-amber-400'
+                              : 'text-slate-200 fill-slate-100'
                           }`}
                         />
                       </button>
@@ -509,11 +548,11 @@ export function RoomServiceLandingPage() {
               ) : (
                 /* Quick Choice Options */
                 <div className="space-y-1.5">
-                  <label className="block text-xs font-bold text-slate-300">Quick Selection</label>
+                  <label className="block text-xs font-bold text-slate-700">Quick Selection</label>
                   <select
                     value={selectedQuickItem}
                     onChange={(e) => setSelectedQuickItem(e.target.value)}
-                    className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:border-amber-400 outline-none"
+                    className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 focus:bg-white focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 outline-none"
                   >
                     {activeModal === 'WATER' && (
                       <>
@@ -581,7 +620,7 @@ export function RoomServiceLandingPage() {
 
               {/* Special Instructions / Notes */}
               <div className="space-y-1.5">
-                <label className="block text-xs font-bold text-slate-300">
+                <label className="block text-xs font-bold text-slate-700">
                   {activeModal === 'FEEDBACK' ? 'Comments / Suggestions' : 'Additional Notes (Optional)'}
                 </label>
                 <textarea
@@ -593,30 +632,30 @@ export function RoomServiceLandingPage() {
                       ? 'Tell us what you loved or how we can improve...'
                       : 'e.g. Please ring bell twice, deliver around 4 PM...'
                   }
-                  className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:border-amber-400 outline-none resize-none"
+                  className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 focus:bg-white focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 outline-none resize-none"
                 />
               </div>
 
               {/* Guest Details */}
               <div className="grid grid-cols-2 gap-2">
                 <div>
-                  <label className="block text-[11px] font-medium text-slate-400 mb-1">Your Name</label>
+                  <label className="block text-[11px] font-semibold text-slate-600 mb-1">Your Name</label>
                   <input
                     type="text"
                     value={guestName}
                     onChange={(e) => setGuestName(e.target.value)}
                     placeholder="Guest Name"
-                    className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-1.5 text-xs text-white"
+                    className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 focus:bg-white focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 outline-none"
                   />
                 </div>
                 <div>
-                  <label className="block text-[11px] font-medium text-slate-400 mb-1">Mobile (Optional)</label>
+                  <label className="block text-[11px] font-semibold text-slate-600 mb-1">Mobile (Optional)</label>
                   <input
                     type="tel"
                     value={guestMobile}
                     onChange={(e) => setGuestMobile(e.target.value)}
                     placeholder="+91..."
-                    className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-1.5 text-xs text-white"
+                    className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 focus:bg-white focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 outline-none"
                   />
                 </div>
               </div>
@@ -625,14 +664,14 @@ export function RoomServiceLandingPage() {
                 <button
                   type="button"
                   onClick={() => setActiveModal(null)}
-                  className="px-4 py-2 text-xs font-semibold text-slate-400 hover:text-white"
+                  className="px-4 py-2 text-xs font-semibold text-slate-500 hover:text-slate-800"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="px-5 py-2 bg-amber-400 hover:bg-amber-500 text-slate-950 font-bold text-xs rounded-xl flex items-center gap-1.5 shadow-md active:scale-95 disabled:opacity-50"
+                  className="px-5 py-2.5 bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs rounded-xl flex items-center gap-1.5 shadow-md active:scale-95 disabled:opacity-50 transition"
                 >
                   {submitting ? (
                     <Loader2 className="w-3.5 h-3.5 animate-spin" />
@@ -647,43 +686,45 @@ export function RoomServiceLandingPage() {
         </div>
       )}
 
-      {/* ROOM BILL MODAL */}
+      {/* ROOM BILL MODAL (White Theme) */}
       {activeModal === 'BILL' && (
-        <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4 animate-in fade-in">
-          <div className="bg-slate-900 border border-slate-800 rounded-t-3xl sm:rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-4 max-h-[85vh] overflow-y-auto">
-            <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4 animate-in fade-in">
+          <div className="bg-white border border-slate-200 rounded-t-3xl sm:rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-4 max-h-[85vh] overflow-y-auto text-slate-900">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <div className="flex items-center gap-2">
-                <Receipt className="w-4 h-4 text-amber-400" />
-                <h3 className="text-base font-black text-white">
+                <div className="w-7 h-7 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center">
+                  <Receipt className="w-4 h-4" />
+                </div>
+                <h3 className="text-base font-black text-slate-900">
                   Live Bill • Room {room.room_number}
                 </h3>
               </div>
               <button
                 onClick={() => setActiveModal(null)}
-                className="p-1 rounded-lg text-slate-400 hover:text-white"
+                className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
             {billLoading ? (
-              <div className="py-8 flex flex-col items-center justify-center text-slate-400">
-                <Loader2 className="w-6 h-6 animate-spin text-amber-400 mb-2" />
-                <p className="text-xs">Calculating room stay and order charges...</p>
+              <div className="py-8 flex flex-col items-center justify-center text-slate-500">
+                <Loader2 className="w-6 h-6 animate-spin text-amber-500 mb-2" />
+                <p className="text-xs font-medium">Calculating room stay and order charges...</p>
               </div>
             ) : billData ? (
               <div className="space-y-4">
                 {/* Itemized list */}
-                <div className="space-y-2 divide-y divide-slate-800/80">
+                <div className="space-y-2 divide-y divide-slate-100">
                   {billData.items.map((item) => (
                     <div key={item.id} className="pt-2 flex items-center justify-between text-xs">
                       <div>
-                        <p className="font-bold text-white">{item.title}</p>
+                        <p className="font-bold text-slate-900">{item.title}</p>
                         {item.details && (
                           <p className="text-[10px] text-slate-400">{item.details}</p>
                         )}
                       </div>
-                      <span className="font-mono font-bold text-slate-200">
+                      <span className="font-mono font-bold text-slate-800">
                         {hotel?.currency_symbol || '₹'}{item.amount.toLocaleString()}
                       </span>
                     </div>
@@ -691,28 +732,28 @@ export function RoomServiceLandingPage() {
                 </div>
 
                 {/* Bill Breakdown */}
-                <div className="p-3.5 rounded-2xl bg-slate-950 border border-slate-800 space-y-1.5 text-xs">
-                  <div className="flex justify-between text-slate-400">
+                <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-2 text-xs">
+                  <div className="flex justify-between text-slate-600">
                     <span>Subtotal</span>
-                    <span className="font-mono text-white">
+                    <span className="font-mono font-semibold text-slate-800">
                       {hotel?.currency_symbol || '₹'}{billData.subtotal.toLocaleString()}
                     </span>
                   </div>
-                  <div className="flex justify-between text-slate-400">
+                  <div className="flex justify-between text-slate-600">
                     <span>Taxes & GST (12%)</span>
-                    <span className="font-mono text-white">
+                    <span className="font-mono font-semibold text-slate-800">
                       {hotel?.currency_symbol || '₹'}{billData.tax_amount.toLocaleString()}
                     </span>
                   </div>
-                  <div className="pt-2 border-t border-slate-800 flex justify-between text-sm font-black text-white">
+                  <div className="pt-2 border-t border-slate-200 flex justify-between text-sm font-black text-slate-900">
                     <span>Total Amount Payable</span>
-                    <span className="font-mono text-amber-400">
+                    <span className="font-mono text-amber-600">
                       {hotel?.currency_symbol || '₹'}{billData.grand_total.toLocaleString()}
                     </span>
                   </div>
                 </div>
 
-                <p className="text-[11px] text-slate-500 text-center">
+                <p className="text-[11px] text-slate-400 text-center leading-relaxed">
                   Room charges and in-room dining orders can be settled at the reception during check-out.
                 </p>
               </div>

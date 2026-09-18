@@ -147,6 +147,23 @@ export function CartDrawer(props: Props) {
 
               {canOrder ? (
                 <div className="space-y-4">
+                  {/* Hotel Room Delivery Banner */}
+                  {(mode === "room" || (table?.table_number && /^room/i.test(table.table_number.trim()))) && (
+                    <div className="flex items-center gap-3 rounded-2xl bg-amber-500/10 border border-amber-500/20 p-3.5 text-amber-900 dark:text-amber-200">
+                      <div className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-amber-500/20 text-lg font-bold">
+                        🏨
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <div className="text-[11px] font-bold uppercase tracking-wider text-amber-700 dark:text-amber-300">
+                          In-Room Dining
+                        </div>
+                        <div className="text-sm font-black">
+                          Delivering to {table?.table_number?.replace(/^room\s*/i, 'Room ') || 'your Room'}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
                   {/* Table Selection for Direct visits when tables exist */}
                   {mode === "direct" && availableTables.length > 0 && (
                     <div className="rounded-2xl border border-border/80 bg-secondary/40 p-3.5 space-y-3">

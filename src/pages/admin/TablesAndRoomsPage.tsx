@@ -35,6 +35,12 @@ import {
   Share2,
   ShieldCheck,
   Flame,
+  Upload,
+  Image as ImageIcon,
+  ToggleLeft,
+  ToggleRight,
+  PhoneCall,
+  Loader2,
 } from 'lucide-react';
 import { QRCodeCanvas } from 'qrcode.react';
 import CrudPage from '@/components/admin/CrudPage';
@@ -46,8 +52,12 @@ import {
   deleteHotelRoom,
   generateRoomQRToken,
   fetchRoomBill,
+  uploadRoomPhoto,
+  getHotelServicesConfig,
+  saveHotelServicesConfig,
 } from '@/lib/hotelService';
-import type { HotelRoom, RoomType, BedType, RoomStatus, RoomBill } from '@/types/hotel';
+import type { HotelRoom, RoomType, BedType, RoomStatus, RoomBill, HotelServicesConfig } from '@/types/hotel';
+import { DEFAULT_HOTEL_SERVICES_CONFIG } from '@/types/hotel';
 import { triggerHaptic } from '@/lib/haptics';
 import { copyTextToClipboard, downloadImageFile, printIframeHtml } from '@/lib/fileExport';
 
@@ -150,6 +160,16 @@ export default function TablesAndRoomsPage() {
   const [roomBill, setRoomBill] = useState<RoomBill | null>(null);
   const [billLoading, setBillLoading] = useState(false);
 
+  // Room Services Configuration State
+  const [servicesModalOpen, setServicesModalOpen] = useState(false);
+  const [servicesConfig, setServicesConfig] = useState<HotelServicesConfig>(DEFAULT_HOTEL_SERVICES_CONFIG);
+  const [savingServices, setSavingServices] = useState(false);
+  const [servicesFeedback, setServicesFeedback] = useState<string | null>(null);
+
+  // Photo Upload State
+  const [uploadingPhoto, setUploadingPhoto] = useState(false);
+  const photoInputRef = useRef<HTMLInputElement>(null);
+
   // Form State
   const [formData, setFormData] = useState<Partial<HotelRoom>>({
     room_number: '',
@@ -173,6 +193,48 @@ export default function TablesAndRoomsPage() {
   const qrCanvasRef = useRef<HTMLDivElement>(null);
   const [copiedUrl, setCopiedUrl] = useState(false);
 
+  // Handle Photo Select & Upload
+  const handlePhotoSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !restaurant?.id) return;
+
+    setUploadingPhoto(true);
+    triggerHaptic('light');
+
+    try {
+      const url = await uploadRoomPhoto(file, restaurant.id);
+      setFormData((prev) => ({ ...prev, image_url: url }));
+      triggerHaptic('success');
+    } catch (err: any) {
+      alert(`Could not upload photo: ${err.message || err}`);
+    } finally {
+      setUploadingPhoto(false);
+      if (photoInputRef.current) photoInputRef.current.value = '';
+    }
+  };
+
+  // Handle Save Services Configuration
+  const handleSaveServicesConfig = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!restaurant?.id) return;
+    setSavingServices(true);
+    triggerHaptic('medium');
+
+    try {
+      await saveHotelServicesConfig(restaurant.id, servicesConfig);
+      setServicesFeedback('Room Services configuration saved! Live on Room QR portal.');
+      triggerHaptic('success');
+      setTimeout(() => {
+        setServicesFeedback(null);
+        setServicesModalOpen(false);
+      }, 1500);
+    } catch (err) {
+      alert('Could not save configuration');
+    } finally {
+      setSavingServices(false);
+    }
+  };
+
   // Load Rooms
   const loadRooms = async () => {
     if (!restaurant?.id) return;
@@ -190,6 +252,9 @@ export default function TablesAndRoomsPage() {
   useEffect(() => {
     if (activeTab === 'rooms') {
       loadRooms();
+    }
+    if (restaurant?.id) {
+      setServicesConfig(getHotelServicesConfig(restaurant.id));
     }
   }, [restaurant?.id, activeTab]);
 
@@ -728,6 +793,20 @@ export default function TablesAndRoomsPage() {
 
               <button
                 type="button"
+                onClick={() => {
+                  triggerHaptic('light');
+                  setServicesModalOpen(true);
+                }}
+                className="flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700 text-xs sm:text-sm font-bold transition native-press"
+                title="Configure services shown on Room QR"
+              >
+                <SlidersHorizontal className="w-4 h-4 text-theme-primary" />
+                <span className="hidden sm:inline">Room Services</span>
+                <span className="sm:hidden">Services</span>
+              </button>
+
+              <button
+                type="button"
                 onClick={handleOpenAddModal}
                 className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-theme-gradient text-white text-xs sm:text-sm font-bold shadow-theme hover:opacity-95 transition native-press"
               >
@@ -1082,15 +1161,69 @@ export default function TablesAndRoomsPage() {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">Room Photo URL</label>
-                  <input
-                    type="url"
-                    placeholder="https://images.unsplash.com/..."
-                    value={formData.image_url || ''}
-                    onChange={(e) => setFormData({ ...formData, image_url: e.target.value })}
-                    className="w-full px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-xs font-medium focus:bg-white focus:outline-hidden truncate"
-                  />
+                  <label className="block text-xs font-bold text-slate-700 mb-1">Room Photo</label>
+                  <div className="flex items-center gap-2">
+                    {formData.image_url ? (
+                      <div className="relative w-14 h-10 rounded-xl overflow-hidden border border-slate-200 shrink-0 bg-slate-100 shadow-2xs">
+                        <img
+                          src={formData.image_url}
+                          alt="Room Preview"
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                    ) : (
+                      <div className="w-14 h-10 rounded-xl border border-dashed border-slate-300 bg-slate-50 flex items-center justify-center text-slate-400 shrink-0">
+                        <ImageIcon className="w-4 h-4" />
+                      </div>
+                    )}
+                    <input
+                      type="file"
+                      ref={photoInputRef}
+                      accept="image/*"
+                      onChange={handlePhotoSelect}
+                      className="hidden"
+                    />
+                    <button
+                      type="button"
+                      disabled={uploadingPhoto}
+                      onClick={() => photoInputRef.current?.click()}
+                      className="flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-xs font-bold text-slate-700 transition native-press"
+                    >
+                      {uploadingPhoto ? (
+                        <>
+                          <Loader2 className="w-3.5 h-3.5 animate-spin text-theme-primary" />
+                          <span>Uploading...</span>
+                        </>
+                      ) : (
+                        <>
+                          <Upload className="w-3.5 h-3.5 text-theme-primary" />
+                          <span>{formData.image_url ? 'Change Photo' : 'Upload Photo'}</span>
+                        </>
+                      )}
+                    </button>
+                    {formData.image_url && (
+                      <button
+                        type="button"
+                        onClick={() => setFormData({ ...formData, image_url: '' })}
+                        className="p-2 text-rose-500 hover:bg-rose-50 rounded-xl border border-rose-200 transition native-press"
+                        title="Remove photo"
+                      >
+                        <X className="w-3.5 h-3.5" />
+                      </button>
+                    )}
+                  </div>
                 </div>
+              </div>
+
+              {/* Optional Manual URL Input */}
+              <div className="space-y-1">
+                <input
+                  type="url"
+                  placeholder="Or paste external image URL (https://images.unsplash.com/...)"
+                  value={formData.image_url || ''}
+                  onChange={(e) => setFormData({ ...formData, image_url: e.target.value })}
+                  className="w-full px-3.5 py-1.5 rounded-xl bg-slate-50 border border-slate-200 text-xs font-medium focus:bg-white focus:border-theme-primary focus:outline-hidden truncate"
+                />
               </div>
 
               {/* Amenities Selector */}
@@ -1372,6 +1505,131 @@ export default function TablesAndRoomsPage() {
                 <span>Print Invoice</span>
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* ========================================================================= */}
+      {/* 4. HOTEL ROOM SERVICES CONFIGURATION MODAL                                */}
+      {/* ========================================================================= */}
+      {servicesModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-backdrop">
+          <div className="bg-white w-full max-w-lg rounded-3xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col max-h-[88vh] animate-scale-in">
+            {/* Header */}
+            <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-xl bg-theme-light text-theme-primary flex items-center justify-center">
+                  <SlidersHorizontal className="w-4 h-4" />
+                </div>
+                <div>
+                  <h3 className="text-base font-bold text-slate-900">Room Services Configuration</h3>
+                  <p className="text-xs text-slate-500">Decide what hospitality services to show on guest QR</p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setServicesModalOpen(false)}
+                className="p-1.5 rounded-full bg-slate-100 text-slate-400 hover:text-slate-700"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Form */}
+            <form onSubmit={handleSaveServicesConfig} className="p-6 overflow-y-auto space-y-4 flex-1">
+              {servicesFeedback && (
+                <div className="p-3 bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs rounded-xl font-bold flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                  <span>{servicesFeedback}</span>
+                </div>
+              )}
+
+              <p className="text-xs text-slate-600 leading-relaxed">
+                Toggle services on or off. Only the enabled services will be visible to guests when they scan the Room QR code.
+              </p>
+
+              {/* Service Switches */}
+              <div className="space-y-2">
+                {[
+                  { key: 'order_food', label: '🍽️ In-Room Food Ordering', desc: 'Order food from digital menu delivered to room' },
+                  { key: 'room_service', label: '🛎️ General Room Service', desc: 'General staff assistance & room supplies' },
+                  { key: 'housekeeping', label: '🧹 Housekeeping & Cleaning', desc: 'Room cleaning, bed making & fresh linens' },
+                  { key: 'water', label: '💧 Extra Mineral Water', desc: 'Packaged drinking water delivery' },
+                  { key: 'laundry', label: '🧺 Laundry & Ironing', desc: 'Clothes laundry, wash & pressing service' },
+                  { key: 'maintenance', label: '🔧 Maintenance & Repairs', desc: 'AC, plumbing, electrical or appliance fixes' },
+                  { key: 'taxi', label: '🚖 Taxi & Cab Booking', desc: 'Front desk cab reservation assistance' },
+                  { key: 'wakeup', label: '⏰ Wake-up Call', desc: 'Scheduled morning wake-up call from desk' },
+                  { key: 'view_bill', label: '🧾 Live Room Bill & Folio', desc: 'Allow guest to view stay charges & food orders' },
+                  { key: 'reception', label: '📞 Front Desk Direct Call', desc: 'One-tap phone call directly to reception' },
+                  { key: 'feedback', label: '⭐ Guest Feedback & Rating', desc: 'Collect ratings & comments from guests' },
+                ].map((s) => {
+                  const isEnabled = (servicesConfig as any)[s.key] ?? true;
+                  return (
+                    <div
+                      key={s.key}
+                      onClick={() => {
+                        triggerHaptic('light');
+                        setServicesConfig((prev) => ({
+                          ...prev,
+                          [s.key]: !isEnabled,
+                        }));
+                      }}
+                      className={`flex items-center justify-between p-3 rounded-2xl border transition cursor-pointer select-none ${
+                        isEnabled
+                          ? 'bg-slate-50 border-slate-200/90 hover:border-theme-primary/50'
+                          : 'bg-slate-100/50 border-slate-200/50 opacity-50'
+                      }`}
+                    >
+                      <div className="pr-2">
+                        <p className="text-xs font-bold text-slate-900">{s.label}</p>
+                        <p className="text-[11px] text-slate-500">{s.desc}</p>
+                      </div>
+                      <div className={`shrink-0 transition ${isEnabled ? 'text-emerald-600' : 'text-slate-400'}`}>
+                        {isEnabled ? <ToggleRight className="w-7 h-7" /> : <ToggleLeft className="w-7 h-7" />}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Front Desk Phone Input */}
+              <div className="pt-2 border-t border-slate-100 space-y-1">
+                <label className="block text-xs font-bold text-slate-700">
+                  Front Desk / Reception Direct Phone
+                </label>
+                <div className="relative">
+                  <PhoneCall className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                  <input
+                    type="tel"
+                    placeholder="e.g. +91 98765 43210 or 0 (Intercom)"
+                    value={servicesConfig.reception_phone || ''}
+                    onChange={(e) => setServicesConfig({ ...servicesConfig, reception_phone: e.target.value })}
+                    className="w-full pl-9 pr-3.5 py-2 rounded-xl bg-slate-50 border border-slate-200 text-xs font-medium focus:bg-white focus:outline-hidden"
+                  />
+                </div>
+                <span className="text-[10px] text-slate-400 block">
+                  Guests tapping the "Contact Reception" button will dial this number directly.
+                </span>
+              </div>
+
+              {/* Modal Actions */}
+              <div className="pt-3 border-t border-slate-100 flex items-center justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={() => setServicesModalOpen(false)}
+                  className="px-4 py-2 rounded-xl border border-slate-200 text-slate-600 text-xs font-bold hover:bg-slate-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={savingServices}
+                  className="px-5 py-2 rounded-xl bg-theme-gradient text-white text-xs font-bold shadow-theme hover:opacity-95 transition disabled:opacity-50"
+                >
+                  {savingServices ? 'Saving...' : 'Save Configuration'}
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}

@@ -1,6 +1,7 @@
 // src/lib/hotelService.ts
 import { supabase } from '@/lib/supabase';
-import type { HotelRoom, RoomServiceRequest, RequestStatus, RoomBill, RoomBillItem } from '@/types/hotel';
+import type { HotelRoom, RoomServiceRequest, RequestStatus, RoomBill, RoomBillItem, HotelServicesConfig } from '@/types/hotel';
+import { DEFAULT_HOTEL_SERVICES_CONFIG } from '@/types/hotel';
 
 const LOCAL_ROOMS_KEY = 'dishgaze_hotel_rooms_cache';
 const LOCAL_REQUESTS_KEY = 'dishgaze_room_requests_cache';
@@ -281,8 +282,72 @@ export async function deleteHotelRoom(id: string): Promise<{ error: string | nul
   return { error: null };
 }
 
+const LOCAL_SERVICES_CONFIG_KEY = 'dishgaze_hotel_services_config_';
+
+export function getHotelServicesConfig(restaurantId: string): HotelServicesConfig {
+  try {
+    const raw = localStorage.getItem(`${LOCAL_SERVICES_CONFIG_KEY}${restaurantId}`);
+    if (raw) {
+      return { ...DEFAULT_HOTEL_SERVICES_CONFIG, ...JSON.parse(raw) };
+    }
+  } catch (_) {}
+  return DEFAULT_HOTEL_SERVICES_CONFIG;
+}
+
+export async function saveHotelServicesConfig(restaurantId: string, config: HotelServicesConfig): Promise<void> {
+  try {
+    localStorage.setItem(`${LOCAL_SERVICES_CONFIG_KEY}${restaurantId}`, JSON.stringify(config));
+  } catch (_) {}
+
+  try {
+    await supabase.from('restaurant_settings').update({
+      room_services_config: config,
+    }).eq('restaurant_id', restaurantId);
+  } catch (_) {}
+}
+
+export async function uploadRoomPhoto(file: File, restaurantId: string): Promise<string> {
+  try {
+    const fileExt = file.name.split('.').pop() || 'jpg';
+    const fileName = `room-${restaurantId}-${Date.now()}-${Math.random().toString(36).substring(2, 7)}.${fileExt}`;
+    const filePath = `rooms/${fileName}`;
+
+    const { data: storageData, error: storageErr } = await supabase
+      .storage
+      .from('restaurant-assets')
+      .upload(filePath, file, { upsert: true });
+
+    if (!storageErr && storageData?.path) {
+      const { data: pubUrlData } = supabase.storage.from('restaurant-assets').getPublicUrl(storageData.path);
+      if (pubUrlData?.publicUrl) {
+        return pubUrlData.publicUrl;
+      }
+    }
+  } catch (err) {
+    console.warn('Storage upload fallback to DataURL:', err);
+  }
+
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      if (typeof reader.result === 'string') {
+        resolve(reader.result);
+      } else {
+        reject(new Error('Failed to read image file'));
+      }
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
 // 5. Lookup Room by QR Token
-export async function getRoomByQrToken(qrToken: string): Promise<{ room: HotelRoom | null; restaurant: any | null; error: string | null }> {
+export async function getRoomByQrToken(qrToken: string): Promise<{
+  room: HotelRoom | null;
+  restaurant: any | null;
+  servicesConfig: HotelServicesConfig;
+  error: string | null;
+}> {
   const clean = qrToken.trim();
 
   // 1. Try Supabase
@@ -301,7 +366,12 @@ export async function getRoomByQrToken(qrToken: string): Promise<{ room: HotelRo
         .eq('id', room.restaurant_id)
         .maybeSingle();
 
-      return { room: room as HotelRoom, restaurant, error: null };
+      return {
+        room: room as HotelRoom,
+        restaurant,
+        servicesConfig: getHotelServicesConfig(room.restaurant_id),
+        error: null,
+      };
     }
   } catch (_) {}
 
@@ -319,11 +389,17 @@ export async function getRoomByQrToken(qrToken: string): Promise<{ room: HotelRo
         logo_url: '/logo.png',
         mobile: '+91 98765 43210',
       },
+      servicesConfig: getHotelServicesConfig(matched.restaurant_id),
       error: null,
     };
   }
 
-  return { room: null, restaurant: null, error: 'Invalid or inactive Room QR Code' };
+  return {
+    room: null,
+    restaurant: null,
+    servicesConfig: DEFAULT_HOTEL_SERVICES_CONFIG,
+    error: 'Invalid or inactive Room QR Code',
+  };
 }
 
 // 6. Fetch Room Service Requests

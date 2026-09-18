@@ -175,7 +175,14 @@ export function MenuHeader({
 
           {/* Search Bar & Table / Direct Badge */}
           <div className="mt-4 flex flex-wrap items-center gap-3">
-            {table ? (
+            {mode === "room" || (table?.table_number && /^room/i.test(table.table_number.trim())) ? (
+              <div
+                className="inline-flex items-center gap-2 rounded-xl px-3.5 py-2 text-sm font-bold text-brand-contrast shadow-sm"
+                style={{ backgroundColor: "var(--brand)" }}
+              >
+                <span>🏨 Delivering to {table?.table_number?.replace(/^room\s*/i, 'Room ') || 'Room'}</span>
+              </div>
+            ) : table ? (
               <div
                 className="inline-flex items-center gap-2 rounded-xl px-3.5 py-2 text-sm font-semibold text-brand-contrast shadow-sm"
                 style={{ backgroundColor: "var(--brand)" }}

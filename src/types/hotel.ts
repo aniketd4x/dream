@@ -115,3 +115,34 @@ export interface RoomBill {
   grand_total: number;
   items: RoomBillItem[];
 }
+
+export interface HotelServicesConfig {
+  order_food: boolean;
+  room_service: boolean;
+  housekeeping: boolean;
+  water: boolean;
+  laundry: boolean;
+  maintenance: boolean;
+  taxi: boolean;
+  wakeup: boolean;
+  view_bill: boolean;
+  reception: boolean;
+  feedback: boolean;
+  reception_phone?: string;
+}
+
+export const DEFAULT_HOTEL_SERVICES_CONFIG: HotelServicesConfig = {
+  order_food: true,
+  room_service: true,
+  housekeeping: true,
+  water: true,
+  laundry: true,
+  maintenance: true,
+  taxi: true,
+  wakeup: true,
+  view_bill: true,
+  reception: true,
+  feedback: true,
+  reception_phone: '',
+};
+

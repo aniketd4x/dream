@@ -88,9 +88,18 @@ export default function AdminLayout({ active, onNavigate, children }: AdminLayou
   const [loading, setLoading] = useState(true);
   const [soundMuted, setSoundMuted] = useState(false);
   const [orderToast, setOrderToast] = useState<{ id: string; order_number: string; grand_total: number } | null>(null);
+  const [pendingRoomRequestsCount, setPendingRoomRequestsCount] = useState<number>(0);
+  const [roomRequestToast, setRoomRequestToast] = useState<{
+    id: string;
+    room_number: string;
+    request_type: string;
+    description?: string;
+  } | null>(null);
   const lastOrderTimeRef = useRef<string | null>(null);
   const acceptedOrderIdsRef = useRef<Set<string>>(new Set());
+  const acceptedRoomRequestIdsRef = useRef<Set<string>>(new Set());
   const activeToastOrderIdRef = useRef<string | null>(null);
+  const activeToastRoomReqIdRef = useRef<string | null>(null);
 
   // Helper to mark an order as accepted locally, clear matching toast, and stop ringing
   const markOrderAccepted = (orderId: string) => {
@@ -110,10 +119,32 @@ export default function AdminLayout({ active, onNavigate, children }: AdminLayou
     });
 
     setPendingCount((prev) => Math.max(0, prev - 1));
-    stopOrderRinging();
+    if (pendingRoomRequestsCount === 0) {
+      stopOrderRinging();
+    }
   };
 
-  // Listen for global custom events dispatched when staff accepts an order anywhere in the app
+  const markRoomRequestAccepted = (reqId: string) => {
+    const idStr = String(reqId);
+    console.log('✅ Local room request acceptance recorded:', idStr);
+    acceptedRoomRequestIdsRef.current.add(idStr);
+
+    if (activeToastRoomReqIdRef.current === idStr) {
+      activeToastRoomReqIdRef.current = null;
+    }
+
+    setRoomRequestToast((prev) => {
+      if (prev && String(prev.id) === idStr) return null;
+      return prev;
+    });
+
+    setPendingRoomRequestsCount((prev) => Math.max(0, prev - 1));
+    if (pendingCount === 0) {
+      stopOrderRinging();
+    }
+  };
+
+  // Listen for global custom events dispatched when staff accepts an order or room request anywhere in the app
   useEffect(() => {
     const handleOrderAcceptedEvent = (e: Event) => {
       const detail = (e as CustomEvent).detail;
@@ -122,14 +153,25 @@ export default function AdminLayout({ active, onNavigate, children }: AdminLayou
       }
     };
 
+    const handleRoomAcceptedEvent = (e: Event) => {
+      const detail = (e as CustomEvent).detail;
+      if (detail?.id) {
+        markRoomRequestAccepted(String(detail.id));
+      }
+    };
+
     window.addEventListener('order_accepted', handleOrderAcceptedEvent);
     window.addEventListener('order_status_updated', handleOrderAcceptedEvent);
+    window.addEventListener('room_request_accepted', handleRoomAcceptedEvent);
+    window.addEventListener('room_request_status_updated', handleRoomAcceptedEvent);
 
     return () => {
       window.removeEventListener('order_accepted', handleOrderAcceptedEvent);
       window.removeEventListener('order_status_updated', handleOrderAcceptedEvent);
+      window.removeEventListener('room_request_accepted', handleRoomAcceptedEvent);
+      window.removeEventListener('room_request_status_updated', handleRoomAcceptedEvent);
     };
-  }, []);
+  }, [pendingCount, pendingRoomRequestsCount]);
 
   // Global Realtime Orders Listener + 2.5-second Failsafe Polling
   useEffect(() => {
@@ -243,8 +285,67 @@ export default function AdminLayout({ active, onNavigate, children }: AdminLayou
         } else {
           // No unaccepted pending orders left - stop ringing!
           activeToastOrderIdRef.current = null;
-          stopOrderRinging();
           setOrderToast(null);
+        }
+
+        // Check Room Service Requests (status: NEW)
+        let unacceptedRoomReqs: any[] = [];
+        try {
+          const { data: reqData } = await supabase
+            .from('room_service_requests')
+            .select('id, room_number, request_type, description, status, hotel_rooms(room_number)')
+            .eq('restaurant_id', restaurant.id)
+            .eq('status', 'NEW')
+            .order('created_at', { ascending: false });
+
+          if (reqData && reqData.length > 0) {
+            unacceptedRoomReqs = reqData.map((d: any) => ({
+              ...d,
+              room_number: d.hotel_rooms?.room_number || d.room_number || 'Room',
+            }));
+          } else {
+            const rawLocal = localStorage.getItem('dishgaze_room_requests_cache');
+            if (rawLocal) {
+              const allReqs = JSON.parse(rawLocal);
+              unacceptedRoomReqs = allReqs.filter(
+                (r: any) => r.status === 'NEW' && r.restaurant_id === restaurant.id
+              );
+            }
+          }
+        } catch (_) {}
+
+        const activeRoomReqs = unacceptedRoomReqs.filter(
+          (r) => !acceptedRoomRequestIdsRef.current.has(String(r.id))
+        );
+
+        setPendingRoomRequestsCount(activeRoomReqs.length);
+
+        if (activeRoomReqs.length > 0) {
+          const latestReq = activeRoomReqs[0];
+          const reqId = String(latestReq.id);
+
+          if (!soundMuted) {
+            startOrderRinging(); // Ring continuously for room service requests!
+          }
+
+          if (activeToastRoomReqIdRef.current !== reqId) {
+            activeToastRoomReqIdRef.current = reqId;
+            setRoomRequestToast({
+              id: reqId,
+              room_number: latestReq.room_number,
+              request_type: latestReq.request_type,
+              description: latestReq.description,
+            });
+            window.dispatchEvent(new CustomEvent('new_room_request_received', { detail: latestReq }));
+          }
+        } else {
+          activeToastRoomReqIdRef.current = null;
+          setRoomRequestToast(null);
+        }
+
+        // Stop ringing only when both orders and room requests are handled
+        if (unacceptedPending.length === 0 && activeRoomReqs.length === 0) {
+          stopOrderRinging();
         }
       } catch (pollErr) {
         console.warn('Smart polling check error:', pollErr);
@@ -288,16 +389,12 @@ export default function AdminLayout({ active, onNavigate, children }: AdminLayou
 
         if (data && data.length > 0) {
           const sub = data[0];
-          const plan = Array.isArray(sub.subscription_plans) && sub.subscription_plans.length > 0 
-            ? sub.subscription_plans[0] 
-            : null;
-          
           const endDate = new Date(sub.end_date);
           const today = new Date();
           const daysRemaining = Math.ceil((endDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
 
           setSubscription({
-            plan_name: plan?.name || 'No Plan',
+            plan_name: (sub.subscription_plans as any)?.name || 'Pro Plan',
             days_remaining: daysRemaining,
             is_expired: daysRemaining < 0,
             is_expiring_soon: daysRemaining <= 7 && daysRemaining >= 0,
@@ -313,13 +410,13 @@ export default function AdminLayout({ active, onNavigate, children }: AdminLayou
     fetchSubscription();
   }, [restaurant]);
 
-  // Navigation Items
+  // Navigation Items (Room Service placed right after Orders)
   const navItems = [
     { key: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { key: 'table:orders', label: 'Orders', icon: ShoppingBag, badge: pendingCount },
+    { key: 'operations:room_service', label: 'Room Service', icon: BellRing, badge: pendingRoomRequestsCount },
     { key: 'reports', label: 'Reports', icon: BarChart3 },
     { key: 'table:dining_tables', label: 'Tables & Rooms', icon: Table2 },
-    { key: 'operations:room_service', label: 'Room Service', icon: BellRing },
     { key: 'table:menu_items', label: 'Menu', icon: UtensilsCrossed },
     { key: 'table:categories', label: 'Categories', icon: FolderTree },
     { key: 'table:restaurant_settings', label: 'Settings', icon: Settings },
@@ -329,7 +426,7 @@ export default function AdminLayout({ active, onNavigate, children }: AdminLayou
   const mobilePrimaryTabs = [
     { key: 'dashboard', label: 'Home', icon: LayoutDashboard },
     { key: 'table:orders', label: 'Orders', icon: ShoppingBag, badge: pendingCount },
-    { key: 'table:menu_items', label: 'Menu', icon: UtensilsCrossed },
+    { key: 'operations:room_service', label: 'Room Service', icon: BellRing, badge: pendingRoomRequestsCount },
     { key: 'table:dining_tables', label: 'Tables & Rooms', icon: Table2 },
   ];
 
@@ -585,6 +682,46 @@ export default function AdminLayout({ active, onNavigate, children }: AdminLayou
                 className="px-3.5 py-2 bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-500 hover:to-green-500 text-white text-xs font-bold rounded-xl transition shrink-0 shadow-md shadow-emerald-500/30 flex items-center gap-1 native-press"
               >
                 Accept
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Global Live Room Service Request Toast Alert Banner */}
+        {roomRequestToast && !orderToast && (
+          <div className="fixed bottom-[calc(5rem+env(safe-area-inset-bottom,0px)+14px)] sm:bottom-28 lg:bottom-8 right-3 sm:right-6 left-3 sm:left-auto z-50 animate-bottom-sheet max-w-sm sm:max-w-md">
+            <div className="bg-slate-950 text-white p-4 rounded-2xl shadow-2xl border border-amber-500/40 flex items-center gap-3.5 backdrop-blur-2xl">
+              <div className="w-11 h-11 rounded-xl bg-amber-500 text-slate-950 flex items-center justify-center shrink-0 shadow-lg font-black">
+                <BellRing className="w-5 h-5 text-white animate-bounce" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center justify-between gap-1">
+                  <span className="text-[10px] uppercase font-black tracking-wider text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded">
+                    🏨 Room Service Request
+                  </span>
+                  <span className="text-xs font-black text-amber-300">
+                    Room {roomRequestToast.room_number}
+                  </span>
+                </div>
+                <h4 className="text-sm font-bold text-slate-100 mt-1 truncate">
+                  {roomRequestToast.request_type}: {roomRequestToast.description || 'Guest assistance'}
+                </h4>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  triggerHaptic('success');
+                  const targetReqId = roomRequestToast?.id;
+                  if (targetReqId) {
+                    markRoomRequestAccepted(targetReqId);
+                  }
+                  stopOrderRinging();
+                  setRoomRequestToast(null);
+                  handleNav('operations:room_service');
+                }}
+                className="px-3.5 py-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 text-xs font-bold rounded-xl transition shrink-0 shadow-md flex items-center gap-1 native-press"
+              >
+                View
               </button>
             </div>
           </div>
