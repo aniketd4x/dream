@@ -179,12 +179,38 @@ export default function RoomServiceStaffPage() {
         .from('orders')
         .select('*')
         .eq('restaurant_id', restaurant.id)
-        .or('order_type.eq.ROOM_SERVICE,room_id.not.is.null')
+        .or('order_type.eq.ROOM_SERVICE,room_id.not.is.null,table_number.ilike.Room%')
         .order('created_at', { ascending: false })
         .limit(50);
 
-      if (data) {
-        setRoomOrders(data);
+      if (data && data.length > 0) {
+        const orderIds = data.map((o: any) => o.id);
+        const { data: itemsData } = await supabase
+          .from('order_items')
+          .select('id, order_id, item_name, quantity, unit_price, total_price, food_type, notes')
+          .in('order_id', orderIds);
+
+        const itemsMap = new Map<string, any[]>();
+        (itemsData || []).forEach((item: any) => {
+          const list = itemsMap.get(item.order_id) || [];
+          list.push(item);
+          itemsMap.set(item.order_id, list);
+        });
+
+        const fullOrders = data.map((order: any) => {
+          const orderItems = itemsMap.get(order.id) || [];
+          const resolvedRoomNumber = order.room_number || (order.table_number ? order.table_number.replace(/^room\s*/i, '').trim() : null);
+          return {
+            ...order,
+            room_number: resolvedRoomNumber,
+            order_items: orderItems,
+            items: orderItems,
+          };
+        });
+
+        setRoomOrders(fullOrders);
+      } else {
+        setRoomOrders([]);
       }
     } catch (err) {
       console.error('Error loading room orders:', err);
@@ -294,13 +320,18 @@ export default function RoomServiceStaffPage() {
   const handlePrintDeliverySlip = (order: any) => {
     triggerHaptic('selection');
     const currency = restaurant?.currency_symbol || restaurant?.currency || '₹';
-    const items = Array.isArray(order.items) ? order.items : [];
+    const items = Array.isArray(order.order_items) && order.order_items.length > 0
+      ? order.order_items
+      : Array.isArray(order.items)
+      ? order.items
+      : [];
+    const roomNum = order.room_number || (order.table_number ? order.table_number.replace(/^room\s*/i, '') : 'DELIVERY');
     const html = `
       <div style="font-family: monospace; width: 280px; margin: 0 auto; padding: 16px; border: 1px dashed #000; text-align: left;">
         <div style="text-align: center; border-bottom: 1px dashed #000; padding-bottom: 8px; margin-bottom: 8px;">
           <h2 style="margin: 0; font-size: 16px;">${restaurant?.name || 'Hotel'}</h2>
           <h3 style="margin: 4px 0 0; font-size: 18px; font-weight: bold;">ROOM SERVICE</h3>
-          <h1 style="margin: 4px 0 0; font-size: 26px; font-weight: 900;">ROOM ${order.room_number || 'DELIVERY'}</h1>
+          <h1 style="margin: 4px 0 0; font-size: 26px; font-weight: 900;">ROOM ${roomNum}</h1>
         </div>
 
         <div style="font-size: 11px; margin-bottom: 8px;">
@@ -313,12 +344,17 @@ export default function RoomServiceStaffPage() {
         <div style="border-top: 1px dashed #000; border-bottom: 1px dashed #000; padding: 8px 0; margin-bottom: 8px;">
           ${items
             .map(
-              (item: any) => `
-            <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 4px;">
-              <span>${item.quantity}x ${item.name}</span>
-              <span>${currency} ${(item.price * item.quantity).toFixed(2)}</span>
-            </div>
-          `
+              (item: any) => {
+                const name = item.item_name || item.name || 'Item';
+                const price = Number(item.unit_price || item.price || 0);
+                const qty = Number(item.quantity || 1);
+                return `
+                  <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 4px;">
+                    <span>${qty}x ${name}</span>
+                    <span>${currency} ${(price * qty).toFixed(2)}</span>
+                  </div>
+                `;
+              }
             )
             .join('')}
         </div>
@@ -665,7 +701,12 @@ export default function RoomServiceStaffPage() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {roomOrders.map((order) => {
                   const currency = restaurant?.currency_symbol || restaurant?.currency || '₹';
-                  const items = Array.isArray(order.items) ? order.items : [];
+                  const items = Array.isArray(order.order_items) && order.order_items.length > 0
+                    ? order.order_items
+                    : Array.isArray(order.items)
+                    ? order.items
+                    : [];
+                  const roomNum = order.room_number || (order.table_number ? order.table_number.replace(/^room\s*/i, '') : 'SERVICE');
 
                   return (
                     <div
@@ -682,7 +723,7 @@ export default function RoomServiceStaffPage() {
                             </span>
                           </div>
                           <div className="inline-block bg-slate-900 text-white font-extrabold text-xs px-2.5 py-0.5 rounded-lg mt-1">
-                            ROOM {order.room_number || 'SERVICE'}
+                            ROOM {roomNum}
                           </div>
                         </div>
 
@@ -707,17 +748,50 @@ export default function RoomServiceStaffPage() {
                       </div>
 
                       {/* Items List */}
-                      <div className="bg-slate-50 p-3 rounded-xl border border-slate-100 space-y-1.5 text-xs">
-                        {items.map((it: any, idx: number) => (
-                          <div key={idx} className="flex justify-between text-slate-700">
-                            <span className="font-semibold">
-                              {it.quantity}x {it.name}
+                      <div className="bg-slate-50 p-3.5 rounded-xl border border-slate-200/80 space-y-2 text-xs">
+                        <div className="flex items-center justify-between pb-1 border-b border-slate-200/60">
+                          <p className="text-[10px] font-black uppercase tracking-wider text-slate-500">
+                            Ordered Items ({items.reduce((s: number, i: any) => s + (Number(i.quantity) || 1), 0)})
+                          </p>
+                          {order.customer_name && (
+                            <span className="text-[10px] font-semibold text-slate-500">
+                              Guest: {order.customer_name}
                             </span>
-                            <span className="font-mono text-slate-500">
-                              {currency} {(it.price * it.quantity).toFixed(2)}
-                            </span>
+                          )}
+                        </div>
+
+                        {items.length > 0 ? (
+                          <div className="space-y-1.5 pt-0.5">
+                            {items.map((it: any, idx: number) => {
+                              const name = it.item_name || it.name || 'Menu Item';
+                              const price = Number(it.unit_price || it.price || 0);
+                              const qty = Number(it.quantity || 1);
+                              return (
+                                <div key={idx} className="flex justify-between items-center text-slate-800">
+                                  <div className="flex items-center gap-2 min-w-0">
+                                    <span className="font-black bg-slate-200 text-slate-900 px-1.5 py-0.5 rounded text-[11px] shrink-0">
+                                      {qty}×
+                                    </span>
+                                    <span className="font-bold truncate text-xs text-slate-900">
+                                      {name}
+                                    </span>
+                                  </div>
+                                  <span className="font-mono font-bold text-slate-700 text-xs shrink-0 pl-2">
+                                    {currency} {(price * qty).toFixed(2)}
+                                  </span>
+                                </div>
+                              );
+                            })}
                           </div>
-                        ))}
+                        ) : (
+                          <p className="text-slate-400 italic text-xs py-1">No items list found</p>
+                        )}
+
+                        {order.notes && (
+                          <div className="pt-2 mt-1 border-t border-slate-200 text-[11px] text-amber-800 bg-amber-50/80 p-2 rounded-lg">
+                            <span className="font-bold">Guest Note:</span> {order.notes}
+                          </div>
+                        )}
                       </div>
 
                       {/* Actions */}

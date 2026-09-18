@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
 import bcrypt from 'bcryptjs';
 import { supabase } from '@/lib/supabase';
-import { applyThemeToDOM } from '@/lib/theme';
+import { applyThemeToDOM, parseThemeConfig } from '@/lib/theme';
 
 interface AuthContextValue {
   user: User | null;
@@ -357,7 +357,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             theme_color: '#d97706',
           };
           setRestaurant(superRest);
-          applyThemeToDOM('#d97706');
+          applyThemeToDOM(parseThemeConfig('#d97706'));
           return;
         }
 
@@ -372,7 +372,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             theme_color: '#0F766E',
           };
           setRestaurant(demoRest);
-          applyThemeToDOM('#0F766E');
+          applyThemeToDOM(parseThemeConfig('#0F766E'));
           return;
         }
         console.error('Error fetching restaurant:', error);
@@ -388,7 +388,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         .maybeSingle();
 
       const themeColor = settingsData?.theme_color || '#f97316';
-      applyThemeToDOM(themeColor);
+      applyThemeToDOM(parseThemeConfig(themeColor));
 
       if (data) {
         setRestaurant({

@@ -1,161 +1,177 @@
 // lib/theme.ts
-import { Flame, Leaf, Sparkles, Moon, Crown } from 'lucide-react';
 
-export interface ThemeTemplate {
-  id: string;
-  name: string;
-  subtitle: string;
-  primaryColor: string;
-  secondaryColor: string;
-  accentBg: string;
-  gradientFrom: string;
-  gradientTo: string;
-  badgeBg: string;
-  badgeText: string;
-  tag: string;
-  tagColor: string;
-  description: string;
-  icon: React.ComponentType<{ className?: string }>;
+export interface ThemeConfig {
+  primaryColor: string;      // Buttons, active pills, CTA highlights
+  secondaryColor: string;    // Gradient end, secondary accents
+  accentColor: string;       // Badges, count chips, tags
+  navbarBg: string;          // Admin sidebar / top navbar background
+  cardBorderColor: string;   // Card border accent line
+  successColor: string;      // Open status, positive states
+  dangerColor: string;       // Closed status, destructive actions
 }
 
-export const THEME_TEMPLATES: ThemeTemplate[] = [
+export const DEFAULT_THEME_CONFIG: ThemeConfig = {
+  primaryColor: '#f97316',
+  secondaryColor: '#ea580c',
+  accentColor: '#fb923c',
+  navbarBg: '#0f172a',
+  cardBorderColor: '#fed7aa',
+  successColor: '#059669',
+  dangerColor: '#e11d48',
+};
+
+// Quick palette presets — coherent full-theme looks
+export interface ThemePalette {
+  id: string;
+  name: string;
+  description: string;
+  preview: string; // primary color used for swatch
+  config: ThemeConfig;
+}
+
+export const THEME_PALETTES: ThemePalette[] = [
   {
-    id: 'sunset-ember',
+    id: 'ember',
     name: 'Sunset Ember',
-    subtitle: 'Warm Bistro & Grill',
-    primaryColor: '#f97316',
-    secondaryColor: '#ea580c',
-    accentBg: 'from-orange-500 to-amber-600',
-    gradientFrom: '#f97316',
-    gradientTo: '#d97706',
-    badgeBg: 'bg-orange-500/15',
-    badgeText: 'text-orange-600',
-    tag: 'Default & Popular',
-    tagColor: 'bg-orange-100 text-orange-800 border-orange-200',
-    description: 'Warm, vibrant, and appetizing. Perfect for cafes, burger joints, and family bistros.',
-    icon: Flame,
+    description: 'Warm & vibrant — bistros, cafes, burger joints',
+    preview: '#f97316',
+    config: {
+      primaryColor: '#f97316',
+      secondaryColor: '#ea580c',
+      accentColor: '#fb923c',
+      navbarBg: '#0f172a',
+      cardBorderColor: '#fed7aa',
+      successColor: '#059669',
+      dangerColor: '#e11d48',
+    },
   },
   {
-    id: 'royal-emerald',
+    id: 'emerald',
     name: 'Royal Emerald',
-    subtitle: 'Fine Dining & Organic',
-    primaryColor: '#059669',
-    secondaryColor: '#047857',
-    accentBg: 'from-emerald-600 to-teal-700',
-    gradientFrom: '#059669',
-    gradientTo: '#0f766e',
-    badgeBg: 'bg-emerald-500/15',
-    badgeText: 'text-emerald-700',
-    tag: 'Fresh & Luxury',
-    tagColor: 'bg-emerald-100 text-emerald-800 border-emerald-200',
-    description: 'Fresh, organic, and prestigious. Ideal for fine dining, vegetarian/vegan spots, and garden lounges.',
-    icon: Leaf,
+    description: 'Fresh & prestigious — fine dining, organic, garden lounges',
+    preview: '#059669',
+    config: {
+      primaryColor: '#059669',
+      secondaryColor: '#047857',
+      accentColor: '#34d399',
+      navbarBg: '#064e3b',
+      cardBorderColor: '#a7f3d0',
+      successColor: '#10b981',
+      dangerColor: '#f43f5e',
+    },
   },
   {
-    id: 'crimson-velvet',
+    id: 'velvet',
     name: 'Crimson Velvet',
-    subtitle: 'Steakhouse & Italian Bar',
-    primaryColor: '#e11d48',
-    secondaryColor: '#be123c',
-    accentBg: 'from-rose-600 to-red-700',
-    gradientFrom: '#e11d48',
-    gradientTo: '#be123c',
-    badgeBg: 'bg-rose-500/15',
-    badgeText: 'text-rose-600',
-    tag: 'Bold & Passionate',
-    tagColor: 'bg-rose-100 text-rose-800 border-rose-200',
-    description: 'Energetic, bold, and modern. Great for steakhouses, pizzerias, Italian kitchens, and cocktail lounges.',
-    icon: Sparkles,
+    description: 'Bold & passionate — steakhouses, Italian, cocktail bars',
+    preview: '#e11d48',
+    config: {
+      primaryColor: '#e11d48',
+      secondaryColor: '#be123c',
+      accentColor: '#fb7185',
+      navbarBg: '#1f0a14',
+      cardBorderColor: '#fecdd3',
+      successColor: '#16a34a',
+      dangerColor: '#dc2626',
+    },
   },
   {
-    id: 'midnight-indigo',
+    id: 'indigo',
     name: 'Midnight Indigo',
-    subtitle: 'Modern Lounge & Fusion',
-    primaryColor: '#6366f1',
-    secondaryColor: '#4f46e5',
-    accentBg: 'from-indigo-600 to-violet-700',
-    gradientFrom: '#6366f1',
-    gradientTo: '#7c3aed',
-    badgeBg: 'bg-indigo-500/15',
-    badgeText: 'text-indigo-600',
-    tag: 'Sleek & Tech',
-    tagColor: 'bg-indigo-100 text-indigo-800 border-indigo-200',
-    description: 'Contemporary, sleek, and high-end. Tailored for sushi & Asian fusion, rooftop restro-bars, and clubs.',
-    icon: Moon,
+    description: 'Sleek & modern — sushi, fusion, rooftop lounges',
+    preview: '#6366f1',
+    config: {
+      primaryColor: '#6366f1',
+      secondaryColor: '#4f46e5',
+      accentColor: '#818cf8',
+      navbarBg: '#1e1b4b',
+      cardBorderColor: '#c7d2fe',
+      successColor: '#059669',
+      dangerColor: '#e11d48',
+    },
   },
   {
-    id: 'golden-saffron',
+    id: 'saffron',
     name: 'Golden Saffron',
-    subtitle: 'Royal Heritage & Authentic',
-    primaryColor: '#d97706',
-    secondaryColor: '#b45309',
-    accentBg: 'from-amber-600 to-yellow-600',
-    gradientFrom: '#d97706',
-    gradientTo: '#ca8a04',
-    badgeBg: 'bg-amber-500/15',
-    badgeText: 'text-amber-700',
-    tag: 'Opulent & Heritage',
-    tagColor: 'bg-amber-100 text-amber-800 border-amber-200',
-    description: 'Royal, opulent, and traditional. Ideal for Indian cuisine, Middle Eastern dining, and artisanal sweets.',
-    icon: Crown,
+    description: 'Royal & heritage — Indian, Middle Eastern, artisan sweets',
+    preview: '#d97706',
+    config: {
+      primaryColor: '#d97706',
+      secondaryColor: '#b45309',
+      accentColor: '#fbbf24',
+      navbarBg: '#1c1208',
+      cardBorderColor: '#fde68a',
+      successColor: '#16a34a',
+      dangerColor: '#dc2626',
+    },
+  },
+  {
+    id: 'slate',
+    name: 'Dark Slate',
+    description: 'Minimal & professional — modern bistros, cloud kitchens',
+    preview: '#475569',
+    config: {
+      primaryColor: '#475569',
+      secondaryColor: '#334155',
+      accentColor: '#94a3b8',
+      navbarBg: '#020617',
+      cardBorderColor: '#cbd5e1',
+      successColor: '#16a34a',
+      dangerColor: '#dc2626',
+    },
   },
 ];
 
-export interface ThemeInfo {
-  primary: string;
-  secondary: string;
-  rgb: string;
-  gradient: string;
-  lightBg: string;
-  borderGlow: string;
+// Parse theme_color from DB — supports both legacy hex string and JSON ThemeConfig
+export function parseThemeConfig(raw: string | null | undefined): ThemeConfig {
+  if (!raw) return { ...DEFAULT_THEME_CONFIG };
+  const trimmed = raw.trim();
+  // Legacy: plain hex color
+  if (trimmed.startsWith('#') || /^[0-9a-fA-F]{6}$/.test(trimmed)) {
+    return { ...DEFAULT_THEME_CONFIG, primaryColor: trimmed.startsWith('#') ? trimmed : `#${trimmed}` };
+  }
+  try {
+    const parsed = JSON.parse(trimmed) as Partial<ThemeConfig>;
+    return { ...DEFAULT_THEME_CONFIG, ...parsed };
+  } catch {
+    return { ...DEFAULT_THEME_CONFIG };
+  }
 }
 
-export function getThemeFromColor(hexColor: string = '#f97316'): ThemeInfo {
-  let hex = hexColor.replace('#', '').trim();
-  if (hex.length === 3) {
-    hex = hex.split('').map((c) => c + c).join('');
-  }
-  if (!/^[0-9A-Fa-f]{6}$/.test(hex)) {
-    hex = 'f97316';
-  }
-
-  const r = parseInt(hex.substring(0, 2), 16);
-  const g = parseInt(hex.substring(2, 4), 16);
-  const b = parseInt(hex.substring(4, 6), 16);
-
-  // Derive harmonious secondary gradient tone
-  const matchedTemplate = THEME_TEMPLATES.find((t) => t.primaryColor.toLowerCase() === `#${hex.toLowerCase()}`);
-  let secondary = matchedTemplate?.secondaryColor;
-
-  if (!secondary) {
-    const secR = Math.max(0, Math.floor(r * 0.85));
-    const secG = Math.max(0, Math.floor(g * 0.85));
-    const secB = Math.max(0, Math.floor(b * 0.85));
-    secondary = `#${secR.toString(16).padStart(2, '0')}${secG.toString(16).padStart(2, '0')}${secB.toString(16).padStart(2, '0')}`;
-  }
-
-  const primary = `#${hex}`;
-  const rgb = `${r}, ${g}, ${b}`;
-
-  return {
-    primary,
-    secondary,
-    rgb,
-    gradient: `linear-gradient(135deg, ${primary}, ${secondary})`,
-    lightBg: `rgba(${rgb}, 0.12)`,
-    borderGlow: `rgba(${rgb}, 0.25)`,
-  };
+// Serialize for DB storage
+export function serializeThemeConfig(config: ThemeConfig): string {
+  return JSON.stringify(config);
 }
 
-export function applyThemeToDOM(themeColor: string = '#f97316') {
+function hexToRgb(hex: string): string {
+  const clean = hex.replace('#', '').trim();
+  const r = parseInt(clean.substring(0, 2), 16) || 0;
+  const g = parseInt(clean.substring(2, 4), 16) || 0;
+  const b = parseInt(clean.substring(4, 6), 16) || 0;
+  return `${r}, ${g}, ${b}`;
+}
+
+export function applyThemeToDOM(config: ThemeConfig) {
   if (typeof document === 'undefined') return;
-  const theme = getThemeFromColor(themeColor);
   const root = document.documentElement;
+  const rgb = hexToRgb(config.primaryColor);
 
-  root.style.setProperty('--theme-primary', theme.primary);
-  root.style.setProperty('--theme-secondary', theme.secondary);
-  root.style.setProperty('--theme-rgb', theme.rgb);
-  root.style.setProperty('--theme-light', `rgba(${theme.rgb}, 0.12)`);
-  root.style.setProperty('--theme-border', `rgba(${theme.rgb}, 0.25)`);
-  root.style.setProperty('--theme-glow', `rgba(${theme.rgb}, 0.35)`);
+  root.style.setProperty('--theme-primary', config.primaryColor);
+  root.style.setProperty('--theme-secondary', config.secondaryColor);
+  root.style.setProperty('--theme-accent', config.accentColor);
+  root.style.setProperty('--theme-navbar-bg', config.navbarBg);
+  root.style.setProperty('--theme-card-border', config.cardBorderColor);
+  root.style.setProperty('--theme-success', config.successColor);
+  root.style.setProperty('--theme-danger', config.dangerColor);
+
+  // Derived utility values from primary
+  root.style.setProperty('--theme-rgb', rgb);
+  root.style.setProperty('--theme-light', `rgba(${rgb}, 0.12)`);
+  root.style.setProperty('--theme-border', `rgba(${rgb}, 0.25)`);
+  root.style.setProperty('--theme-glow', `rgba(${rgb}, 0.35)`);
+}
+
+// Legacy single-color apply for compatibility
+export function applyThemeColorToDOM(hexColor: string = '#f97316') {
+  applyThemeToDOM({ ...DEFAULT_THEME_CONFIG, primaryColor: hexColor });
 }

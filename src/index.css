@@ -61,9 +61,16 @@
   --brand: #16a34a;
   --brand-contrast: #ffffff;
 
-  /* Admin Theme Variables */
+  /* Admin Theme Variables — per-element control */
   --theme-primary: #f97316;
   --theme-secondary: #ea580c;
+  --theme-accent: #fb923c;
+  --theme-navbar-bg: #0f172a;
+  --theme-card-border: #fed7aa;
+  --theme-success: #059669;
+  --theme-danger: #e11d48;
+
+  /* Derived utilities from primary */
   --theme-rgb: 249, 115, 22;
   --theme-light: rgba(249, 115, 22, 0.12);
   --theme-border: rgba(249, 115, 22, 0.25);
@@ -112,6 +119,40 @@ html, body {
 
 .shadow-theme-lg {
   box-shadow: 0 10px 25px -3px var(--theme-glow), 0 4px 10px -2px var(--theme-glow) !important;
+}
+
+/* Accent utilities */
+.bg-theme-accent {
+  background-color: var(--theme-accent) !important;
+}
+.text-theme-accent {
+  color: var(--theme-accent) !important;
+}
+
+/* Navbar / Sidebar utilities */
+.bg-theme-navbar {
+  background-color: var(--theme-navbar-bg) !important;
+}
+
+/* Card border accent */
+.border-theme-card {
+  border-color: var(--theme-card-border) !important;
+}
+
+/* Success utilities */
+.bg-theme-success {
+  background-color: var(--theme-success) !important;
+}
+.text-theme-success {
+  color: var(--theme-success) !important;
+}
+
+/* Danger utilities */
+.bg-theme-danger {
+  background-color: var(--theme-danger) !important;
+}
+.text-theme-danger {
+  color: var(--theme-danger) !important;
 }
 
 /* Tactile Spring Buttons */

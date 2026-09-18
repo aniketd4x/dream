@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+﻿import { useEffect, useState } from 'react';
 import {
   Store,
   Phone,
@@ -28,12 +28,21 @@ import {
   Copy,
   ExternalLink,
   MessageCircle,
+  RotateCcw,
+  Sliders,
 } from 'lucide-react';
 import bcrypt from 'bcryptjs';
 import { QRCodeCanvas } from 'qrcode.react';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/auth';
-import { THEME_TEMPLATES, applyThemeToDOM } from '@/lib/theme';
+import {
+  ThemeConfig,
+  DEFAULT_THEME_CONFIG,
+  THEME_PALETTES,
+  parseThemeConfig,
+  serializeThemeConfig,
+  applyThemeToDOM,
+} from '@/lib/theme';
 import { triggerHaptic } from '@/lib/haptics';
 import { SettingsSkeleton } from '@/components/admin/Skeleton';
 import { RestaurantQRModal } from '@/components/admin/RestaurantQRModal';
@@ -56,11 +65,29 @@ export default function SettingsPage() {
   const [showQRModal, setShowQRModal] = useState(false);
   const [copiedLink, setCopiedLink] = useState(false);
 
-  // Real-time theme change handler
-  function handleThemeColorChange(color: string) {
+  // Theme config state â€” full per-element control
+  const [themeConfig, setThemeConfig] = useState<ThemeConfig>({ ...DEFAULT_THEME_CONFIG });
+
+  // Update a single theme element slot live
+  function handleThemeSlotChange(slot: keyof ThemeConfig, value: string) {
     triggerHaptic('selection');
-    setForm((prev) => ({ ...prev, theme_color: color }));
-    applyThemeToDOM(color);
+    const updated = { ...themeConfig, [slot]: value };
+    setThemeConfig(updated);
+    applyThemeToDOM(updated);
+  }
+
+  // Apply a full palette preset
+  function handleApplyPalette(config: ThemeConfig) {
+    triggerHaptic('selection');
+    setThemeConfig(config);
+    applyThemeToDOM(config);
+  }
+
+  // Reset to defaults
+  function handleResetTheme() {
+    triggerHaptic('light');
+    setThemeConfig({ ...DEFAULT_THEME_CONFIG });
+    applyThemeToDOM({ ...DEFAULT_THEME_CONFIG });
   }
 
   // File Upload Helper (Supabase Storage + DataURL fallback)
@@ -123,9 +150,8 @@ export default function SettingsPage() {
     city: '',
     state: '',
     country: 'India',
-    
+
     // Restaurant Settings table fields
-    theme_color: '#f97316',
     gst_percent: 0,
     service_charge: 0,
     accept_orders: true,
@@ -178,7 +204,7 @@ export default function SettingsPage() {
           opening_time: '09:00',
           closing_time: '23:00',
           currency: restaurant.currency || 'INR',
-          currency_symbol: restaurant.currency_symbol || '₹',
+          currency_symbol: restaurant.currency_symbol || 'â‚¹',
           rating: 4.9,
           total_reviews: 1420,
           address: '42 Gourmet Avenue, MG Road',
@@ -196,7 +222,7 @@ export default function SettingsPage() {
           opening_time: activeRest.opening_time || '09:00',
           closing_time: activeRest.closing_time || '23:00',
           currency: activeRest.currency || 'INR',
-          currency_symbol: activeRest.currency_symbol || '₹',
+          currency_symbol: activeRest.currency_symbol || 'â‚¹',
           rating: Number(activeRest.rating ?? 4.9),
           total_reviews: Number(activeRest.total_reviews ?? 0),
           address: activeRest.address || '',
@@ -204,7 +230,6 @@ export default function SettingsPage() {
           state: activeRest.state || '',
           country: activeRest.country || 'India',
 
-          theme_color: settingsData?.theme_color || '#0F766E',
           gst_percent: Number(settingsData?.gst_percent ?? 5),
           service_charge: Number(settingsData?.service_charge ?? 0),
           accept_orders: settingsData?.accept_orders !== false,
@@ -212,6 +237,11 @@ export default function SettingsPage() {
           whatsapp_number: settingsData?.whatsapp_number || '+919876543210',
           support_number: settingsData?.support_number || '+919876543210',
         });
+
+        // Parse and apply theme config
+        const loaded = parseThemeConfig(settingsData?.theme_color || null);
+        setThemeConfig(loaded);
+        applyThemeToDOM(loaded);
       } catch (err) {
         console.error('Error loading settings:', err);
         setErrorMessage('Failed to load settings');
@@ -274,7 +304,7 @@ export default function SettingsPage() {
         await supabase
           .from('restaurant_settings')
           .update({
-            theme_color: form.theme_color || '#f97316',
+            theme_color: serializeThemeConfig(themeConfig),
             gst_percent: Number(form.gst_percent),
             service_charge: Number(form.service_charge),
             accept_orders: form.accept_orders,
@@ -287,7 +317,7 @@ export default function SettingsPage() {
       } else {
         await supabase.from('restaurant_settings').insert({
           restaurant_id: restaurant.id,
-          theme_color: form.theme_color || '#f97316',
+          theme_color: serializeThemeConfig(themeConfig),
           gst_percent: Number(form.gst_percent),
           service_charge: Number(form.service_charge),
           accept_orders: form.accept_orders,
@@ -299,7 +329,7 @@ export default function SettingsPage() {
 
       await refetchRestaurant();
       triggerHaptic('success');
-      setSuccessMessage('✅ Restaurant settings updated successfully!');
+      setSuccessMessage('âœ… Restaurant settings updated successfully!');
       setTimeout(() => setSuccessMessage(null), 4000);
     } catch (err) {
       console.error('Error saving restaurant settings:', err);
@@ -368,7 +398,7 @@ export default function SettingsPage() {
 
       if (updateErr) throw updateErr;
 
-      setPasswordSuccess('✅ Password changed successfully!');
+      setPasswordSuccess('âœ… Password changed successfully!');
       setPasswordForm({ currentPassword: '', newPassword: '', confirmPassword: '' });
       setTimeout(() => setPasswordSuccess(null), 4000);
     } catch (err) {
@@ -494,7 +524,7 @@ export default function SettingsPage() {
                 </label>
                 <label className="inline-flex items-center gap-1.5 text-xs text-theme-primary font-bold cursor-pointer hover:underline">
                   <Upload className="w-3.5 h-3.5" />
-                  {uploadingLogo ? 'Uploading...' : '📁 Upload Logo File'}
+                  {uploadingLogo ? 'Uploading...' : 'ðŸ“ Upload Logo File'}
                   <input
                     type="file"
                     accept="image/*"
@@ -578,7 +608,7 @@ export default function SettingsPage() {
                 </label>
                 <label className="inline-flex items-center gap-1.5 text-xs text-theme-primary font-bold cursor-pointer hover:underline">
                   <Upload className="w-3.5 h-3.5" />
-                  {uploadingCover ? 'Uploading...' : '📁 Upload Cover File'}
+                  {uploadingCover ? 'Uploading...' : 'ðŸ“ Upload Cover File'}
                   <input
                     type="file"
                     accept="image/*"
@@ -779,7 +809,7 @@ export default function SettingsPage() {
                     onClick={() => {
                       triggerHaptic('selection');
                       const url = getRestaurantDirectMenuUrl(restaurant);
-                      const msg = `🍽️ *${form.name || restaurant.name}* - Official Digital Menu\n\n✨ Browse our full menu, dishes, and prices directly on your phone:\n🔗 ${url}\n\n_Scan or tap the link to view our menu & place orders!_`;
+                      const msg = `ðŸ½ï¸ *${form.name || restaurant.name}* - Official Digital Menu\n\nâœ¨ Browse our full menu, dishes, and prices directly on your phone:\nðŸ”— ${url}\n\n_Scan or tap the link to view our menu & place orders!_`;
                       openWhatsAppShare(msg);
                     }}
                     className="flex items-center gap-2 p-3 rounded-xl border border-emerald-200 bg-emerald-50/60 hover:bg-emerald-100/60 text-emerald-900 transition native-press text-left"
@@ -798,252 +828,306 @@ export default function SettingsPage() {
           </div>
         )}
 
-        {/* 4. Brand Theme & Templates */}
+        {/* 4. Brand Theme Studio â€” Full Element Control */}
         <div className="bg-white rounded-2xl border border-slate-200 shadow-xs p-6 space-y-6">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-3">
+          {/* Header */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-4">
             <div>
               <h3 className="text-base font-bold text-slate-800 flex items-center gap-2">
-                <Palette className="w-5 h-5 text-theme-primary" />
-                Brand Theme & QR Menu Templates
+                <Sliders className="w-5 h-5 text-theme-primary" />
+                Brand Theme Studio
               </h3>
               <p className="text-xs text-slate-500 mt-0.5">
-                Select from 5 beautifully crafted theme templates or customize your brand colors with live preview.
+                Full per-element color control with live preview. Every color applies instantly.
               </p>
             </div>
-            <div className="flex items-center gap-2">
-              <span className="text-xs font-semibold text-slate-500">Active Color:</span>
-              <div
-                className="w-5 h-5 rounded-full border border-slate-200 shadow-xs"
-                style={{ backgroundColor: form.theme_color || '#f97316' }}
-              />
-              <span className="text-xs font-mono font-bold text-slate-700 uppercase">
-                {form.theme_color || '#f97316'}
-              </span>
+            <button
+              type="button"
+              onClick={handleResetTheme}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-xs font-semibold text-slate-600 transition native-press shrink-0"
+            >
+              <RotateCcw className="w-3.5 h-3.5" />
+              Reset to Default
+            </button>
+          </div>
+
+          {/* Quick Palette Presets */}
+          <div className="space-y-2">
+            <p className="text-xs font-bold uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
+              <Sparkles className="w-3.5 h-3.5 text-theme-primary" />
+              Quick Palettes â€” one click applies all colors
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {THEME_PALETTES.map((palette) => {
+                const isActive =
+                  themeConfig.primaryColor.toLowerCase() === palette.config.primaryColor.toLowerCase() &&
+                  themeConfig.navbarBg.toLowerCase() === palette.config.navbarBg.toLowerCase();
+                return (
+                  <button
+                    key={palette.id}
+                    type="button"
+                    onClick={() => handleApplyPalette(palette.config)}
+                    title={palette.description}
+                    className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-xl border text-xs font-semibold transition native-press ${
+                      isActive
+                        ? 'border-transparent text-white shadow-theme scale-[1.02]'
+                        : 'border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:shadow-sm'
+                    }`}
+                    style={isActive ? { backgroundColor: palette.preview } : {}}
+                  >
+                    <span
+                      className="w-3 h-3 rounded-full border border-white/50 shadow-xs shrink-0"
+                      style={{ backgroundColor: palette.preview }}
+                    />
+                    {palette.name}
+                    {isActive && <Check className="w-3 h-3 stroke-[3]" />}
+                  </button>
+                );
+              })}
             </div>
           </div>
 
-          {/* 5 Theme Cards Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3.5">
-            {THEME_TEMPLATES.map((tmpl) => {
-              const IconComp = tmpl.icon;
-              const isSelected = (form.theme_color || '#f97316').toLowerCase() === tmpl.primaryColor.toLowerCase();
+          {/* Main Studio: Controls + Preview */}
+          <div className="grid grid-cols-1 xl:grid-cols-12 gap-6">
+            {/* Left: Per-Element Color Controls */}
+            <div className="xl:col-span-5 space-y-3">
+              <p className="text-xs font-bold uppercase tracking-wider text-slate-500">
+                Element Controls
+              </p>
 
-              return (
+              {/* Helper component inline rows */}
+              {(
+                [
+                  {
+                    slot: 'primaryColor' as keyof ThemeConfig,
+                    label: 'Primary Color',
+                    hint: 'Buttons, active states, CTA',
+                  },
+                  {
+                    slot: 'secondaryColor' as keyof ThemeConfig,
+                    label: 'Secondary / Gradient End',
+                    hint: 'Button gradient, hover accents',
+                  },
+                  {
+                    slot: 'accentColor' as keyof ThemeConfig,
+                    label: 'Accent Color',
+                    hint: 'Badges, count chips, tags',
+                  },
+                  {
+                    slot: 'navbarBg' as keyof ThemeConfig,
+                    label: 'Navbar / Sidebar Background',
+                    hint: 'Admin sidebar & top nav bar',
+                  },
+                  {
+                    slot: 'cardBorderColor' as keyof ThemeConfig,
+                    label: 'Card Border Accent',
+                    hint: 'Cards, panels, input borders',
+                  },
+                  {
+                    slot: 'successColor' as keyof ThemeConfig,
+                    label: 'Success Color',
+                    hint: 'Open status, positive states',
+                  },
+                  {
+                    slot: 'dangerColor' as keyof ThemeConfig,
+                    label: 'Danger Color',
+                    hint: 'Closed status, destructive actions',
+                  },
+                ] as { slot: keyof ThemeConfig; label: string; hint: string }[]
+              ).map(({ slot, label, hint }) => (
                 <div
-                  key={tmpl.id}
-                  onClick={() => handleThemeColorChange(tmpl.primaryColor)}
-                  className={`cursor-pointer group relative rounded-2xl border-2 transition-all flex flex-col justify-between overflow-hidden ${
-                    isSelected
-                      ? 'bg-slate-50/90 shadow-md scale-[1.02]'
-                      : 'bg-white border-slate-200 hover:border-slate-300 hover:shadow-sm'
-                  }`}
-                  style={{
-                    borderColor: isSelected ? tmpl.primaryColor : undefined,
-                  }}
+                  key={slot}
+                  className="flex items-center gap-3 bg-slate-50 border border-slate-200/80 rounded-xl px-3 py-2.5"
                 >
-                  {/* Top Color Banner */}
-                  <div
-                    className={`h-16 w-full p-2.5 flex items-start justify-between relative overflow-hidden bg-gradient-to-br ${tmpl.accentBg}`}
-                  >
-                    <div className="w-7 h-7 rounded-lg bg-white/20 backdrop-blur-md flex items-center justify-center text-white">
-                      <IconComp className="w-4 h-4" />
-                    </div>
-
-                    {isSelected && (
-                      <span className="inline-flex items-center gap-1 text-[10px] font-bold bg-white text-slate-900 px-2 py-0.5 rounded-full shadow-xs">
-                        <Check className="w-3 h-3 text-emerald-600 stroke-[3]" />
-                        Active
-                      </span>
-                    )}
-
-                    {/* Decorative glow circle */}
-                    <div className="absolute -bottom-6 -right-6 w-16 h-16 rounded-full bg-white/10 blur-sm pointer-events-none" />
-                  </div>
-
-                  {/* Body Content */}
-                  <div className="p-3.5 space-y-2 flex-1 flex flex-col justify-between">
-                    <div>
-                      <div className="flex items-center justify-between gap-1 mb-1">
-                        <h4 className="text-xs font-bold text-slate-900 leading-tight">
-                          {tmpl.name}
-                        </h4>
-                      </div>
-                      <p className="text-[11px] font-medium text-slate-500 leading-tight mb-2">
-                        {tmpl.subtitle}
-                      </p>
-
-                      <span className={`inline-block text-[10px] font-semibold px-2 py-0.5 rounded-md border mb-2.5 ${tmpl.tagColor}`}>
-                        {tmpl.tag}
-                      </span>
-
-                      <p className="text-[11px] text-slate-600 leading-relaxed line-clamp-3">
-                        {tmpl.description}
-                      </p>
-                    </div>
-
-                    {/* Color Swatch row */}
-                    <div className="pt-2 border-t border-slate-100 flex items-center justify-between">
-                      <div className="flex items-center gap-1.5">
-                        <span
-                          className="w-3.5 h-3.5 rounded-full shadow-2xs border border-white"
-                          style={{ backgroundColor: tmpl.primaryColor }}
-                        />
-                        <span
-                          className="w-3.5 h-3.5 rounded-full shadow-2xs border border-white"
-                          style={{ backgroundColor: tmpl.secondaryColor }}
-                        />
-                      </div>
-                      <span className="text-[10px] font-mono text-slate-400 uppercase font-semibold">
-                        {tmpl.primaryColor}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-
-          {/* Bottom Custom Color Picker & Live Interactive Preview */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 bg-slate-50/70 p-5 rounded-2xl border border-slate-200/80">
-            {/* Custom Color Fine-Tuning */}
-            <div className="lg:col-span-5 space-y-4">
-              <h4 className="text-xs font-bold uppercase tracking-wider text-slate-600 flex items-center gap-1.5">
-                <Sparkles className="w-3.5 h-3.5 text-orange-500" />
-                Custom Brand Color Picker
-              </h4>
-
-              <div className="flex items-center gap-3">
-                <div className="relative">
-                  <input
-                    type="color"
-                    value={form.theme_color || '#f97316'}
-                    onChange={(e) => handleThemeColorChange(e.target.value)}
-                    className="w-12 h-12 rounded-xl border-2 border-white shadow-md cursor-pointer p-0.5 bg-white"
-                  />
-                </div>
-                <div className="flex-1 space-y-1">
-                  <label className="text-xs font-semibold text-slate-700">Hex Color Code</label>
-                  <div className="relative">
+                  {/* Color picker wheel */}
+                  <div className="relative shrink-0">
                     <input
-                      type="text"
-                      value={form.theme_color || '#f97316'}
-                      onChange={(e) => handleThemeColorChange(e.target.value)}
-                      placeholder="#f97316"
-                      className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-mono font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-orange-500/30"
+                      type="color"
+                      value={themeConfig[slot] || '#000000'}
+                      onChange={(e) => handleThemeSlotChange(slot, e.target.value)}
+                      className="w-9 h-9 rounded-lg border-2 border-white shadow-md cursor-pointer p-0.5 bg-white"
+                      title={`Pick ${label}`}
                     />
                   </div>
-                </div>
-              </div>
 
-              {/* Quick Preset Color Chips */}
-              <div>
-                <p className="text-[11px] font-medium text-slate-500 mb-1.5">Popular Quick Colors:</p>
-                <div className="flex items-center gap-2 flex-wrap">
-                  {[
-                    { label: 'Orange', hex: '#f97316' },
-                    { label: 'Emerald', hex: '#059669' },
-                    { label: 'Ruby', hex: '#e11d48' },
-                    { label: 'Indigo', hex: '#6366f1' },
-                    { label: 'Saffron', hex: '#d97706' },
-                    { label: 'Cyan', hex: '#0891b2' },
-                    { label: 'Purple', hex: '#9333ea' },
-                    { label: 'Dark Slate', hex: '#0f172a' },
-                  ].map((preset) => (
-                    <button
-                      key={preset.hex}
-                      type="button"
-                      onClick={() => handleThemeColorChange(preset.hex)}
-                      className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-white border border-slate-200 hover:border-slate-400 rounded-lg text-[11px] font-medium text-slate-700 shadow-2xs transition"
-                    >
-                      <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: preset.hex }} />
-                      <span>{preset.label}</span>
-                    </button>
-                  ))}
+                  {/* Label + hint */}
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs font-bold text-slate-800 leading-tight truncate">{label}</p>
+                    <p className="text-[10px] text-slate-400 leading-tight truncate">{hint}</p>
+                  </div>
+
+                  {/* Hex input */}
+                  <input
+                    type="text"
+                    value={themeConfig[slot] || ''}
+                    onChange={(e) => handleThemeSlotChange(slot, e.target.value)}
+                    maxLength={7}
+                    className="w-[80px] shrink-0 bg-white border border-slate-200 rounded-lg px-2 py-1 text-[11px] font-mono font-bold text-slate-700 focus:outline-none focus:ring-2 focus:ring-theme-light focus:border-theme-primary uppercase"
+                  />
+
+                  {/* Live swatch */}
+                  <span
+                    className="w-5 h-5 rounded-full border-2 border-white shadow shrink-0"
+                    style={{ backgroundColor: themeConfig[slot] || '#000' }}
+                  />
                 </div>
-              </div>
+              ))}
             </div>
 
-            {/* Live Interactive Preview Box */}
-            <div className="lg:col-span-7 bg-white rounded-xl border border-slate-200 p-4 shadow-sm space-y-3">
-              <div className="flex items-center justify-between border-b border-slate-100 pb-2">
-                <span className="text-xs font-bold text-slate-700 flex items-center gap-1.5">
-                  <Eye className="w-3.5 h-3.5 text-slate-400" />
-                  Live Customer Menu Preview
-                </span>
-                <span className="text-[10px] font-semibold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
-                  Realtime Styling
-                </span>
-              </div>
+            {/* Right: Live Preview */}
+            <div className="xl:col-span-7 space-y-3">
+              <p className="text-xs font-bold uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
+                <Eye className="w-3.5 h-3.5" />
+                Live Preview
+              </p>
 
-              {/* Mock Customer Menu Header & Dish */}
-              <div className="rounded-xl border border-slate-100 overflow-hidden bg-slate-50/50 p-3 space-y-3">
-                {/* Simulated Restaurant Header */}
+              <div className="rounded-2xl border border-slate-200 overflow-hidden bg-slate-100/50 shadow-sm">
+                {/* Simulated Navbar */}
                 <div
-                  className="rounded-lg p-3 text-white flex items-center justify-between shadow-xs transition-colors duration-300"
-                  style={{
-                    backgroundColor: form.theme_color || '#f97316',
-                  }}
+                  className="flex items-center justify-between px-4 py-2.5 transition-colors duration-300"
+                  style={{ backgroundColor: themeConfig.navbarBg }}
                 >
-                  <div className="flex items-center gap-2.5">
-                    <div className="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center font-bold text-sm">
+                  <div className="flex items-center gap-2">
+                    <div
+                      className="w-6 h-6 rounded-lg flex items-center justify-center text-[10px] font-black"
+                      style={{ backgroundColor: themeConfig.primaryColor, color: '#fff' }}
+                    >
                       {(form.name || 'R')[0].toUpperCase()}
                     </div>
-                    <div>
-                      <p className="text-xs font-bold leading-tight">{form.name || 'Your Restaurant Name'}</p>
-                      <p className="text-[10px] text-white/80">Table #04 · Dine-in</p>
-                    </div>
+                    <span className="text-white text-xs font-bold opacity-90 truncate max-w-[120px]">
+                      {form.name || 'Your Restaurant'}
+                    </span>
                   </div>
-                  <span className="text-[10px] bg-black/20 px-2 py-0.5 rounded-full font-medium">
-                    ★ {form.rating || 4.5}
-                  </span>
+                  <div className="flex items-center gap-2">
+                    <span
+                      className="text-[10px] font-bold px-2 py-0.5 rounded-full"
+                      style={{ backgroundColor: themeConfig.successColor, color: '#fff' }}
+                    >
+                      Open
+                    </span>
+                    <span
+                      className="text-[10px] font-bold px-2 py-0.5 rounded-full"
+                      style={{ backgroundColor: themeConfig.dangerColor, color: '#fff' }}
+                    >
+                      Closed
+                    </span>
+                  </div>
                 </div>
 
-                {/* Simulated Category Pills */}
-                <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none pb-0.5">
-                  <span
-                    className="text-[10px] font-bold text-white px-2.5 py-1 rounded-full shadow-2xs transition-colors duration-300"
-                    style={{ backgroundColor: form.theme_color || '#f97316' }}
-                  >
-                    All Items
-                  </span>
-                  <span className="text-[10px] font-medium text-slate-600 bg-white border border-slate-200 px-2.5 py-1 rounded-full">
-                    Starters
-                  </span>
-                  <span className="text-[10px] font-medium text-slate-600 bg-white border border-slate-200 px-2.5 py-1 rounded-full">
-                    Main Course
-                  </span>
-                  <span className="text-[10px] font-medium text-slate-600 bg-white border border-slate-200 px-2.5 py-1 rounded-full">
-                    Beverages
-                  </span>
-                </div>
-
-                {/* Simulated Dish Card */}
-                <div className="bg-white rounded-lg border border-slate-200 p-2.5 flex items-center justify-between gap-3 shadow-2xs">
-                  <div className="flex items-center gap-2.5 min-w-0">
-                    <div className="w-10 h-10 rounded-lg bg-orange-100/50 flex items-center justify-center shrink-0">
-                      <Store className="w-5 h-5 text-slate-400" />
-                    </div>
-                    <div className="min-w-0">
-                      <p className="text-xs font-bold text-slate-800 truncate">Chef's Signature Special</p>
-                      <p className="text-[10px] text-slate-400 truncate">Fresh ingredients, premium taste</p>
-                      <p className="text-xs font-bold text-slate-900 mt-0.5">
-                        {form.currency_symbol || 'AED'} 45.00
-                      </p>
-                    </div>
+                {/* Simulated page content */}
+                <div className="p-4 space-y-3">
+                  {/* Category pills */}
+                  <div className="flex items-center gap-1.5">
+                    <span
+                      className="text-[10px] font-bold text-white px-2.5 py-1 rounded-full transition-colors duration-300"
+                      style={{ backgroundColor: themeConfig.primaryColor }}
+                    >
+                      All Items
+                    </span>
+                    <span className="text-[10px] font-medium text-slate-600 bg-white border border-slate-200 px-2.5 py-1 rounded-full">
+                      Starters
+                    </span>
+                    <span className="text-[10px] font-medium text-slate-600 bg-white border border-slate-200 px-2.5 py-1 rounded-full">
+                      Main Course
+                    </span>
+                    <span
+                      className="text-[10px] font-bold text-white px-2 py-0.5 rounded-full ml-auto"
+                      style={{ backgroundColor: themeConfig.accentColor }}
+                    >
+                      12 items
+                    </span>
                   </div>
 
-                  <button
-                    type="button"
-                    className="shrink-0 text-white font-bold text-[11px] px-3 py-1.5 rounded-lg shadow-xs transition-colors duration-300 flex items-center gap-1"
-                    style={{ backgroundColor: form.theme_color || '#f97316' }}
+                  {/* Dish card */}
+                  <div
+                    className="bg-white rounded-xl p-3 flex items-center justify-between gap-3 shadow-xs border-l-4 transition-colors duration-300"
+                    style={{ borderColor: themeConfig.cardBorderColor }}
                   >
-                    <span>+ Add</span>
-                  </button>
+                    <div className="flex items-center gap-2.5 min-w-0">
+                      <div
+                        className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0"
+                        style={{ backgroundColor: themeConfig.accentColor + '22' }}
+                      >
+                        <Store className="w-5 h-5" style={{ color: themeConfig.accentColor }} />
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-xs font-bold text-slate-800 truncate">Chef's Signature Special</p>
+                        <p className="text-[10px] text-slate-400 truncate">Fresh ingredients Â· Premium taste</p>
+                        <p className="text-xs font-bold text-slate-900 mt-0.5">
+                          {form.currency_symbol || 'AED'} 45.00
+                        </p>
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      className="shrink-0 text-white font-bold text-[11px] px-3 py-1.5 rounded-lg shadow-xs transition-colors duration-300"
+                      style={{
+                        background: `linear-gradient(135deg, ${themeConfig.primaryColor}, ${themeConfig.secondaryColor})`,
+                      }}
+                    >
+                      + Add
+                    </button>
+                  </div>
+
+                  {/* Second dish card */}
+                  <div
+                    className="bg-white rounded-xl p-3 flex items-center justify-between gap-3 shadow-xs border-l-4 transition-colors duration-300"
+                    style={{ borderColor: themeConfig.cardBorderColor }}
+                  >
+                    <div className="flex items-center gap-2.5 min-w-0">
+                      <div
+                        className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0"
+                        style={{ backgroundColor: themeConfig.primaryColor + '18' }}
+                      >
+                        <Sparkles className="w-5 h-5" style={{ color: themeConfig.primaryColor }} />
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-xs font-bold text-slate-800 truncate">Seasonal Dessert Platter</p>
+                        <p className="text-[10px] text-slate-400 truncate">Chef's choice Â· Limited daily</p>
+                        <p className="text-xs font-bold text-slate-900 mt-0.5">
+                          {form.currency_symbol || 'AED'} 28.00
+                        </p>
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      className="shrink-0 text-white font-bold text-[11px] px-3 py-1.5 rounded-lg shadow-xs transition-colors duration-300"
+                      style={{
+                        background: `linear-gradient(135deg, ${themeConfig.primaryColor}, ${themeConfig.secondaryColor})`,
+                      }}
+                    >
+                      + Add
+                    </button>
+                  </div>
+
+                  {/* Color summary strip */}
+                  <div className="flex items-center gap-1.5 pt-1 flex-wrap">
+                    {(
+                      [
+                        { label: 'Primary', color: themeConfig.primaryColor },
+                        { label: 'Secondary', color: themeConfig.secondaryColor },
+                        { label: 'Accent', color: themeConfig.accentColor },
+                        { label: 'Navbar', color: themeConfig.navbarBg },
+                        { label: 'Border', color: themeConfig.cardBorderColor },
+                        { label: 'Success', color: themeConfig.successColor },
+                        { label: 'Danger', color: themeConfig.dangerColor },
+                      ] as { label: string; color: string }[]
+                    ).map(({ label, color }) => (
+                      <span key={label} className="inline-flex items-center gap-1 text-[10px] text-slate-500 font-medium">
+                        <span
+                          className="w-3 h-3 rounded-full border border-slate-200 shrink-0"
+                          style={{ backgroundColor: color }}
+                        />
+                        {label}
+                      </span>
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
+
 
         {/* 4. Operating Hours & Schedule */}
         <div className="bg-white rounded-2xl border border-slate-200 shadow-xs p-6 space-y-4">
@@ -1140,7 +1224,7 @@ export default function SettingsPage() {
                 type="text"
                 value={form.currency_symbol}
                 onChange={(e) => setForm({ ...form, currency_symbol: e.target.value })}
-                placeholder="AED, $, ₹"
+                placeholder="AED, $, â‚¹"
                 className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-sm font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-theme-light focus:border-theme-primary"
               />
             </div>
@@ -1295,7 +1379,7 @@ export default function SettingsPage() {
                   required
                   value={passwordForm.currentPassword}
                   onChange={(e) => setPasswordForm({ ...passwordForm, currentPassword: e.target.value })}
-                  placeholder="••••••••"
+                  placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢"
                   className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-9 pr-10 py-2.5 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-theme-light focus:border-theme-primary"
                 />
                 <button

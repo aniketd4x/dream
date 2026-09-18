@@ -570,7 +570,7 @@ export default function TablesAndRoomsPage() {
               }`}
             >
               <Table2 className="w-4 h-4 text-emerald-600" />
-              <span>🍽️ Restaurant Tables</span>
+              <span>Restaurant Tables</span>
             </button>
 
             <button
@@ -586,7 +586,7 @@ export default function TablesAndRoomsPage() {
               }`}
             >
               <Bed className="w-4 h-4 text-theme-primary" />
-              <span>🏨 Hotel Rooms</span>
+              <span>Hotel Rooms</span>
               <span className="bg-theme-light text-theme-primary px-2 py-0.5 rounded-full text-[10px] font-black">
                 {rooms.length}
               </span>
