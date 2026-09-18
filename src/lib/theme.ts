@@ -1,31 +1,54 @@
 // lib/theme.ts
 
 export interface ThemeConfig {
+  // ── Core brand colors ─────────────────────────────────────────
   primaryColor: string;      // Buttons, active pills, CTA highlights
-  secondaryColor: string;    // Gradient end, secondary accents
+  secondaryColor: string;    // Gradient end / secondary accents
+
+  // ── UI Element colors ──────────────────────────────────────────
   accentColor: string;       // Badges, count chips, tags
-  navbarBg: string;          // Admin sidebar / top navbar background
-  cardBorderColor: string;   // Card border accent line
+  cardBorderColor: string;   // Card left-border accent, panel borders
+
+  // ── Navigation ─────────────────────────────────────────────────
+  sidebarBg: string;         // Desktop sidebar background
+  sidebarText: string;       // Sidebar inactive text color
+  headerBg: string;          // Top header & mobile bottom nav background
+  mobileNavBg: string;       // Mobile bottom nav (can differ from header)
+
+  // ── Status colors ──────────────────────────────────────────────
   successColor: string;      // Open status, positive states
   dangerColor: string;       // Closed status, destructive actions
+  warningColor: string;      // Expiring, caution states
+
+  // ── Page ───────────────────────────────────────────────────────
+  pageBg: string;            // Main page/content area background
+  textPrimary: string;       // Primary body text
+  textMuted: string;         // Secondary / muted text
 }
 
 export const DEFAULT_THEME_CONFIG: ThemeConfig = {
   primaryColor: '#f97316',
   secondaryColor: '#ea580c',
   accentColor: '#fb923c',
-  navbarBg: '#0f172a',
   cardBorderColor: '#fed7aa',
+  sidebarBg: '#0f172a',
+  sidebarText: '#94a3b8',
+  headerBg: '#ffffff',
+  mobileNavBg: '#ffffff',
   successColor: '#059669',
   dangerColor: '#e11d48',
+  warningColor: '#d97706',
+  pageBg: '#f8fafc',
+  textPrimary: '#0f172a',
+  textMuted: '#64748b',
 };
 
-// Quick palette presets — coherent full-theme looks
+// ── Quick palette presets ──────────────────────────────────────────
 export interface ThemePalette {
   id: string;
   name: string;
   description: string;
-  preview: string; // primary color used for swatch
+  preview: string;
   config: ThemeConfig;
 }
 
@@ -39,25 +62,39 @@ export const THEME_PALETTES: ThemePalette[] = [
       primaryColor: '#f97316',
       secondaryColor: '#ea580c',
       accentColor: '#fb923c',
-      navbarBg: '#0f172a',
       cardBorderColor: '#fed7aa',
+      sidebarBg: '#0f172a',
+      sidebarText: '#94a3b8',
+      headerBg: '#ffffff',
+      mobileNavBg: '#ffffff',
       successColor: '#059669',
       dangerColor: '#e11d48',
+      warningColor: '#d97706',
+      pageBg: '#f8fafc',
+      textPrimary: '#0f172a',
+      textMuted: '#64748b',
     },
   },
   {
     id: 'emerald',
     name: 'Royal Emerald',
-    description: 'Fresh & prestigious — fine dining, organic, garden lounges',
+    description: 'Fresh & prestigious — fine dining, organic, garden',
     preview: '#059669',
     config: {
       primaryColor: '#059669',
       secondaryColor: '#047857',
       accentColor: '#34d399',
-      navbarBg: '#064e3b',
       cardBorderColor: '#a7f3d0',
+      sidebarBg: '#064e3b',
+      sidebarText: '#6ee7b7',
+      headerBg: '#ffffff',
+      mobileNavBg: '#ffffff',
       successColor: '#10b981',
       dangerColor: '#f43f5e',
+      warningColor: '#f59e0b',
+      pageBg: '#f0fdf4',
+      textPrimary: '#0f172a',
+      textMuted: '#64748b',
     },
   },
   {
@@ -69,10 +106,17 @@ export const THEME_PALETTES: ThemePalette[] = [
       primaryColor: '#e11d48',
       secondaryColor: '#be123c',
       accentColor: '#fb7185',
-      navbarBg: '#1f0a14',
       cardBorderColor: '#fecdd3',
+      sidebarBg: '#1f0a14',
+      sidebarText: '#fda4af',
+      headerBg: '#ffffff',
+      mobileNavBg: '#ffffff',
       successColor: '#16a34a',
       dangerColor: '#dc2626',
+      warningColor: '#f59e0b',
+      pageBg: '#fff1f2',
+      textPrimary: '#0f172a',
+      textMuted: '#64748b',
     },
   },
   {
@@ -84,25 +128,39 @@ export const THEME_PALETTES: ThemePalette[] = [
       primaryColor: '#6366f1',
       secondaryColor: '#4f46e5',
       accentColor: '#818cf8',
-      navbarBg: '#1e1b4b',
       cardBorderColor: '#c7d2fe',
+      sidebarBg: '#1e1b4b',
+      sidebarText: '#a5b4fc',
+      headerBg: '#ffffff',
+      mobileNavBg: '#ffffff',
       successColor: '#059669',
       dangerColor: '#e11d48',
+      warningColor: '#d97706',
+      pageBg: '#eef2ff',
+      textPrimary: '#0f172a',
+      textMuted: '#64748b',
     },
   },
   {
     id: 'saffron',
     name: 'Golden Saffron',
-    description: 'Royal & heritage — Indian, Middle Eastern, artisan sweets',
+    description: 'Royal & heritage — Indian, Middle Eastern, artisan',
     preview: '#d97706',
     config: {
       primaryColor: '#d97706',
       secondaryColor: '#b45309',
       accentColor: '#fbbf24',
-      navbarBg: '#1c1208',
       cardBorderColor: '#fde68a',
+      sidebarBg: '#1c1208',
+      sidebarText: '#fcd34d',
+      headerBg: '#fffbeb',
+      mobileNavBg: '#fffbeb',
       successColor: '#16a34a',
       dangerColor: '#dc2626',
+      warningColor: '#f59e0b',
+      pageBg: '#fefce8',
+      textPrimary: '#1c1917',
+      textMuted: '#78716c',
     },
   },
   {
@@ -114,19 +172,25 @@ export const THEME_PALETTES: ThemePalette[] = [
       primaryColor: '#475569',
       secondaryColor: '#334155',
       accentColor: '#94a3b8',
-      navbarBg: '#020617',
       cardBorderColor: '#cbd5e1',
+      sidebarBg: '#020617',
+      sidebarText: '#64748b',
+      headerBg: '#ffffff',
+      mobileNavBg: '#ffffff',
       successColor: '#16a34a',
       dangerColor: '#dc2626',
+      warningColor: '#d97706',
+      pageBg: '#f8fafc',
+      textPrimary: '#0f172a',
+      textMuted: '#64748b',
     },
   },
 ];
 
-// Parse theme_color from DB — supports both legacy hex string and JSON ThemeConfig
+// ── Parse from DB (supports legacy hex OR full JSON) ───────────────
 export function parseThemeConfig(raw: string | null | undefined): ThemeConfig {
   if (!raw) return { ...DEFAULT_THEME_CONFIG };
   const trimmed = raw.trim();
-  // Legacy: plain hex color
   if (trimmed.startsWith('#') || /^[0-9a-fA-F]{6}$/.test(trimmed)) {
     return { ...DEFAULT_THEME_CONFIG, primaryColor: trimmed.startsWith('#') ? trimmed : `#${trimmed}` };
   }
@@ -138,7 +202,6 @@ export function parseThemeConfig(raw: string | null | undefined): ThemeConfig {
   }
 }
 
-// Serialize for DB storage
 export function serializeThemeConfig(config: ThemeConfig): string {
   return JSON.stringify(config);
 }
@@ -156,22 +219,38 @@ export function applyThemeToDOM(config: ThemeConfig) {
   const root = document.documentElement;
   const rgb = hexToRgb(config.primaryColor);
 
+  // Core brand
   root.style.setProperty('--theme-primary', config.primaryColor);
   root.style.setProperty('--theme-secondary', config.secondaryColor);
-  root.style.setProperty('--theme-accent', config.accentColor);
-  root.style.setProperty('--theme-navbar-bg', config.navbarBg);
-  root.style.setProperty('--theme-card-border', config.cardBorderColor);
-  root.style.setProperty('--theme-success', config.successColor);
-  root.style.setProperty('--theme-danger', config.dangerColor);
 
-  // Derived utility values from primary
+  // Derived from primary
   root.style.setProperty('--theme-rgb', rgb);
   root.style.setProperty('--theme-light', `rgba(${rgb}, 0.12)`);
   root.style.setProperty('--theme-border', `rgba(${rgb}, 0.25)`);
   root.style.setProperty('--theme-glow', `rgba(${rgb}, 0.35)`);
+
+  // UI elements
+  root.style.setProperty('--theme-accent', config.accentColor);
+  root.style.setProperty('--theme-card-border', config.cardBorderColor);
+
+  // Navigation
+  root.style.setProperty('--theme-sidebar-bg', config.sidebarBg);
+  root.style.setProperty('--theme-sidebar-text', config.sidebarText);
+  root.style.setProperty('--theme-header-bg', config.headerBg);
+  root.style.setProperty('--theme-mobile-nav-bg', config.mobileNavBg);
+
+  // Status
+  root.style.setProperty('--theme-success', config.successColor);
+  root.style.setProperty('--theme-danger', config.dangerColor);
+  root.style.setProperty('--theme-warning', config.warningColor);
+
+  // Page
+  root.style.setProperty('--theme-page-bg', config.pageBg);
+  root.style.setProperty('--theme-text-primary', config.textPrimary);
+  root.style.setProperty('--theme-text-muted', config.textMuted);
 }
 
-// Legacy single-color apply for compatibility
+// Legacy compat
 export function applyThemeColorToDOM(hexColor: string = '#f97316') {
   applyThemeToDOM({ ...DEFAULT_THEME_CONFIG, primaryColor: hexColor });
 }

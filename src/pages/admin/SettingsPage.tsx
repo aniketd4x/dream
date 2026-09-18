@@ -1,4 +1,4 @@
-﻿import { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   Store,
   Phone,
@@ -861,7 +861,7 @@ export default function SettingsPage() {
               {THEME_PALETTES.map((palette) => {
                 const isActive =
                   themeConfig.primaryColor.toLowerCase() === palette.config.primaryColor.toLowerCase() &&
-                  themeConfig.navbarBg.toLowerCase() === palette.config.navbarBg.toLowerCase();
+                  themeConfig.sidebarBg.toLowerCase() === palette.config.sidebarBg.toLowerCase();
                 return (
                   <button
                     key={palette.id}
@@ -895,81 +895,68 @@ export default function SettingsPage() {
                 Element Controls
               </p>
 
-              {/* Helper component inline rows */}
               {(
                 [
-                  {
-                    slot: 'primaryColor' as keyof ThemeConfig,
-                    label: 'Primary Color',
-                    hint: 'Buttons, active states, CTA',
-                  },
-                  {
-                    slot: 'secondaryColor' as keyof ThemeConfig,
-                    label: 'Secondary / Gradient End',
-                    hint: 'Button gradient, hover accents',
-                  },
-                  {
-                    slot: 'accentColor' as keyof ThemeConfig,
-                    label: 'Accent Color',
-                    hint: 'Badges, count chips, tags',
-                  },
-                  {
-                    slot: 'navbarBg' as keyof ThemeConfig,
-                    label: 'Navbar / Sidebar Background',
-                    hint: 'Admin sidebar & top nav bar',
-                  },
-                  {
-                    slot: 'cardBorderColor' as keyof ThemeConfig,
-                    label: 'Card Border Accent',
-                    hint: 'Cards, panels, input borders',
-                  },
-                  {
-                    slot: 'successColor' as keyof ThemeConfig,
-                    label: 'Success Color',
-                    hint: 'Open status, positive states',
-                  },
-                  {
-                    slot: 'dangerColor' as keyof ThemeConfig,
-                    label: 'Danger Color',
-                    hint: 'Closed status, destructive actions',
-                  },
-                ] as { slot: keyof ThemeConfig; label: string; hint: string }[]
-              ).map(({ slot, label, hint }) => (
-                <div
-                  key={slot}
-                  className="flex items-center gap-3 bg-slate-50 border border-slate-200/80 rounded-xl px-3 py-2.5"
-                >
-                  {/* Color picker wheel */}
-                  <div className="relative shrink-0">
-                    <input
-                      type="color"
-                      value={themeConfig[slot] || '#000000'}
-                      onChange={(e) => handleThemeSlotChange(slot, e.target.value)}
-                      className="w-9 h-9 rounded-lg border-2 border-white shadow-md cursor-pointer p-0.5 bg-white"
-                      title={`Pick ${label}`}
-                    />
-                  </div>
-
-                  {/* Label + hint */}
-                  <div className="flex-1 min-w-0">
-                    <p className="text-xs font-bold text-slate-800 leading-tight truncate">{label}</p>
-                    <p className="text-[10px] text-slate-400 leading-tight truncate">{hint}</p>
-                  </div>
-
-                  {/* Hex input */}
-                  <input
-                    type="text"
-                    value={themeConfig[slot] || ''}
-                    onChange={(e) => handleThemeSlotChange(slot, e.target.value)}
-                    maxLength={7}
-                    className="w-[80px] shrink-0 bg-white border border-slate-200 rounded-lg px-2 py-1 text-[11px] font-mono font-bold text-slate-700 focus:outline-none focus:ring-2 focus:ring-theme-light focus:border-theme-primary uppercase"
-                  />
-
-                  {/* Live swatch */}
-                  <span
-                    className="w-5 h-5 rounded-full border-2 border-white shadow shrink-0"
-                    style={{ backgroundColor: themeConfig[slot] || '#000' }}
-                  />
+                  // ── Brand ──────────────────────────────────────────
+                  { slot: 'primaryColor'    as keyof ThemeConfig, label: 'Primary Color',             hint: 'Buttons, active nav, CTA highlights',      group: 'Brand' },
+                  { slot: 'secondaryColor'  as keyof ThemeConfig, label: 'Secondary / Gradient End',  hint: 'Button gradient end, hover accents',        group: 'Brand' },
+                  { slot: 'accentColor'     as keyof ThemeConfig, label: 'Accent Color',              hint: 'Badges, count chips, tags',                 group: 'Brand' },
+                  { slot: 'cardBorderColor' as keyof ThemeConfig, label: 'Card Border Accent',        hint: 'Card left-border, panel accent lines',      group: 'Brand' },
+                  // ── Navigation ─────────────────────────────────────
+                  { slot: 'sidebarBg'       as keyof ThemeConfig, label: 'Sidebar Background',        hint: 'Desktop sidebar background',                group: 'Navigation' },
+                  { slot: 'sidebarText'     as keyof ThemeConfig, label: 'Sidebar Text',              hint: 'Sidebar inactive link color',               group: 'Navigation' },
+                  { slot: 'headerBg'        as keyof ThemeConfig, label: 'Top Header Background',     hint: 'Desktop top bar background color',          group: 'Navigation' },
+                  { slot: 'mobileNavBg'     as keyof ThemeConfig, label: 'Mobile Nav Background',     hint: 'Mobile bottom nav bar background',          group: 'Navigation' },
+                  // ── Status ─────────────────────────────────────────
+                  { slot: 'successColor'    as keyof ThemeConfig, label: 'Success Color',             hint: 'Open status, positive states',              group: 'Status' },
+                  { slot: 'dangerColor'     as keyof ThemeConfig, label: 'Danger Color',              hint: 'Closed status, destructive actions',        group: 'Status' },
+                  { slot: 'warningColor'    as keyof ThemeConfig, label: 'Warning Color',             hint: 'Expiring soon, caution states',             group: 'Status' },
+                  // ── Page ───────────────────────────────────────────
+                  { slot: 'pageBg'          as keyof ThemeConfig, label: 'Page Background',           hint: 'Main content area background',              group: 'Page' },
+                  { slot: 'textPrimary'     as keyof ThemeConfig, label: 'Primary Text',              hint: 'Main body / heading text color',            group: 'Page' },
+                  { slot: 'textMuted'       as keyof ThemeConfig, label: 'Muted Text',                hint: 'Secondary / helper text color',             group: 'Page' },
+                ] as { slot: keyof ThemeConfig; label: string; hint: string; group: string }[]
+              ).reduce<{ group: string; items: { slot: keyof ThemeConfig; label: string; hint: string }[] }[]>((acc, item) => {
+                const existing = acc.find(g => g.group === item.group);
+                if (existing) existing.items.push(item);
+                else acc.push({ group: item.group, items: [item] });
+                return acc;
+              }, []).map(({ group, items }) => (
+                <div key={group} className="space-y-1.5">
+                  <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 px-1 pt-1">{group}</p>
+                  {items.map(({ slot, label, hint }) => (
+                    <div
+                      key={slot}
+                      className="flex items-center gap-3 bg-slate-50 border border-slate-200/80 rounded-xl px-3 py-2.5"
+                    >
+                      {/* Color picker */}
+                      <input
+                        type="color"
+                        value={themeConfig[slot] || '#000000'}
+                        onChange={(e) => handleThemeSlotChange(slot, e.target.value)}
+                        className="w-9 h-9 rounded-lg border-2 border-white shadow-md cursor-pointer p-0.5 bg-white shrink-0"
+                        title={`Pick ${label}`}
+                      />
+                      {/* Label */}
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs font-bold text-slate-800 leading-tight truncate">{label}</p>
+                        <p className="text-[10px] text-slate-400 leading-tight truncate">{hint}</p>
+                      </div>
+                      {/* Hex input */}
+                      <input
+                        type="text"
+                        value={themeConfig[slot] || ''}
+                        onChange={(e) => handleThemeSlotChange(slot, e.target.value)}
+                        maxLength={7}
+                        className="w-[80px] shrink-0 bg-white border border-slate-200 rounded-lg px-2 py-1 text-[11px] font-mono font-bold text-slate-700 focus:outline-none focus:ring-2 focus:ring-theme-light focus:border-theme-primary uppercase"
+                      />
+                      {/* Swatch */}
+                      <span
+                        className="w-5 h-5 rounded-full border-2 border-white shadow shrink-0"
+                        style={{ backgroundColor: themeConfig[slot] || '#000' }}
+                      />
+                    </div>
+                  ))}
                 </div>
               ))}
             </div>
@@ -978,155 +965,149 @@ export default function SettingsPage() {
             <div className="xl:col-span-7 space-y-3">
               <p className="text-xs font-bold uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
                 <Eye className="w-3.5 h-3.5" />
-                Live Preview
+                Live Preview — Full Admin UI
               </p>
 
-              <div className="rounded-2xl border border-slate-200 overflow-hidden bg-slate-100/50 shadow-sm">
-                {/* Simulated Navbar */}
-                <div
-                  className="flex items-center justify-between px-4 py-2.5 transition-colors duration-300"
-                  style={{ backgroundColor: themeConfig.navbarBg }}
-                >
-                  <div className="flex items-center gap-2">
-                    <div
-                      className="w-6 h-6 rounded-lg flex items-center justify-center text-[10px] font-black"
-                      style={{ backgroundColor: themeConfig.primaryColor, color: '#fff' }}
-                    >
-                      {(form.name || 'R')[0].toUpperCase()}
+              <div className="rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
+                {/* Simulated Admin Layout */}
+                <div className="flex" style={{ height: '360px', backgroundColor: themeConfig.pageBg }}>
+
+                  {/* Mini Sidebar */}
+                  <div
+                    className="w-28 flex-col flex shrink-0"
+                    style={{ backgroundColor: themeConfig.sidebarBg }}
+                  >
+                    {/* Sidebar Header */}
+                    <div className="flex items-center gap-1.5 px-2.5 py-2 border-b border-white/10">
+                      <div
+                        className="w-5 h-5 rounded-md flex items-center justify-center text-[9px] font-black text-white shrink-0"
+                        style={{ backgroundColor: themeConfig.primaryColor }}
+                      >
+                        {(form.name || 'R')[0].toUpperCase()}
+                      </div>
+                      <span className="text-[9px] font-bold truncate" style={{ color: '#fff' }}>
+                        {form.name || 'Restaurant'}
+                      </span>
                     </div>
-                    <span className="text-white text-xs font-bold opacity-90 truncate max-w-[120px]">
-                      {form.name || 'Your Restaurant'}
-                    </span>
+                    {/* Sidebar Nav */}
+                    <div className="flex-1 p-1.5 space-y-0.5">
+                      {['Dashboard', 'Orders', 'Menu', 'Tables', 'Settings'].map((item, i) => (
+                        <div
+                          key={item}
+                          className="flex items-center gap-1.5 px-2 py-1.5 rounded-lg text-[9px] font-semibold transition-colors"
+                          style={
+                            i === 0
+                              ? { backgroundColor: themeConfig.primaryColor + '22', color: themeConfig.primaryColor }
+                              : { color: themeConfig.sidebarText }
+                          }
+                        >
+                          <span className="w-1.5 h-1.5 rounded-full shrink-0" style={{ backgroundColor: i === 0 ? themeConfig.primaryColor : themeConfig.sidebarText }} />
+                          {item}
+                        </div>
+                      ))}
+                    </div>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <span
-                      className="text-[10px] font-bold px-2 py-0.5 rounded-full"
-                      style={{ backgroundColor: themeConfig.successColor, color: '#fff' }}
+
+                  {/* Main content area */}
+                  <div className="flex-1 flex flex-col min-w-0">
+                    {/* Top Header */}
+                    <div
+                      className="flex items-center justify-between px-3 py-2 border-b border-slate-200/60 shrink-0"
+                      style={{ backgroundColor: themeConfig.headerBg }}
                     >
-                      Open
-                    </span>
-                    <span
-                      className="text-[10px] font-bold px-2 py-0.5 rounded-full"
-                      style={{ backgroundColor: themeConfig.dangerColor, color: '#fff' }}
+                      <span className="text-[10px] font-bold" style={{ color: themeConfig.textPrimary }}>Dashboard</span>
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full text-white" style={{ backgroundColor: themeConfig.successColor }}>Open</span>
+                        <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full text-white" style={{ backgroundColor: themeConfig.dangerColor }}>Closed</span>
+                        <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full text-white" style={{ backgroundColor: themeConfig.warningColor }}>Soon</span>
+                        <div className="w-5 h-5 rounded-md flex items-center justify-center text-white text-[9px] font-black" style={{ background: `linear-gradient(135deg,${themeConfig.primaryColor},${themeConfig.secondaryColor})` }}>A</div>
+                      </div>
+                    </div>
+
+                    {/* Page content */}
+                    <div className="flex-1 p-3 space-y-2 overflow-hidden" style={{ backgroundColor: themeConfig.pageBg }}>
+                      {/* Stats row */}
+                      <div className="grid grid-cols-3 gap-1.5">
+                        {[
+                          { label: 'Orders', val: '24', color: themeConfig.primaryColor },
+                          { label: 'Revenue', val: `${form.currency_symbol || 'AED'} 1.2k`, color: themeConfig.successColor },
+                          { label: 'Tables', val: '8/12', color: themeConfig.accentColor },
+                        ].map(s => (
+                          <div key={s.label} className="bg-white rounded-lg p-2 border text-center shadow-xs" style={{ borderColor: themeConfig.cardBorderColor }}>
+                            <p className="text-[11px] font-black" style={{ color: s.color }}>{s.val}</p>
+                            <p className="text-[8px] font-medium" style={{ color: themeConfig.textMuted }}>{s.label}</p>
+                          </div>
+                        ))}
+                      </div>
+
+                      {/* Category pills */}
+                      <div className="flex items-center gap-1 flex-wrap">
+                        <span className="text-[9px] font-bold text-white px-2 py-0.5 rounded-full" style={{ backgroundColor: themeConfig.primaryColor }}>All</span>
+                        {['Starters', 'Main', 'Drinks'].map(c => (
+                          <span key={c} className="text-[9px] font-medium px-2 py-0.5 rounded-full bg-white border" style={{ color: themeConfig.textMuted, borderColor: themeConfig.cardBorderColor }}>{c}</span>
+                        ))}
+                        <span className="text-[9px] font-bold text-white px-1.5 py-0.5 rounded-full ml-auto" style={{ backgroundColor: themeConfig.accentColor }}>12</span>
+                      </div>
+
+                      {/* Orders */}
+                      {['Butter Chicken', 'Paneer Tikka'].map((dish, i) => (
+                        <div key={dish} className="bg-white rounded-lg p-2 flex items-center justify-between shadow-xs border-l-2" style={{ borderColor: themeConfig.cardBorderColor }}>
+                          <div>
+                            <p className="text-[9px] font-bold" style={{ color: themeConfig.textPrimary }}>{dish}</p>
+                            <p className="text-[8px]" style={{ color: themeConfig.textMuted }}>{form.currency_symbol || 'AED'} {i === 0 ? '320' : '240'}</p>
+                          </div>
+                          <button
+                            type="button"
+                            className="text-[9px] font-bold text-white px-2 py-0.5 rounded-md"
+                            style={{ background: `linear-gradient(135deg,${themeConfig.primaryColor},${themeConfig.secondaryColor})` }}
+                          >
+                            + Add
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Mobile bottom nav simulation */}
+                    <div
+                      className="flex items-center justify-around px-2 py-1.5 border-t border-slate-200/60 shrink-0"
+                      style={{ backgroundColor: themeConfig.mobileNavBg }}
                     >
-                      Closed
-                    </span>
+                      {['Home', 'Orders', 'Tables', 'More'].map((t, i) => (
+                        <div key={t} className="flex flex-col items-center gap-0.5">
+                          <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: i === 0 ? themeConfig.primaryColor : themeConfig.textMuted, opacity: i === 0 ? 1 : 0.5 }} />
+                          <span className="text-[7px] font-bold" style={{ color: i === 0 ? themeConfig.primaryColor : themeConfig.textMuted }}>{t}</span>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 </div>
 
-                {/* Simulated page content */}
-                <div className="p-4 space-y-3">
-                  {/* Category pills */}
-                  <div className="flex items-center gap-1.5">
-                    <span
-                      className="text-[10px] font-bold text-white px-2.5 py-1 rounded-full transition-colors duration-300"
-                      style={{ backgroundColor: themeConfig.primaryColor }}
-                    >
-                      All Items
+                {/* Color legend strip */}
+                <div className="flex flex-wrap gap-x-3 gap-y-1 px-3 py-2 bg-slate-50 border-t border-slate-200">
+                  {(
+                    [
+                      { label: 'Primary',    color: themeConfig.primaryColor },
+                      { label: 'Secondary',  color: themeConfig.secondaryColor },
+                      { label: 'Accent',     color: themeConfig.accentColor },
+                      { label: 'Sidebar',    color: themeConfig.sidebarBg },
+                      { label: 'Header',     color: themeConfig.headerBg },
+                      { label: 'Page BG',    color: themeConfig.pageBg },
+                      { label: 'Success',    color: themeConfig.successColor },
+                      { label: 'Danger',     color: themeConfig.dangerColor },
+                      { label: 'Warning',    color: themeConfig.warningColor },
+                    ] as { label: string; color: string }[]
+                  ).map(({ label, color }) => (
+                    <span key={label} className="inline-flex items-center gap-1 text-[9px] text-slate-500 font-medium">
+                      <span className="w-2.5 h-2.5 rounded-full border border-slate-300 shrink-0" style={{ backgroundColor: color }} />
+                      {label}
                     </span>
-                    <span className="text-[10px] font-medium text-slate-600 bg-white border border-slate-200 px-2.5 py-1 rounded-full">
-                      Starters
-                    </span>
-                    <span className="text-[10px] font-medium text-slate-600 bg-white border border-slate-200 px-2.5 py-1 rounded-full">
-                      Main Course
-                    </span>
-                    <span
-                      className="text-[10px] font-bold text-white px-2 py-0.5 rounded-full ml-auto"
-                      style={{ backgroundColor: themeConfig.accentColor }}
-                    >
-                      12 items
-                    </span>
-                  </div>
-
-                  {/* Dish card */}
-                  <div
-                    className="bg-white rounded-xl p-3 flex items-center justify-between gap-3 shadow-xs border-l-4 transition-colors duration-300"
-                    style={{ borderColor: themeConfig.cardBorderColor }}
-                  >
-                    <div className="flex items-center gap-2.5 min-w-0">
-                      <div
-                        className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0"
-                        style={{ backgroundColor: themeConfig.accentColor + '22' }}
-                      >
-                        <Store className="w-5 h-5" style={{ color: themeConfig.accentColor }} />
-                      </div>
-                      <div className="min-w-0">
-                        <p className="text-xs font-bold text-slate-800 truncate">Chef's Signature Special</p>
-                        <p className="text-[10px] text-slate-400 truncate">Fresh ingredients Â· Premium taste</p>
-                        <p className="text-xs font-bold text-slate-900 mt-0.5">
-                          {form.currency_symbol || 'AED'} 45.00
-                        </p>
-                      </div>
-                    </div>
-                    <button
-                      type="button"
-                      className="shrink-0 text-white font-bold text-[11px] px-3 py-1.5 rounded-lg shadow-xs transition-colors duration-300"
-                      style={{
-                        background: `linear-gradient(135deg, ${themeConfig.primaryColor}, ${themeConfig.secondaryColor})`,
-                      }}
-                    >
-                      + Add
-                    </button>
-                  </div>
-
-                  {/* Second dish card */}
-                  <div
-                    className="bg-white rounded-xl p-3 flex items-center justify-between gap-3 shadow-xs border-l-4 transition-colors duration-300"
-                    style={{ borderColor: themeConfig.cardBorderColor }}
-                  >
-                    <div className="flex items-center gap-2.5 min-w-0">
-                      <div
-                        className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0"
-                        style={{ backgroundColor: themeConfig.primaryColor + '18' }}
-                      >
-                        <Sparkles className="w-5 h-5" style={{ color: themeConfig.primaryColor }} />
-                      </div>
-                      <div className="min-w-0">
-                        <p className="text-xs font-bold text-slate-800 truncate">Seasonal Dessert Platter</p>
-                        <p className="text-[10px] text-slate-400 truncate">Chef's choice Â· Limited daily</p>
-                        <p className="text-xs font-bold text-slate-900 mt-0.5">
-                          {form.currency_symbol || 'AED'} 28.00
-                        </p>
-                      </div>
-                    </div>
-                    <button
-                      type="button"
-                      className="shrink-0 text-white font-bold text-[11px] px-3 py-1.5 rounded-lg shadow-xs transition-colors duration-300"
-                      style={{
-                        background: `linear-gradient(135deg, ${themeConfig.primaryColor}, ${themeConfig.secondaryColor})`,
-                      }}
-                    >
-                      + Add
-                    </button>
-                  </div>
-
-                  {/* Color summary strip */}
-                  <div className="flex items-center gap-1.5 pt-1 flex-wrap">
-                    {(
-                      [
-                        { label: 'Primary', color: themeConfig.primaryColor },
-                        { label: 'Secondary', color: themeConfig.secondaryColor },
-                        { label: 'Accent', color: themeConfig.accentColor },
-                        { label: 'Navbar', color: themeConfig.navbarBg },
-                        { label: 'Border', color: themeConfig.cardBorderColor },
-                        { label: 'Success', color: themeConfig.successColor },
-                        { label: 'Danger', color: themeConfig.dangerColor },
-                      ] as { label: string; color: string }[]
-                    ).map(({ label, color }) => (
-                      <span key={label} className="inline-flex items-center gap-1 text-[10px] text-slate-500 font-medium">
-                        <span
-                          className="w-3 h-3 rounded-full border border-slate-200 shrink-0"
-                          style={{ backgroundColor: color }}
-                        />
-                        {label}
-                      </span>
-                    ))}
-                  </div>
+                  ))}
                 </div>
               </div>
             </div>
           </div>
         </div>
+
 
 
         {/* 4. Operating Hours & Schedule */}

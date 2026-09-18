@@ -61,16 +61,29 @@
   --brand: #16a34a;
   --brand-contrast: #ffffff;
 
-  /* Admin Theme Variables — per-element control */
+  /* Admin Theme Variables — full per-element control */
   --theme-primary: #f97316;
   --theme-secondary: #ea580c;
   --theme-accent: #fb923c;
-  --theme-navbar-bg: #0f172a;
   --theme-card-border: #fed7aa;
+
+  /* Navigation */
+  --theme-sidebar-bg: #0f172a;
+  --theme-sidebar-text: #94a3b8;
+  --theme-header-bg: #ffffff;
+  --theme-mobile-nav-bg: #ffffff;
+
+  /* Status */
   --theme-success: #059669;
   --theme-danger: #e11d48;
+  --theme-warning: #d97706;
 
-  /* Derived utilities from primary */
+  /* Page */
+  --theme-page-bg: #f8fafc;
+  --theme-text-primary: #0f172a;
+  --theme-text-muted: #64748b;
+
+  /* Derived from primary */
   --theme-rgb: 249, 115, 22;
   --theme-light: rgba(249, 115, 22, 0.12);
   --theme-border: rgba(249, 115, 22, 0.25);
@@ -89,71 +102,41 @@ html, body {
 }
 
 /* Dynamic Theme Utilities for Admin */
-.bg-theme-primary {
-  background-color: var(--theme-primary) !important;
-}
+.bg-theme-primary { background-color: var(--theme-primary) !important; }
+.text-theme-primary { color: var(--theme-primary) !important; }
+.border-theme-primary { border-color: var(--theme-primary) !important; }
+.bg-theme-gradient { background: linear-gradient(135deg, var(--theme-primary), var(--theme-secondary)) !important; }
+.bg-theme-light { background-color: var(--theme-light) !important; }
+.border-theme-light { border-color: var(--theme-border) !important; }
+.shadow-theme { box-shadow: 0 4px 16px 0 var(--theme-glow) !important; }
+.shadow-theme-lg { box-shadow: 0 10px 25px -3px var(--theme-glow), 0 4px 10px -2px var(--theme-glow) !important; }
 
-.text-theme-primary {
-  color: var(--theme-primary) !important;
-}
+/* Accent */
+.bg-theme-accent { background-color: var(--theme-accent) !important; }
+.text-theme-accent { color: var(--theme-accent) !important; }
 
-.border-theme-primary {
-  border-color: var(--theme-primary) !important;
-}
+/* Card border */
+.border-theme-card { border-color: var(--theme-card-border) !important; }
 
-.bg-theme-gradient {
-  background: linear-gradient(135deg, var(--theme-primary), var(--theme-secondary)) !important;
-}
+/* Navigation */
+.bg-theme-sidebar { background-color: var(--theme-sidebar-bg) !important; }
+.text-theme-sidebar { color: var(--theme-sidebar-text) !important; }
+.bg-theme-header { background-color: var(--theme-header-bg) !important; }
+.bg-theme-mobile-nav { background-color: var(--theme-mobile-nav-bg) !important; }
 
-.bg-theme-light {
-  background-color: var(--theme-light) !important;
-}
+/* Status */
+.bg-theme-success { background-color: var(--theme-success) !important; }
+.text-theme-success { color: var(--theme-success) !important; }
+.bg-theme-danger { background-color: var(--theme-danger) !important; }
+.text-theme-danger { color: var(--theme-danger) !important; }
+.bg-theme-warning { background-color: var(--theme-warning) !important; }
+.text-theme-warning { color: var(--theme-warning) !important; }
 
-.border-theme-light {
-  border-color: var(--theme-border) !important;
-}
+/* Page */
+.bg-theme-page { background-color: var(--theme-page-bg) !important; }
+.text-theme-body { color: var(--theme-text-primary) !important; }
+.text-theme-muted { color: var(--theme-text-muted) !important; }
 
-.shadow-theme {
-  box-shadow: 0 4px 16px 0 var(--theme-glow) !important;
-}
-
-.shadow-theme-lg {
-  box-shadow: 0 10px 25px -3px var(--theme-glow), 0 4px 10px -2px var(--theme-glow) !important;
-}
-
-/* Accent utilities */
-.bg-theme-accent {
-  background-color: var(--theme-accent) !important;
-}
-.text-theme-accent {
-  color: var(--theme-accent) !important;
-}
-
-/* Navbar / Sidebar utilities */
-.bg-theme-navbar {
-  background-color: var(--theme-navbar-bg) !important;
-}
-
-/* Card border accent */
-.border-theme-card {
-  border-color: var(--theme-card-border) !important;
-}
-
-/* Success utilities */
-.bg-theme-success {
-  background-color: var(--theme-success) !important;
-}
-.text-theme-success {
-  color: var(--theme-success) !important;
-}
-
-/* Danger utilities */
-.bg-theme-danger {
-  background-color: var(--theme-danger) !important;
-}
-.text-theme-danger {
-  color: var(--theme-danger) !important;
-}
 
 /* Tactile Spring Buttons */
 .btn-theme-primary {

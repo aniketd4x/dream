@@ -439,10 +439,10 @@ export default function AdminLayout({ active, onNavigate, children }: AdminLayou
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 flex font-sans antialiased text-slate-900 selection:bg-theme-light selection:text-theme-primary">
+    <div className="min-h-screen bg-theme-page flex font-sans antialiased text-slate-900 selection:bg-theme-light selection:text-theme-primary">
       {/* Sidebar - Desktop Only (Hidden on Mobile) */}
-      <aside className="hidden lg:flex sticky top-0 left-0 z-40 h-screen w-64 bg-slate-900 text-slate-300 flex-col shrink-0">
-        <div className="flex items-center gap-3 px-5 h-16 border-b border-slate-800 shrink-0">
+      <aside className="hidden lg:flex sticky top-0 left-0 z-40 h-screen w-64 bg-theme-sidebar flex-col shrink-0" style={{ color: 'var(--theme-sidebar-text)' }}>
+        <div className="flex items-center gap-3 px-5 h-16 border-b border-white/10 shrink-0">
           <img
             src={restaurant?.logo_url || '/logo.png'}
             alt={restaurant?.name || 'Dishgaze'}
@@ -466,8 +466,9 @@ export default function AdminLayout({ active, onNavigate, children }: AdminLayou
                 className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all native-press ${
                   isActive
                     ? 'bg-theme-light text-theme-primary border border-theme-light font-bold shadow-xs'
-                    : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+                    : 'hover:bg-white/10'
                 }`}
+                style={!isActive ? { color: 'var(--theme-sidebar-text)' } : {}}
               >
                 <div className="flex items-center gap-3 min-w-0">
                   <Icon className="w-4.5 h-4.5 shrink-0" />
@@ -535,7 +536,7 @@ export default function AdminLayout({ active, onNavigate, children }: AdminLayou
       {/* Main Container */}
       <div className="flex-1 flex flex-col min-w-0">
         {/* Modern App Header - Clean on Mobile, No Hamburger Menu */}
-        <header className="sticky top-0 z-30 min-h-16 h-auto py-2.5 bg-white/95 backdrop-blur-xl border-b border-slate-200/80 flex items-center justify-between px-4 lg:px-8 gap-3 pt-safe">
+        <header className="sticky top-0 z-30 min-h-16 h-auto py-2.5 backdrop-blur-xl border-b border-slate-200/80 flex items-center justify-between px-4 lg:px-8 gap-3 pt-safe bg-theme-header">
           <div className="flex items-center gap-3 min-w-0">
             {/* Mobile Header Logo/Icon */}
             <img
@@ -743,7 +744,7 @@ export default function AdminLayout({ active, onNavigate, children }: AdminLayou
       {/* ========================================================================= */}
       {/* NATIVE MOBILE BOTTOM NAVIGATION BAR (Thumb Friendly, iOS/Android style)   */}
       {/* ========================================================================= */}
-      <nav className="lg:hidden fixed bottom-0 inset-x-0 z-40 bg-white/95 backdrop-blur-2xl border-t border-slate-200/90 shadow-[0_-4px_25px_rgba(0,0,0,0.06)] pb-safe">
+      <nav className="lg:hidden fixed bottom-0 inset-x-0 z-40 bg-theme-mobile-nav backdrop-blur-2xl border-t border-slate-200/90 shadow-[0_-4px_25px_rgba(0,0,0,0.06)] pb-safe">
         <div className="grid grid-cols-5 items-center h-16 px-1">
           {mobilePrimaryTabs.map((tab) => {
             const Icon = tab.icon;
