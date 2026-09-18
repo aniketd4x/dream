@@ -22,7 +22,8 @@ import {
   Loader2,
   X,
   Store,
-  DollarSign
+  DollarSign,
+  LogOut,
 } from 'lucide-react';
 import bcrypt from 'bcryptjs';
 import { supabase } from '@/lib/supabase';
@@ -53,7 +54,7 @@ export interface RestaurantRecord {
 
 export default function SuperAdminPage() {
   const navigate = useNavigate();
-  const { user, restaurant, switchRestaurant, isSuperAdmin } = useAuth();
+  const { user, restaurant, switchRestaurant, isSuperAdmin, signOut } = useAuth();
 
   const [restaurants, setRestaurants] = useState<RestaurantRecord[]>([]);
   const [loading, setLoading] = useState(true);
@@ -416,25 +417,74 @@ export default function SuperAdminPage() {
   };
 
   return (
-    <div className="space-y-6 max-w-7xl mx-auto pb-16">
-      {/* Top Banner & Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 p-6 rounded-2xl text-white shadow-lg border border-slate-700/50">
-        <div>
-          <div className="flex items-center gap-2 mb-1">
-            <span className="bg-amber-400 text-slate-900 text-xs font-black px-2.5 py-0.5 rounded-full uppercase tracking-wider flex items-center gap-1 shadow-sm">
-              <ShieldCheck className="w-3.5 h-3.5" /> Super Admin
-            </span>
-            <span className="text-slate-400 text-xs">• Platform Command Center</span>
+    <div className="min-h-screen bg-slate-950 text-slate-100 font-sans antialiased selection:bg-amber-400 selection:text-slate-950">
+      {/* Standalone Super Admin Platform Navbar */}
+      <header className="sticky top-0 z-40 bg-slate-900/90 backdrop-blur-md border-b border-slate-800 shadow-md">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-4">
+          <div className="flex items-center gap-3 min-w-0">
+            <img
+              src="/logo.png"
+              alt="Dishgaze"
+              className="w-9 h-9 rounded-xl object-contain bg-white/10 p-1 border border-white/10 shadow-sm shrink-0"
+              onError={(e) => { (e.currentTarget as HTMLImageElement).src = '/logo.png'; }}
+            />
+            <div className="min-w-0">
+              <div className="flex items-center gap-2">
+                <span className="font-black text-base text-white tracking-tight">DishGaze</span>
+                <span className="bg-amber-400 text-slate-950 text-[10px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider">
+                  Super Admin
+                </span>
+              </div>
+              <p className="text-[11px] text-slate-400 truncate hidden sm:block">Platform Multi-Tenant Command Center</p>
+            </div>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-white">
-            All Registered Restaurants
-          </h1>
-          <p className="text-slate-300 text-sm mt-1">
-            Provision, monitor, configure, and switch between restaurant portals across the DishGaze network.
-          </p>
-        </div>
 
-        <div className="flex items-center gap-2 shrink-0">
+          <div className="flex items-center gap-3 shrink-0">
+            <button
+              onClick={() => navigate('/admin')}
+              className="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-sm active:scale-95"
+              title="Open Restaurant Manager Panel"
+            >
+              <Store className="w-3.5 h-3.5 text-emerald-400" />
+              <span className="hidden sm:inline">Go to Restaurant Panel</span>
+              <span className="sm:hidden">Manager</span>
+            </button>
+
+            <button
+              onClick={() => {
+                triggerHaptic('medium');
+                signOut();
+              }}
+              className="px-3 py-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/30 rounded-xl text-xs font-bold transition flex items-center gap-1.5 active:scale-95"
+              title="Sign Out"
+            >
+              <LogOut className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">Sign Out</span>
+            </button>
+          </div>
+        </div>
+      </header>
+
+      {/* Main Super Admin Body */}
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 py-8 space-y-6">
+        {/* Top Banner & Header */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 p-6 rounded-2xl text-white shadow-lg border border-slate-800">
+          <div>
+            <div className="flex items-center gap-2 mb-1">
+              <span className="bg-amber-400 text-slate-900 text-xs font-black px-2.5 py-0.5 rounded-full uppercase tracking-wider flex items-center gap-1 shadow-sm">
+                <ShieldCheck className="w-3.5 h-3.5" /> Super Admin
+              </span>
+              <span className="text-slate-400 text-xs">• All Restaurants Master Directory</span>
+            </div>
+            <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-white">
+              All Registered Restaurants
+            </h1>
+            <p className="text-slate-300 text-sm mt-1">
+              Provision, monitor, configure, and switch between restaurant portals across the DishGaze network.
+            </p>
+          </div>
+
+          <div className="flex items-center gap-2 shrink-0">
           <button
             onClick={fetchAllData}
             disabled={loading}
@@ -1067,6 +1117,7 @@ export default function SuperAdminPage() {
           </div>
         </div>
       )}
+      </main>
     </div>
   );
 }

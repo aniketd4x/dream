@@ -313,13 +313,7 @@ export default function AdminLayout({ active, onNavigate, children }: AdminLayou
   }, [restaurant]);
 
   // Navigation Items
-  const navItems: Array<{
-    key: string;
-    label: string;
-    icon: any;
-    badge?: number;
-    tag?: string;
-  }> = [
+  const navItems = [
     { key: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { key: 'table:orders', label: 'Orders', icon: ShoppingBag, badge: pendingCount },
     { key: 'reports', label: 'Reports', icon: BarChart3 },
@@ -327,9 +321,6 @@ export default function AdminLayout({ active, onNavigate, children }: AdminLayou
     { key: 'table:menu_items', label: 'Menu', icon: UtensilsCrossed },
     { key: 'table:categories', label: 'Categories', icon: FolderTree },
     { key: 'table:restaurant_settings', label: 'Settings', icon: Settings },
-    ...(isSuperAdmin
-      ? [{ key: 'super:restaurants', label: 'All Restaurants', icon: Building2, tag: 'SUPER' }]
-      : []),
   ];
 
   // Mobile Bottom Bar Primary Tabs (Top 4 most used + More)
@@ -340,10 +331,7 @@ export default function AdminLayout({ active, onNavigate, children }: AdminLayou
     { key: 'table:dining_tables', label: 'Tables', icon: Table2 },
   ];
 
-  const activeLabel =
-    active === 'super:restaurants'
-      ? 'All Restaurants'
-      : (navItems.find((n) => n.key === active)?.label ?? 'Dashboard');
+  const activeLabel = navItems.find((n) => n.key === active)?.label ?? 'Dashboard';
 
   function handleNav(key: string) {
     triggerHaptic('selection');
@@ -386,11 +374,6 @@ export default function AdminLayout({ active, onNavigate, children }: AdminLayou
                   <Icon className="w-4.5 h-4.5 shrink-0" />
                   <span className="truncate">{item.label}</span>
                 </div>
-                {item.tag && (
-                  <span className="ml-2 bg-amber-400 text-slate-950 text-[10px] font-black rounded px-1.5 py-0.5 tracking-wider uppercase shadow-xs">
-                    {item.tag}
-                  </span>
-                )}
                 {item.badge !== undefined && item.badge > 0 && (
                   <span className="ml-2 bg-red-500 text-white text-[10px] font-black rounded-full h-5 min-w-[20px] px-1.5 flex items-center justify-center animate-live-pulse shadow-sm">
                     {item.badge}
@@ -452,37 +435,6 @@ export default function AdminLayout({ active, onNavigate, children }: AdminLayou
 
       {/* Main Container */}
       <div className="flex-1 flex flex-col min-w-0">
-        {/* Super Admin Impersonation Notice Banner */}
-        {isManagingDifferentRestaurant && (
-          <div className="bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 text-slate-950 px-4 py-2 text-xs font-bold flex flex-wrap items-center justify-between gap-2 shadow-sm z-40">
-            <div className="flex items-center gap-2">
-              <span className="bg-slate-950 text-amber-400 text-[10px] font-black px-2 py-0.5 rounded uppercase tracking-wider">
-                Super Admin Mode
-              </span>
-              <span>
-                Managing outlet: <strong>{restaurant?.name}</strong> ({restaurant?.currency_symbol || '₹'})
-              </span>
-            </div>
-            <div className="flex items-center gap-2">
-              <button
-                onClick={() => handleNav('super:restaurants')}
-                className="px-2.5 py-1 bg-slate-950 text-white rounded-lg text-xs font-bold hover:bg-slate-800 transition-all shadow-xs active:scale-95"
-              >
-                Switch Restaurant
-              </button>
-              <button
-                onClick={async () => {
-                  await resetToSuperAdmin();
-                  handleNav('super:restaurants');
-                }}
-                className="px-2.5 py-1 bg-white/90 hover:bg-white text-slate-900 rounded-lg text-xs font-bold transition-all shadow-xs active:scale-95"
-              >
-                Exit to All Restaurants
-              </button>
-            </div>
-          </div>
-        )}
-
         {/* Modern App Header - Clean on Mobile, No Hamburger Menu */}
         <header className="sticky top-0 z-30 min-h-16 h-auto py-2.5 bg-white/95 backdrop-blur-xl border-b border-slate-200/80 flex items-center justify-between px-4 lg:px-8 gap-3 pt-safe">
           <div className="flex items-center gap-3 min-w-0">
@@ -747,33 +699,6 @@ export default function AdminLayout({ active, onNavigate, children }: AdminLayou
 
             {/* Quick Links Grid */}
             <div className="space-y-2">
-              {isSuperAdmin && (
-                <button
-                  onClick={() => handleNav('super:restaurants')}
-                  className={`w-full flex items-center justify-between p-3.5 rounded-2xl border transition native-press ${
-                    active === 'super:restaurants'
-                      ? 'bg-amber-500/10 border-amber-500/30 text-amber-900 font-bold'
-                      : 'bg-slate-900 text-white border-slate-800'
-                  }`}
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-xl bg-amber-400 text-slate-950 flex items-center justify-center font-bold shadow-xs">
-                      <Building2 className="w-5 h-5" />
-                    </div>
-                    <div className="text-left">
-                      <div className="flex items-center gap-1.5">
-                        <p className="text-sm font-bold text-white">All Restaurants</p>
-                        <span className="bg-amber-400 text-slate-950 text-[10px] font-black px-1.5 rounded uppercase">
-                          SUPER
-                        </span>
-                      </div>
-                      <p className="text-xs text-slate-400 font-normal">Manage all outlets & platform accounts</p>
-                    </div>
-                  </div>
-                  <ChevronRight className="w-4 h-4 text-slate-400" />
-                </button>
-              )}
-
               <button
                 onClick={() => handleNav('reports')}
                 className={`w-full flex items-center justify-between p-3.5 rounded-2xl border transition native-press ${

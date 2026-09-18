@@ -33,7 +33,6 @@ function AdminApp() {
 
   // Map route pathname to AdminLayout active tab string
   const getActiveFromPath = (pathname: string): string => {
-    if (pathname.includes('/admin/restaurants') || pathname.includes('/admin/super')) return 'super:restaurants';
     if (pathname.includes('/admin/categories')) return 'table:categories';
     if (pathname.includes('/admin/menu')) return 'table:menu_items';
     if (pathname.includes('/admin/tables')) return 'table:dining_tables';
@@ -55,8 +54,6 @@ function AdminApp() {
   const handleNavigate = (newSection: string) => {
     if (newSection === 'dashboard') {
       navigate('/admin');
-    } else if (newSection === 'super:restaurants') {
-      navigate('/admin/restaurants');
     } else if (newSection === 'reports') {
       navigate('/admin/reports');
     } else if (newSection === 'table:categories') {
@@ -133,7 +130,6 @@ function AdminApp() {
   useEffect(() => {
     const titles: Record<string, string> = {
       dashboard: 'Dashboard',
-      'super:restaurants': 'All Restaurants (Super Admin)',
       'table:orders': 'Orders',
       reports: 'Reports & Analytics',
       'table:dining_tables': 'Dining Tables',
@@ -162,7 +158,6 @@ function AdminApp() {
     <>
       <AdminLayout active={active} onNavigate={handleNavigate}>
         {active === 'dashboard' && <Dashboard onNavigate={handleNavigate} />}
-        {active === 'super:restaurants' && <SuperAdminPage />}
         {active === 'table:orders' && <CrudPage table="orders" />}
         {active === 'reports' && <ReportsPage />}
         {active === 'table:categories' && <CategoryPage />}
@@ -217,6 +212,28 @@ function AdminGate() {
   }
 
   return <AdminApp />;
+}
+
+function SuperAdminGate() {
+  const { user, loading } = useAuth();
+
+  useEffect(() => {
+    document.title = 'Super Admin | DishGaze Network';
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-slate-950 p-4 sm:p-6 max-w-7xl mx-auto flex items-center justify-center text-white">
+        <DashboardSkeleton />
+      </div>
+    );
+  }
+
+  if (!user) {
+    return <AdminLogin />;
+  }
+
+  return <SuperAdminPage />;
 }
 
 function FullScreenSplash({ onFinish }: { onFinish: () => void }) {
@@ -276,7 +293,11 @@ export default function App() {
         <Route path="/menu/:qrToken" element={<QRMenuPage />} />
         <Route path="/order/:orderId" element={<OrderStatusPage />} />
 
-        {/* Restaurant Staff & Admin Portal Routes */}
+        {/* Separate Dedicated Super Admin Routes */}
+        <Route path="/superadmin" element={<SuperAdminGate />} />
+        <Route path="/super-admin" element={<Navigate to="/superadmin" replace />} />
+
+        {/* Restaurant Staff & Manager Portal Routes */}
         <Route path="/admin" element={<AdminGate />} />
         <Route path="/admin/*" element={<AdminGate />} />
         <Route path="/login" element={<Navigate to="/admin" replace />} />
