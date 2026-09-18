@@ -6,6 +6,7 @@ export interface QRCardRenderParams {
   qrValue: string;
   restaurantName?: string;
   logoUrl?: string | null;
+  isRoom?: boolean;
 }
 
 export interface RestaurantQRCardRenderParams {
@@ -247,6 +248,7 @@ export async function generateQRCardDataUrl(params: QRCardRenderParams): Promise
     qrValue,
     restaurantName = 'Smart Restaurant',
     logoUrl,
+    isRoom = false,
   } = params;
 
   // High-res canvas dimensions (approx 4" x 5.8" at 300 DPI)
@@ -359,7 +361,7 @@ export async function generateQRCardDataUrl(params: QRCardRenderParams): Promise
   ctx.font = '900 24px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
   ctx.textAlign = 'center';
   ctx.letterSpacing = '5px';
-  ctx.fillText('DIGITAL MENU', width / 2, currentY);
+  ctx.fillText(isRoom ? 'ROOM SERVICE & DINING' : 'DIGITAL MENU', width / 2, currentY);
 
   // Right line
   ctx.beginPath();
@@ -369,7 +371,7 @@ export async function generateQRCardDataUrl(params: QRCardRenderParams): Promise
 
   currentY += 45;
 
-  // 6. YOUR TABLE Card Box
+  // 6. YOUR TABLE / YOUR ROOM Card Box
   const tableBoxX = pad + 45;
   const tableBoxW = innerW - 90;
   const tableBoxH = 135;
@@ -381,15 +383,15 @@ export async function generateQRCardDataUrl(params: QRCardRenderParams): Promise
   ctx.strokeStyle = '#E8E2D5';
   ctx.stroke();
 
-  // Table Box Text
+  // Box Text
   ctx.textAlign = 'left';
   ctx.fillStyle = '#8C827A';
   ctx.font = '900 20px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
-  ctx.fillText('YOUR TABLE', tableBoxX + 35, currentY + 24);
+  ctx.fillText(isRoom ? 'YOUR ROOM' : 'YOUR TABLE', tableBoxX + 35, currentY + 24);
 
   ctx.fillStyle = '#171717';
   ctx.font = '900 46px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
-  ctx.fillText(`TABLE ${tableNumber}`, tableBoxX + 35, currentY + 54);
+  ctx.fillText(isRoom ? `ROOM ${tableNumber}` : `TABLE ${tableNumber}`, tableBoxX + 35, currentY + 54);
 
   if (tableName && tableName.trim()) {
     ctx.fillStyle = '#0F766E';
@@ -397,7 +399,7 @@ export async function generateQRCardDataUrl(params: QRCardRenderParams): Promise
     ctx.fillText(tableName, tableBoxX + 35, currentY + 98);
   }
 
-  // Table Number Pill on Right - Deep emerald with gold ring
+  // Number Pill on Right - Deep emerald with gold ring
   const pillSize = 88;
   const pillX = tableBoxX + tableBoxW - pillSize - 28;
   const pillY = currentY + (tableBoxH - pillSize) / 2;
@@ -428,11 +430,11 @@ export async function generateQRCardDataUrl(params: QRCardRenderParams): Promise
   ctx.strokeStyle = '#E7E2D8';
   ctx.stroke();
 
-  // SCAN TO VIEW MENU
+  // SCAN TO VIEW MENU / ROOM SERVICE
   ctx.textAlign = 'center';
   ctx.fillStyle = '#0F172A';
   ctx.font = '900 25px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
-  ctx.fillText('SCAN TO VIEW MENU', width / 2, currentY + 30);
+  ctx.fillText(isRoom ? 'SCAN FOR ROOM SERVICE & FOOD' : 'SCAN TO VIEW MENU', width / 2, currentY + 30);
 
   ctx.fillStyle = '#78716C';
   ctx.font = '700 21px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
@@ -451,23 +453,46 @@ export async function generateQRCardDataUrl(params: QRCardRenderParams): Promise
   ctx.strokeStyle = '#E0D9CB';
   ctx.stroke();
 
-  // 4 Luxury Gold Corner Guide Brackets around QR box
-  drawGoldCornerBrackets(ctx, qrWhiteBoxX, qrWhiteBoxY, qrWhiteBoxSize, qrWhiteBoxSize, 32, 10, 4, '#C59D5F');
+  // 4 Luxury Gold Corner Guide Brackets
+  drawGoldCornerBrackets(ctx, qrWhiteBoxX, qrWhiteBoxY, qrWhiteBoxSize, qrWhiteBoxSize, 36, 12, 4);
 
-  // Draw High-Res QR matrix directly with deep emerald & center logo badge
-  const qrDataUrl = await generateRawQRDataUrl(qrValue, qrSize, logoUrl);
-  const qrImg = await loadSafeImage(qrDataUrl);
-  if (qrImg) {
-    ctx.drawImage(qrImg, qrWhiteBoxX + 20, qrWhiteBoxY + 20, qrSize, qrSize);
+  // Generate QR Canvas with Logo in center
+  const qrCanvas = document.createElement('canvas');
+  await QRCode.toCanvas(qrCanvas, qrValue, {
+    width: qrSize,
+    margin: 2,
+    color: {
+      dark: '#0D3B36',
+      light: '#FFFFFF',
+    },
+    errorCorrectionLevel: 'H',
+  });
+
+  // Embed Logo inside QR Canvas if available
+  if (logoImage) {
+    const qrCtx = qrCanvas.getContext('2d');
+    if (qrCtx) {
+      const iconSize = Math.round(qrSize * 0.22);
+      const iconX = (qrSize - iconSize) / 2;
+      const iconY = (qrSize - iconSize) / 2;
+      qrCtx.fillStyle = '#FFFFFF';
+      qrCtx.beginPath();
+      qrCtx.arc(qrSize / 2, qrSize / 2, iconSize / 2 + 5, 0, Math.PI * 2);
+      qrCtx.fill();
+      qrCtx.drawImage(logoImage, iconX, iconY, iconSize, iconSize);
+    }
   }
 
-  // SCAN • BROWSE • ORDER
-  const scanSubY = qrWhiteBoxY + qrWhiteBoxSize + 32;
+  ctx.drawImage(qrCanvas, qrWhiteBoxX + 20, qrWhiteBoxY + 20);
+
+  // 8. SCAN • BROWSE • ORDER Tagline with Gold Diamonds
+  const scanSubY = currentY + qrBoxH - 45;
   drawDiamond(ctx, width / 2 - 180, scanSubY + 11, 5, '#C59D5F');
 
+  ctx.textAlign = 'center';
   ctx.fillStyle = '#0F766E';
-  ctx.font = '900 21px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
-  ctx.fillText('SCAN  •  BROWSE  •  ORDER', width / 2, scanSubY);
+  ctx.font = '900 23px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+  ctx.fillText(isRoom ? 'SCAN  •  SERVICES  •  DINING' : 'SCAN  •  BROWSE  •  ORDER', width / 2, scanSubY);
 
   drawDiamond(ctx, width / 2 + 180, scanSubY + 11, 5, '#C59D5F');
 

@@ -15,6 +15,9 @@ import {
   QrCode as QrCodeIcon,
   ChevronDown,
   Sparkles,
+  RefreshCw,
+  ExternalLink,
+  Bed,
 } from 'lucide-react';
 import { toPng } from 'html-to-image';
 import {
@@ -31,13 +34,19 @@ import {
 } from '@/lib/qrCanvasGenerator';
 import { triggerHaptic } from '@/lib/haptics';
 
-interface QRCardProps {
+export interface QRCardProps {
   tableNumber: string;
   tableName?: string;
   qrValue: string;
   restaurantName?: string;
   logoUrl?: string | null;
   onClose?: () => void;
+  // Hotel Room extensions
+  isRoom?: boolean;
+  roomType?: string;
+  floorNumber?: number;
+  onRegenerateToken?: () => void;
+  previewUrl?: string;
 }
 
 export function QRCard({
@@ -47,6 +56,11 @@ export function QRCard({
   restaurantName = 'Smart Restaurant',
   logoUrl,
   onClose,
+  isRoom = false,
+  roomType,
+  floorNumber,
+  onRegenerateToken,
+  previewUrl,
 }: QRCardProps) {
   const cardRef = useRef<HTMLDivElement>(null);
   const [downloadLoading, setDownloadLoading] = useState(false);
@@ -90,8 +104,9 @@ export function QRCard({
       qrValue,
       restaurantName,
       logoUrl: hasLogo ? logoUrl : null,
+      isRoom,
     });
-  }, [tableNumber, tableName, qrValue, restaurantName, logoUrl, hasLogo]);
+  }, [tableNumber, tableName, qrValue, restaurantName, logoUrl, hasLogo, isRoom]);
 
   /**
    * 1. High-Resolution Standee PNG Download (Exact Preview Match)
@@ -100,9 +115,10 @@ export function QRCard({
     triggerHaptic('medium');
     setDownloadLoading(true);
 
+    const typePrefix = isRoom ? 'room' : 'table';
     try {
       const dataUrl = await getCardPreviewDataUrl();
-      const fileName = `${restaurantName.toLowerCase().replace(/[^a-z0-9]/g, '-')}-table-${tableNumber}-qr.png`;
+      const fileName = `${restaurantName.toLowerCase().replace(/[^a-z0-9]/g, '-')}-${typePrefix}-${tableNumber}-qr.png`;
       await downloadImageFile(dataUrl, fileName);
 
       triggerHaptic('success');
@@ -111,15 +127,15 @@ export function QRCard({
       console.error('QR Standee download failed, falling back to raw QR:', error);
       try {
         const rawDataUrl = await generateRawQRDataUrl(qrValue, 800, hasLogo ? logoUrl : null);
-        await downloadImageFile(rawDataUrl, `table-${tableNumber}-qr.png`);
-        showToast(`Downloaded table-${tableNumber}-qr.png`);
+        await downloadImageFile(rawDataUrl, `${typePrefix}-${tableNumber}-qr.png`);
+        showToast(`Downloaded ${typePrefix}-${tableNumber}-qr.png`);
       } catch (err) {
         showToast('Download failed. Please try copying link.', 'info');
       }
     } finally {
       setDownloadLoading(false);
     }
-  }, [getCardPreviewDataUrl, restaurantName, tableNumber, qrValue, hasLogo, logoUrl]);
+  }, [getCardPreviewDataUrl, restaurantName, tableNumber, qrValue, hasLogo, logoUrl, isRoom]);
 
   /**
    * 2. Raw High-Res QR Code Only Download
@@ -128,9 +144,10 @@ export function QRCard({
     triggerHaptic('medium');
     setDownloadLoading(true);
 
+    const typePrefix = isRoom ? 'room' : 'table';
     try {
       const rawDataUrl = await generateRawQRDataUrl(qrValue, 1000, hasLogo ? logoUrl : null);
-      const fileName = `table-${tableNumber}-raw-qrcode.png`;
+      const fileName = `${typePrefix}-${tableNumber}-raw-qrcode.png`;
       await downloadImageFile(rawDataUrl, fileName);
 
       triggerHaptic('success');
@@ -141,7 +158,7 @@ export function QRCard({
     } finally {
       setDownloadLoading(false);
     }
-  }, [tableNumber, qrValue, hasLogo, logoUrl]);
+  }, [tableNumber, qrValue, hasLogo, logoUrl, isRoom]);
 
   /**
    * 3. Print QR Card Trigger (Standee, 80mm POS Thermal, or A4)
@@ -165,7 +182,7 @@ export function QRCard({
         mode
       );
 
-      printIframeHtml(html, `Table ${tableNumber} QR - ${restaurantName}`);
+      printIframeHtml(html, `${isRoom ? 'Room' : 'Table'} ${tableNumber} QR - ${restaurantName}`);
       triggerHaptic('success');
       setShowPrintModal(false);
     } catch (error) {
@@ -174,7 +191,7 @@ export function QRCard({
     } finally {
       setPrintLoading(false);
     }
-  }, [getCardPreviewDataUrl, qrValue, tableNumber, tableName, restaurantName, printMode, hasLogo, logoUrl]);
+  }, [getCardPreviewDataUrl, qrValue, tableNumber, tableName, restaurantName, printMode, hasLogo, logoUrl, isRoom]);
 
   /**
    * 4. Native / Web Image Share (Exact Preview Match)
@@ -183,12 +200,15 @@ export function QRCard({
     triggerHaptic('medium');
     setShareLoading(true);
 
+    const typePrefix = isRoom ? 'room' : 'table';
     try {
       const dataUrl = await getCardPreviewDataUrl();
-      const fileName = `restaurant-qr-table-${tableNumber}.png`;
-      const shareText = `🍽️ ${restaurantName} - Digital Menu for Table ${tableNumber}\nScan or open link: ${qrValue}`;
+      const fileName = `${restaurantName.toLowerCase().replace(/[^a-z0-9]/g, '-')}-${typePrefix}-${tableNumber}.png`;
+      const shareText = isRoom
+        ? `🏨 ${restaurantName} - Room Service & In-Room Dining for Room ${tableNumber}\nScan or open link: ${qrValue}`
+        : `🍽️ ${restaurantName} - Digital Menu for Table ${tableNumber}\nScan or open link: ${qrValue}`;
 
-      await shareImageFile(dataUrl, fileName, `Table ${tableNumber} QR - ${restaurantName}`, shareText);
+      await shareImageFile(dataUrl, fileName, `${isRoom ? 'Room' : 'Table'} ${tableNumber} QR - ${restaurantName}`, shareText);
       triggerHaptic('success');
       setShowShareModal(false);
     } catch (error) {
@@ -197,14 +217,16 @@ export function QRCard({
     } finally {
       setShareLoading(false);
     }
-  }, [getCardPreviewDataUrl, tableNumber, restaurantName, qrValue]);
+  }, [getCardPreviewDataUrl, tableNumber, restaurantName, qrValue, isRoom]);
 
   /**
    * 5. 1-Tap WhatsApp Share
    */
   const handleWhatsAppShare = () => {
     triggerHaptic('selection');
-    const msg = `🍽️ *${restaurantName}*\n\nHere is the digital menu for *Table ${tableNumber}${tableName ? ` (${tableName})` : ''}*:\n🔗 ${qrValue}\n\n_Scan or tap to browse menu & place your order!_`;
+    const msg = isRoom
+      ? `🏨 *${restaurantName}*\n\nHere is the Room Service & In-Room Dining QR for *Room ${tableNumber}${roomType ? ` (${roomType})` : ''}*:\n🔗 ${qrValue}\n\n_Scan or tap to request room services, order food & view live bill!_`
+      : `🍽️ *${restaurantName}*\n\nHere is the digital menu for *Table ${tableNumber}${tableName ? ` (${tableName})` : ''}*:\n🔗 ${qrValue}\n\n_Scan or tap to browse menu & place your order!_`;
     openWhatsAppShare(msg);
     showToast('Opening WhatsApp…');
     setShowShareModal(false);
@@ -217,7 +239,7 @@ export function QRCard({
     triggerHaptic('success');
     const success = await copyTextToClipboard(qrValue);
     if (success) {
-      showToast('Menu URL copied to clipboard! 📋');
+      showToast(isRoom ? 'Room portal URL copied to clipboard! 📋' : 'Menu URL copied to clipboard! 📋');
     } else {
       showToast('Failed to copy link', 'info');
     }
@@ -323,7 +345,7 @@ export function QRCard({
         </div>
 
         {/* ======================================
-            1. RESTAURANT NAME & DIGITAL MENU
+            1. RESTAURANT / HOTEL NAME & BADGE
         ====================================== */}
         <div className="relative mt-3 sm:mt-4 flex flex-col items-center text-center">
           {/* Logo or Icon */}
@@ -372,11 +394,15 @@ export function QRCard({
                 mb-2
               "
             >
-              <Utensils className="h-6 w-6 text-[#0F766E]" />
+              {isRoom ? (
+                <Bed className="h-6 w-6 text-[#0F766E]" />
+              ) : (
+                <Utensils className="h-6 w-6 text-[#0F766E]" />
+              )}
             </div>
           )}
 
-          {/* Restaurant name */}
+          {/* Name */}
           <h1
             className="
               text-[18px]
@@ -391,7 +417,7 @@ export function QRCard({
             {restaurantName}
           </h1>
 
-          {/* DIGITAL MENU Pill */}
+          {/* Pill Badge */}
           <div className="mt-1.5 flex items-center justify-center gap-2">
             <span className="h-px w-6 bg-[#C59D5F]/60" />
             <span
@@ -404,14 +430,14 @@ export function QRCard({
                 uppercase
               "
             >
-              DIGITAL MENU
+              {isRoom ? 'ROOM SERVICE & DINING' : 'DIGITAL MENU'}
             </span>
             <span className="h-px w-6 bg-[#C59D5F]/60" />
           </div>
         </div>
 
         {/* ======================================
-            2. YOUR TABLE SECTION
+            2. YOUR TABLE / YOUR ROOM SECTION
         ====================================== */}
         <div
           className="
@@ -439,7 +465,7 @@ export function QRCard({
                 text-[#8C827A]
               "
             >
-              YOUR TABLE
+              {isRoom ? 'YOUR ROOM' : 'YOUR TABLE'}
             </p>
 
             <h2
@@ -453,10 +479,22 @@ export function QRCard({
                 mt-0.5
               "
             >
-              TABLE {tableNumber}
+              {isRoom ? `ROOM ${tableNumber}` : `TABLE ${tableNumber}`}
             </h2>
 
-            {tableName && (
+            {isRoom ? (
+              <p
+                className="
+                  mt-0.5
+                  text-[11px]
+                  sm:text-[12px]
+                  font-semibold
+                  text-[#0F766E]
+                "
+              >
+                {roomType || tableName || 'Hotel Room'}{floorNumber ? ` • Floor ${floorNumber}` : ''}
+              </p>
+            ) : tableName ? (
               <p
                 className="
                   mt-0.5
@@ -468,10 +506,10 @@ export function QRCard({
               >
                 {tableName}
               </p>
-            )}
+            ) : null}
           </div>
 
-          {/* Table Number Pill */}
+          {/* Number Pill */}
           <div
             className="
               flex
@@ -526,7 +564,7 @@ export function QRCard({
                 uppercase
               "
             >
-              SCAN TO VIEW MENU
+              {isRoom ? 'SCAN FOR ROOM SERVICE & FOOD' : 'SCAN TO VIEW MENU'}
             </h3>
           </div>
 
@@ -586,16 +624,15 @@ export function QRCard({
             </div>
           </div>
 
-          {/* SCAN • BROWSE • ORDER with Gold Diamond Accents */}
+          {/* Tagline with Gold Diamond Accents */}
           <div className="mt-2.5 flex items-center justify-center gap-2">
             <span className="h-1.5 w-1.5 rotate-45 bg-[#C59D5F]" />
             <p className="text-[9px] sm:text-[9.5px] font-black tracking-[0.2em] text-[#0F766E] uppercase">
-              SCAN • BROWSE • ORDER
+              {isRoom ? 'SCAN • SERVICES • DINING' : 'SCAN • BROWSE • ORDER'}
             </p>
             <span className="h-1.5 w-1.5 rotate-45 bg-[#C59D5F]" />
           </div>
         </div>
-
       </div>
 
       {/* ========================================
@@ -756,6 +793,39 @@ export function QRCard({
       </div>
 
       {/* ========================================
+          OPTIONAL REGENERATE & PREVIEW BAR
+      ======================================== */}
+      {(onRegenerateToken || previewUrl) && (
+        <div className="mt-3 pt-2.5 border-t border-[#E7E2D8] flex items-center justify-between text-xs px-1">
+          {onRegenerateToken && (
+            <button
+              type="button"
+              onClick={() => {
+                triggerHaptic('medium');
+                onRegenerateToken();
+              }}
+              className="flex items-center gap-1.5 text-slate-500 hover:text-slate-900 font-bold transition native-press text-[11px]"
+            >
+              <RefreshCw className="w-3.5 h-3.5 text-slate-400" />
+              <span>Regenerate QR</span>
+            </button>
+          )}
+
+          {previewUrl && (
+            <a
+              href={previewUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="flex items-center gap-1 text-[#0F766E] hover:underline font-bold transition text-[11px] ml-auto"
+            >
+              <span>Preview Guest View</span>
+              <ExternalLink className="w-3.5 h-3.5" />
+            </a>
+          )}
+        </div>
+      )}
+
+      {/* ========================================
           PRINT FORMAT MODAL / POPOVER
       ======================================== */}
       {showPrintModal && (
@@ -768,8 +838,8 @@ export function QRCard({
                   <Printer className="w-4 h-4" />
                 </div>
                 <div>
-                  <h3 className="text-sm font-black text-slate-900">Print Table QR</h3>
-                  <p className="text-[11px] text-slate-400 font-medium">Table {tableNumber}</p>
+                  <h3 className="text-sm font-black text-slate-900">{isRoom ? 'Print Room QR' : 'Print Table QR'}</h3>
+                  <p className="text-[11px] text-slate-400 font-medium">{isRoom ? `Room ${tableNumber}` : `Table ${tableNumber}`}</p>
                 </div>
               </div>
               <button
@@ -797,8 +867,8 @@ export function QRCard({
                 }`}
               >
                 <div>
-                  <p className="text-xs font-bold">🪧 Table Standee / Tent (4" x 6")</p>
-                  <p className="text-[10px] text-slate-400">Fits standard acrylic table card holders</p>
+                  <p className="text-xs font-bold">{isRoom ? '🪧 Room Standee / Tent (4" x 6")' : '🪧 Table Standee / Tent (4" x 6")'}</p>
+                  <p className="text-[10px] text-slate-400">{isRoom ? 'Fits standard nightstand card holders' : 'Fits standard acrylic table card holders'}</p>
                 </div>
                 {printMode === 'standee' && <Sparkles className="w-4 h-4 text-theme-primary shrink-0" />}
               </button>
@@ -873,8 +943,8 @@ export function QRCard({
                   <Share2 className="w-4 h-4" />
                 </div>
                 <div>
-                  <h3 className="text-sm font-black text-slate-900">Share QR & Menu</h3>
-                  <p className="text-[11px] text-slate-400 font-medium">Table {tableNumber}</p>
+                  <h3 className="text-sm font-black text-slate-900">{isRoom ? 'Share Room QR & Portal' : 'Share QR & Menu'}</h3>
+                  <p className="text-[11px] text-slate-400 font-medium">{isRoom ? `Room ${tableNumber}` : `Table ${tableNumber}`}</p>
                 </div>
               </div>
               <button
@@ -898,7 +968,7 @@ export function QRCard({
                 </div>
                 <div>
                   <p className="text-xs font-black">Share on WhatsApp</p>
-                  <p className="text-[10px] text-emerald-800">Send preformatted menu link & table info</p>
+                  <p className="text-[10px] text-emerald-800">{isRoom ? 'Send room service portal link & room details' : 'Send preformatted menu link & table info'}</p>
                 </div>
               </button>
 
@@ -918,7 +988,7 @@ export function QRCard({
                 </div>
               </button>
 
-              {/* Option 3: Copy Menu Link */}
+              {/* Option 3: Copy Link */}
               <button
                 type="button"
                 onClick={handleCopyLink}
@@ -928,7 +998,7 @@ export function QRCard({
                   <Copy className="w-5 h-5" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-xs font-black">Copy Digital Menu Link</p>
+                  <p className="text-xs font-black">{isRoom ? 'Copy Room Portal Link' : 'Copy Digital Menu Link'}</p>
                   <p className="text-[10px] text-slate-400 truncate">{qrValue}</p>
                 </div>
               </button>
