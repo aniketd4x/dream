@@ -56,7 +56,26 @@ export default function Login() {
     document.title = mode === 'signin' ? 'Sign In | Dishgaze Admin' : 'Register Restaurant | Dishgaze';
   }, [mode]);
 
-  // 1-Click Quick Demo Login
+  // 1-Click Quick Super Admin Login
+  const handleQuickSuperAdminLogin = async () => {
+    triggerHaptic('medium');
+    setEmail('akshay44x@gmail.com');
+    setPassword('Sayghar@3689#');
+    setError(null);
+    setLoading(true);
+
+    const { error: signErr } = await signIn('akshay44x@gmail.com', 'Sayghar@3689#');
+    setLoading(false);
+
+    if (signErr) {
+      triggerHaptic('alert');
+      setError(signErr);
+    } else {
+      triggerHaptic('success');
+    }
+  };
+
+  // 1-Click Quick Restaurant Demo Login
   const handleQuickDemoLogin = async () => {
     triggerHaptic('medium');
     setEmail('admin@resto.com');
@@ -232,31 +251,56 @@ export default function Login() {
 
             {/* 1-Click Quick Demo Login Banner (Only in Sign In mode) */}
             {mode === 'signin' && (
-              <div className="mb-6 rounded-2xl border border-emerald-200 bg-emerald-50/70 p-3.5 text-left">
-                <div className="flex items-center justify-between mb-1.5">
-                  <div className="flex items-center gap-1.5 text-xs font-extrabold text-emerald-800">
-                    <Sparkles className="size-3.5 text-emerald-600" />
-                    <span>Demo Account Available</span>
+              <div className="mb-6 rounded-2xl border border-slate-200 bg-slate-50/80 p-3.5 text-left space-y-3">
+                {/* Super Admin Quick Box */}
+                <div className="rounded-xl bg-amber-500/10 border border-amber-500/30 p-2.5">
+                  <div className="flex items-center justify-between mb-1">
+                    <div className="flex items-center gap-1.5 text-xs font-black text-amber-900">
+                      <ShieldCheck className="size-3.5 text-amber-600" />
+                      <span>Super Admin (All Restaurants)</span>
+                    </div>
+                    <span className="text-[10px] font-black bg-amber-400 text-slate-950 px-1.5 py-0.5 rounded uppercase">
+                      Super
+                    </span>
                   </div>
-                  <span className="text-[10px] font-bold bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full">
-                    Ready to test
-                  </span>
+                  <p className="text-[11px] text-amber-800 font-mono font-medium mb-2">
+                    akshay44x@gmail.com · Sayghar@3689#
+                  </p>
+                  <button
+                    type="button"
+                    onClick={handleQuickSuperAdminLogin}
+                    disabled={loading}
+                    className="w-full inline-flex items-center justify-center gap-1.5 rounded-lg bg-amber-500 hover:bg-amber-600 px-2.5 py-1.5 text-xs font-bold text-slate-950 shadow-xs active:scale-[0.98] transition disabled:opacity-50"
+                  >
+                    <Sparkles className="size-3" />
+                    <span>Login as Super Admin</span>
+                  </button>
                 </div>
-                <p className="text-[11px] text-emerald-700 leading-relaxed mb-2.5">
-                  Sign in instantly using the pre-configured administrator account:
-                  <span className="block font-mono text-[10px] text-emerald-800 font-bold mt-0.5">
+
+                {/* Restaurant Demo Quick Box */}
+                <div className="rounded-xl bg-emerald-500/10 border border-emerald-500/30 p-2.5">
+                  <div className="flex items-center justify-between mb-1">
+                    <div className="flex items-center gap-1.5 text-xs font-black text-emerald-900">
+                      <Store className="size-3.5 text-emerald-600" />
+                      <span>Restaurant Manager (Spice Garden)</span>
+                    </div>
+                    <span className="text-[10px] font-bold bg-emerald-200 text-emerald-900 px-1.5 py-0.5 rounded">
+                      Demo
+                    </span>
+                  </div>
+                  <p className="text-[11px] text-emerald-800 font-mono font-medium mb-2">
                     admin@resto.com · Admin@123
-                  </span>
-                </p>
-                <button
-                  type="button"
-                  onClick={handleQuickDemoLogin}
-                  disabled={loading}
-                  className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-emerald-600 px-3 py-2 text-xs font-bold text-white shadow-sm hover:bg-emerald-700 active:scale-[0.98] transition disabled:opacity-50"
-                >
-                  <Sparkles className="size-3.5" />
-                  <span>1-Click Demo Login</span>
-                </button>
+                  </p>
+                  <button
+                    type="button"
+                    onClick={handleQuickDemoLogin}
+                    disabled={loading}
+                    className="w-full inline-flex items-center justify-center gap-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 px-2.5 py-1.5 text-xs font-bold text-white shadow-xs active:scale-[0.98] transition disabled:opacity-50"
+                  >
+                    <Sparkles className="size-3" />
+                    <span>Login as Restaurant Staff</span>
+                  </button>
+                </div>
               </div>
             )}
 
@@ -279,20 +323,20 @@ export default function Login() {
             {/* SIGN IN FORM */}
             {mode === 'signin' ? (
               <form onSubmit={handleSignIn} className="space-y-4">
-                {/* Email */}
+                {/* Email or Username */}
                 <div className="space-y-1.5">
                   <label className="block text-xs font-bold text-slate-700">
-                    Email Address
+                    Email Address or Username
                   </label>
                   <div className="relative">
                     <Mail className="size-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
                     <input
-                      type="email"
+                      type="text"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       required
-                      placeholder="admin@resto.com"
-                      autoComplete="email"
+                      placeholder="akshay44x@gmail.com or admin@resto.com"
+                      autoComplete="username"
                       className="w-full rounded-xl border border-slate-200 bg-white pl-10 pr-4 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 outline-none transition focus:border-emerald-600 focus:ring-4 focus:ring-emerald-600/10"
                     />
                   </div>

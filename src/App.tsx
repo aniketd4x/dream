@@ -214,7 +214,7 @@ function AdminGate() {
   return <AdminApp />;
 }
 
-function SuperAdminGate() {
+function SuperAdminGate({ initialTab }: { initialTab?: 'restaurants' | 'settings' }) {
   const { user, loading } = useAuth();
 
   useEffect(() => {
@@ -233,7 +233,7 @@ function SuperAdminGate() {
     return <AdminLogin />;
   }
 
-  return <SuperAdminPage />;
+  return <SuperAdminPage initialTab={initialTab} />;
 }
 
 function FullScreenSplash({ onFinish }: { onFinish: () => void }) {
@@ -295,7 +295,9 @@ export default function App() {
 
         {/* Separate Dedicated Super Admin Routes */}
         <Route path="/superadmin" element={<SuperAdminGate />} />
+        <Route path="/superadmin/settings" element={<SuperAdminGate initialTab="settings" />} />
         <Route path="/super-admin" element={<Navigate to="/superadmin" replace />} />
+        <Route path="/super-admin/settings" element={<Navigate to="/superadmin/settings" replace />} />
 
         {/* Restaurant Staff & Manager Portal Routes */}
         <Route path="/admin" element={<AdminGate />} />
