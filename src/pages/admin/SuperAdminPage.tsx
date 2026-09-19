@@ -772,30 +772,30 @@ export default function SuperAdminPage({ initialTab = 'restaurants' }: SuperAdmi
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 font-sans antialiased selection:bg-amber-400 selection:text-slate-950">
+    <div className="min-h-screen bg-gray-50 text-slate-800 font-sans antialiased selection:bg-amber-400 selection:text-slate-950">
       {/* Standalone Super Admin Platform Navbar */}
-      <header className="sticky top-0 z-40 bg-slate-900/90 backdrop-blur-md border-b border-slate-800 shadow-md">
+      <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-4">
           <div className="flex items-center gap-3 min-w-0">
             <img
               src="/logo.png"
               alt="Dishgaze"
-              className="w-9 h-9 rounded-xl object-contain bg-white/10 p-1 border border-white/10 shadow-sm shrink-0"
+              className="w-9 h-9 rounded-xl object-contain bg-slate-100 p-1 border border-slate-200 shadow-sm shrink-0"
               onError={(e) => { (e.currentTarget as HTMLImageElement).src = '/logo.png'; }}
             />
             <div className="min-w-0">
               <div className="flex items-center gap-2">
-                <span className="font-black text-base text-white tracking-tight">DishGaze</span>
+                <span className="font-black text-base text-slate-900 tracking-tight">DishGaze</span>
                 <span className="bg-amber-400 text-slate-950 text-[10px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider">
                   Super Admin
                 </span>
               </div>
-              <p className="text-[11px] text-slate-400 truncate hidden sm:block">Platform Multi-Tenant Command Center</p>
+              <p className="text-[11px] text-slate-500 truncate hidden sm:block">Platform Multi-Tenant Command Center</p>
             </div>
           </div>
 
           {/* Center Navigation Tabs */}
-          <div className="flex items-center bg-slate-950/80 p-1 rounded-xl border border-slate-800 shrink-0">
+          <div className="flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200 shrink-0">
             <button
               onClick={() => {
                 triggerHaptic('light');
@@ -805,13 +805,13 @@ export default function SuperAdminPage({ initialTab = 'restaurants' }: SuperAdmi
               className={`px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 ${
                 activeTab === 'restaurants'
                   ? 'bg-amber-400 text-slate-950 shadow-sm'
-                  : 'text-slate-400 hover:text-white'
+                  : 'text-slate-500 hover:text-slate-700'
               }`}
             >
               <Building2 className="w-3.5 h-3.5" />
               <span>Restaurants</span>
               <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-bold ${
-                activeTab === 'restaurants' ? 'bg-slate-950/20 text-slate-950' : 'bg-slate-800 text-slate-400'
+                activeTab === 'restaurants' ? 'bg-slate-950/20 text-slate-950' : 'bg-slate-200 text-slate-500'
               }`}>
                 {platformStats.totalRestaurants}
               </span>
@@ -826,7 +826,7 @@ export default function SuperAdminPage({ initialTab = 'restaurants' }: SuperAdmi
               className={`px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 ${
                 activeTab === 'settings'
                   ? 'bg-amber-400 text-slate-950 shadow-sm'
-                  : 'text-slate-400 hover:text-white'
+                  : 'text-slate-500 hover:text-slate-700'
               }`}
             >
               <Settings className="w-3.5 h-3.5" />
@@ -837,7 +837,7 @@ export default function SuperAdminPage({ initialTab = 'restaurants' }: SuperAdmi
           <div className="flex items-center gap-3 shrink-0">
             <button
               onClick={() => navigate('/admin')}
-              className="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-sm active:scale-95"
+              className="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 border border-slate-200 text-slate-700 rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-sm active:scale-95"
               title="Open Restaurant Manager Panel"
             >
               <Store className="w-3.5 h-3.5 text-emerald-400" />
@@ -865,7 +865,7 @@ export default function SuperAdminPage({ initialTab = 'restaurants' }: SuperAdmi
         {activeTab === 'restaurants' ? (
           <>
             {/* Top Banner & Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 p-6 rounded-2xl text-white shadow-lg border border-slate-800">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-gradient-to-r from-slate-800 via-slate-700 to-slate-800 p-6 rounded-2xl text-white shadow-lg border border-slate-700">
           <div>
             <div className="flex items-center gap-2 mb-1">
               <span className="bg-amber-400 text-slate-900 text-xs font-black px-2.5 py-0.5 rounded-full uppercase tracking-wider flex items-center gap-1 shadow-sm">
@@ -885,7 +885,7 @@ export default function SuperAdminPage({ initialTab = 'restaurants' }: SuperAdmi
           <button
             onClick={fetchAllData}
             disabled={loading}
-            className="px-3.5 py-2.5 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-xl text-xs font-semibold text-slate-200 transition-all flex items-center gap-1.5 shadow-sm active:scale-95"
+            className="px-3.5 py-2.5 bg-white/10 hover:bg-white/20 border border-white/20 rounded-xl text-xs font-semibold text-white transition-all flex items-center gap-1.5 shadow-sm active:scale-95"
             title="Refresh Data"
           >
             <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin text-amber-400' : ''}`} />
@@ -1227,7 +1227,7 @@ export default function SuperAdminPage({ initialTab = 'restaurants' }: SuperAdmi
         /* SUPER ADMIN SETTINGS TAB */
         <div className="space-y-6 animate-fade-in">
           {/* Settings Top Banner */}
-          <div className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 p-6 rounded-2xl text-white shadow-lg border border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="bg-gradient-to-r from-slate-800 via-slate-700 to-slate-800 p-6 rounded-2xl text-white shadow-lg border border-slate-700 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
               <div className="flex items-center gap-2 mb-1">
                 <span className="bg-amber-400 text-slate-900 text-xs font-black px-2.5 py-0.5 rounded-full uppercase tracking-wider flex items-center gap-1 shadow-sm">
@@ -1247,7 +1247,7 @@ export default function SuperAdminPage({ initialTab = 'restaurants' }: SuperAdmi
               <button
                 type="button"
                 onClick={fetchSuperAdminProfile}
-                className="px-3.5 py-2.5 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-xl text-xs font-semibold text-slate-200 transition flex items-center gap-1.5 shadow-sm active:scale-95"
+                className="px-3.5 py-2.5 bg-white/10 hover:bg-white/20 border border-white/20 rounded-xl text-xs font-semibold text-white transition flex items-center gap-1.5 shadow-sm active:scale-95"
                 title="Reload Latest Data"
               >
                 <RefreshCw className="w-4 h-4 text-amber-400" />
@@ -1260,15 +1260,15 @@ export default function SuperAdminPage({ initialTab = 'restaurants' }: SuperAdmi
             {/* Left 2 Columns: Forms */}
             <div className="lg:col-span-2 space-y-6">
               {/* Account Information Card */}
-              <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-md">
-                <div className="flex items-center justify-between border-b border-slate-800 pb-4 mb-5">
+              <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
+                <div className="flex items-center justify-between border-b border-slate-100 pb-4 mb-5">
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-xl bg-amber-400/10 border border-amber-400/20 text-amber-400 flex items-center justify-center font-bold">
                       <User className="w-5 h-5" />
                     </div>
                     <div>
-                      <h2 className="text-base font-black text-white">Account Information</h2>
-                      <p className="text-xs text-slate-400">Change your login email, username, and administrator name</p>
+                      <h2 className="text-base font-black text-slate-900">Account Information</h2>
+                      <p className="text-xs text-slate-500">Change your login email, username, and administrator name</p>
                     </div>
                   </div>
                   <span className="text-[10px] font-black uppercase tracking-wider bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2.5 py-0.5 rounded-full">
@@ -1294,9 +1294,9 @@ export default function SuperAdminPage({ initialTab = 'restaurants' }: SuperAdmi
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     {/* Email */}
                     <div className="space-y-1.5 sm:col-span-2">
-                      <label className="block text-xs font-bold text-slate-300 flex items-center gap-1.5">
-                        <Mail className="w-3.5 h-3.5 text-amber-400" />
-                        <span>Login Email Address <span className="text-red-400">*</span></span>
+                      <label className="block text-xs font-bold text-slate-700 flex items-center gap-1.5">
+                        <Mail className="w-3.5 h-3.5 text-amber-500" />
+                        <span>Login Email Address <span className="text-red-500">*</span></span>
                       </label>
                       <input
                         type="email"
@@ -1304,7 +1304,7 @@ export default function SuperAdminPage({ initialTab = 'restaurants' }: SuperAdmi
                         onChange={(e) => setProfileEmail(e.target.value)}
                         required
                         placeholder="akshay44x@gmail.com"
-                        className="w-full bg-slate-950 border border-slate-700 focus:border-amber-400 rounded-xl px-3.5 py-2.5 text-sm text-white placeholder:text-slate-500 outline-none transition"
+                        className="w-full bg-slate-50 border border-slate-200 focus:border-amber-400 focus:bg-white rounded-xl px-3.5 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 outline-none transition focus:ring-2 focus:ring-amber-400/20"
                       />
                       <p className="text-[11px] text-slate-500">
                         This email address is your primary credential for signing in as Super Admin.
@@ -1313,8 +1313,8 @@ export default function SuperAdminPage({ initialTab = 'restaurants' }: SuperAdmi
 
                     {/* Username */}
                     <div className="space-y-1.5">
-                      <label className="block text-xs font-bold text-slate-300 flex items-center gap-1.5">
-                        <User className="w-3.5 h-3.5 text-amber-400" />
+                      <label className="block text-xs font-bold text-slate-700 flex items-center gap-1.5">
+                        <User className="w-3.5 h-3.5 text-amber-500" />
                         <span>Username</span>
                       </label>
                       <input
@@ -1322,15 +1322,15 @@ export default function SuperAdminPage({ initialTab = 'restaurants' }: SuperAdmi
                         value={profileUsername}
                         onChange={(e) => setProfileUsername(e.target.value)}
                         placeholder="akshay44x"
-                        className="w-full bg-slate-950 border border-slate-700 focus:border-amber-400 rounded-xl px-3.5 py-2.5 text-sm text-white placeholder:text-slate-500 outline-none transition"
+                        className="w-full bg-slate-50 border border-slate-200 focus:border-amber-400 focus:bg-white rounded-xl px-3.5 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 outline-none transition focus:ring-2 focus:ring-amber-400/20"
                       />
                       <p className="text-[11px] text-slate-500">Optional handle to sign in instead of email.</p>
                     </div>
 
                     {/* Mobile Phone */}
                     <div className="space-y-1.5">
-                      <label className="block text-xs font-bold text-slate-300 flex items-center gap-1.5">
-                        <Phone className="w-3.5 h-3.5 text-amber-400" />
+                      <label className="block text-xs font-bold text-slate-700 flex items-center gap-1.5">
+                        <Phone className="w-3.5 h-3.5 text-amber-500" />
                         <span>Contact Mobile</span>
                       </label>
                       <input
@@ -1338,14 +1338,14 @@ export default function SuperAdminPage({ initialTab = 'restaurants' }: SuperAdmi
                         value={profileMobile}
                         onChange={(e) => setProfileMobile(e.target.value)}
                         placeholder="+919999999999"
-                        className="w-full bg-slate-950 border border-slate-700 focus:border-amber-400 rounded-xl px-3.5 py-2.5 text-sm text-white placeholder:text-slate-500 outline-none transition"
+                        className="w-full bg-slate-50 border border-slate-200 focus:border-amber-400 focus:bg-white rounded-xl px-3.5 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 outline-none transition focus:ring-2 focus:ring-amber-400/20"
                       />
                       <p className="text-[11px] text-slate-500">Master emergency and administrative contact.</p>
                     </div>
 
                     {/* Full Name */}
                     <div className="space-y-1.5 sm:col-span-2">
-                      <label className="block text-xs font-bold text-slate-300">
+                      <label className="block text-xs font-bold text-slate-700">
                         Full Administrator Name
                       </label>
                       <input
@@ -1353,7 +1353,7 @@ export default function SuperAdminPage({ initialTab = 'restaurants' }: SuperAdmi
                         value={profileName}
                         onChange={(e) => setProfileName(e.target.value)}
                         placeholder="Akshay (Super Admin)"
-                        className="w-full bg-slate-950 border border-slate-700 focus:border-amber-400 rounded-xl px-3.5 py-2.5 text-sm text-white placeholder:text-slate-500 outline-none transition"
+                        className="w-full bg-slate-50 border border-slate-200 focus:border-amber-400 focus:bg-white rounded-xl px-3.5 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 outline-none transition focus:ring-2 focus:ring-amber-400/20"
                       />
                     </div>
                   </div>
@@ -1381,18 +1381,18 @@ export default function SuperAdminPage({ initialTab = 'restaurants' }: SuperAdmi
               </div>
 
               {/* Change Password Card */}
-              <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-md">
-                <div className="flex items-center justify-between border-b border-slate-800 pb-4 mb-5">
+              <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
+                <div className="flex items-center justify-between border-b border-slate-100 pb-4 mb-5">
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-xl bg-purple-500/10 border border-purple-500/20 text-purple-400 flex items-center justify-center font-bold">
                       <KeyRound className="w-5 h-5" />
                     </div>
                     <div>
-                      <h2 className="text-base font-black text-white">Change Master Password</h2>
-                      <p className="text-xs text-slate-400">Set a new secure password for your Super Admin account</p>
+                      <h2 className="text-base font-black text-slate-900">Change Master Password</h2>
+                      <p className="text-xs text-slate-500">Set a new secure password for your Super Admin account</p>
                     </div>
                   </div>
-                  <span className="text-[10px] font-bold text-slate-400 bg-slate-800 px-2 py-0.5 rounded-full">
+                  <span className="text-[10px] font-bold text-slate-500 bg-slate-100 border border-slate-200 px-2 py-0.5 rounded-full">
                     Bcrypt Secured
                   </span>
                 </div>
@@ -1414,8 +1414,8 @@ export default function SuperAdminPage({ initialTab = 'restaurants' }: SuperAdmi
                 <form onSubmit={handleUpdatePassword} className="space-y-4">
                   {/* Current Password */}
                   <div className="space-y-1.5">
-                    <label className="block text-xs font-bold text-slate-300">
-                      Current Password <span className="text-slate-500 font-normal">(Optional if already logged in)</span>
+                    <label className="block text-xs font-bold text-slate-700">
+                      Current Password <span className="text-slate-400 font-normal">(Optional if already logged in)</span>
                     </label>
                     <div className="relative">
                       <input
@@ -1423,12 +1423,12 @@ export default function SuperAdminPage({ initialTab = 'restaurants' }: SuperAdmi
                         value={currentPassword}
                         onChange={(e) => setCurrentPassword(e.target.value)}
                         placeholder="Enter current password"
-                        className="w-full bg-slate-950 border border-slate-700 focus:border-amber-400 rounded-xl pl-3.5 pr-10 py-2.5 text-sm text-white placeholder:text-slate-500 outline-none transition"
+                        className="w-full bg-slate-50 border border-slate-200 focus:border-amber-400 focus:bg-white rounded-xl pl-3.5 pr-10 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 outline-none transition focus:ring-2 focus:ring-amber-400/20"
                       />
                       <button
                         type="button"
                         onClick={() => setShowCurrentPw(!showCurrentPw)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white"
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700"
                       >
                         {showCurrentPw ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                       </button>
@@ -1438,8 +1438,8 @@ export default function SuperAdminPage({ initialTab = 'restaurants' }: SuperAdmi
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     {/* New Password */}
                     <div className="space-y-1.5">
-                      <label className="block text-xs font-bold text-slate-300">
-                        New Password <span className="text-red-400">*</span>
+                      <label className="block text-xs font-bold text-slate-700">
+                        New Password <span className="text-red-500">*</span>
                       </label>
                       <div className="relative">
                         <input
@@ -1449,12 +1449,12 @@ export default function SuperAdminPage({ initialTab = 'restaurants' }: SuperAdmi
                           required
                           minLength={6}
                           placeholder="At least 6 characters"
-                          className="w-full bg-slate-950 border border-slate-700 focus:border-amber-400 rounded-xl pl-3.5 pr-10 py-2.5 text-sm text-white placeholder:text-slate-500 outline-none transition"
+                          className="w-full bg-slate-50 border border-slate-200 focus:border-amber-400 focus:bg-white rounded-xl pl-3.5 pr-10 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 outline-none transition focus:ring-2 focus:ring-amber-400/20"
                         />
                         <button
                           type="button"
                           onClick={() => setShowNewPw(!showNewPw)}
-                          className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white"
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700"
                         >
                           {showNewPw ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                         </button>
@@ -1463,8 +1463,8 @@ export default function SuperAdminPage({ initialTab = 'restaurants' }: SuperAdmi
 
                     {/* Confirm New Password */}
                     <div className="space-y-1.5">
-                      <label className="block text-xs font-bold text-slate-300">
-                        Confirm New Password <span className="text-red-400">*</span>
+                      <label className="block text-xs font-bold text-slate-700">
+                        Confirm New Password <span className="text-red-500">*</span>
                       </label>
                       <input
                         type={showNewPw ? 'text' : 'password'}
@@ -1473,7 +1473,7 @@ export default function SuperAdminPage({ initialTab = 'restaurants' }: SuperAdmi
                         required
                         minLength={6}
                         placeholder="Repeat new password"
-                        className="w-full bg-slate-950 border border-slate-700 focus:border-amber-400 rounded-xl px-3.5 py-2.5 text-sm text-white placeholder:text-slate-500 outline-none transition"
+                        className="w-full bg-slate-50 border border-slate-200 focus:border-amber-400 focus:bg-white rounded-xl px-3.5 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 outline-none transition focus:ring-2 focus:ring-amber-400/20"
                       />
                     </div>
                   </div>
@@ -1504,58 +1504,58 @@ export default function SuperAdminPage({ initialTab = 'restaurants' }: SuperAdmi
             {/* Right Column: Platform Overview & System Info */}
             <div className="space-y-6">
               {/* Master Super Admin Status Card */}
-              <div className="bg-gradient-to-br from-slate-900 via-slate-900 to-amber-950/30 border border-amber-500/20 rounded-2xl p-6 shadow-md space-y-4">
+              <div className="bg-gradient-to-br from-amber-50 via-white to-amber-50/50 border border-amber-200 rounded-2xl p-6 shadow-sm space-y-4">
                 <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 rounded-2xl bg-amber-400 text-slate-950 flex items-center justify-center font-black shadow-lg shadow-amber-400/20">
+                  <div className="w-12 h-12 rounded-2xl bg-amber-400 text-slate-950 flex items-center justify-center font-black shadow-lg shadow-amber-400/30">
                     <ShieldCheck className="w-6 h-6" />
                   </div>
                   <div className="min-w-0">
                     <div className="flex items-center gap-2">
-                      <span className="text-sm font-black text-white">Super Admin</span>
+                      <span className="text-sm font-black text-slate-900">Super Admin</span>
                       <span className="bg-amber-400 text-slate-950 text-[10px] font-black px-1.5 rounded uppercase">
                         MASTER
                       </span>
                     </div>
-                    <p className="text-xs text-slate-400 font-mono truncate">
+                    <p className="text-xs text-slate-500 font-mono truncate">
                       {profileEmail}
                     </p>
                   </div>
                 </div>
 
-                <div className="pt-2 border-t border-slate-800 space-y-2.5 text-xs">
-                  <div className="flex items-center justify-between text-slate-400">
+                <div className="pt-2 border-t border-amber-200 space-y-2.5 text-xs">
+                  <div className="flex items-center justify-between text-slate-500">
                     <span>Account Status</span>
-                    <span className="text-emerald-400 font-bold flex items-center gap-1">
-                      <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                    <span className="text-emerald-600 font-bold flex items-center gap-1">
+                      <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
                       Active & Verified
                     </span>
                   </div>
 
-                  <div className="flex items-center justify-between text-slate-400">
+                  <div className="flex items-center justify-between text-slate-500">
                     <span>Access Role</span>
-                    <span className="text-amber-400 font-bold">Unrestricted Super Admin</span>
+                    <span className="text-amber-600 font-bold">Unrestricted Super Admin</span>
                   </div>
 
-                  <div className="flex items-center justify-between text-slate-400">
+                  <div className="flex items-center justify-between text-slate-500">
                     <span>Total Outlets</span>
-                    <span className="text-white font-bold">{platformStats.totalRestaurants} Restaurants</span>
+                    <span className="text-slate-800 font-bold">{platformStats.totalRestaurants} Restaurants</span>
                   </div>
 
-                  <div className="flex items-center justify-between text-slate-400">
+                  <div className="flex items-center justify-between text-slate-500">
                     <span>Total Tables</span>
-                    <span className="text-white font-bold">{platformStats.totalTables} Tables</span>
+                    <span className="text-slate-800 font-bold">{platformStats.totalTables} Tables</span>
                   </div>
 
-                  <div className="flex items-center justify-between text-slate-400">
+                  <div className="flex items-center justify-between text-slate-500">
                     <span>Password Encryption</span>
-                    <span className="text-slate-300 font-mono text-[11px]">Bcrypt (10 Salt Rounds)</span>
+                    <span className="text-slate-600 font-mono text-[11px]">Bcrypt (10 Salt Rounds)</span>
                   </div>
                 </div>
 
                 {/* Master ID Box */}
-                <div className="pt-2 border-t border-slate-800">
-                  <p className="text-[11px] text-slate-400 mb-1">Master Account UUID</p>
-                  <div className="flex items-center justify-between bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-[11px] font-mono text-slate-300">
+                <div className="pt-2 border-t border-amber-200">
+                  <p className="text-[11px] text-slate-500 mb-1">Master Account UUID</p>
+                  <div className="flex items-center justify-between bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-[11px] font-mono text-slate-600">
                     <span className="truncate max-w-[180px]">
                       {user?.id || '7510736f-8c03-4562-b3bc-8f7e7fefddbb'}
                     </span>
@@ -1566,28 +1566,28 @@ export default function SuperAdminPage({ initialTab = 'restaurants' }: SuperAdmi
                         setCopiedId(true);
                         setTimeout(() => setCopiedId(false), 2000);
                       }}
-                      className="text-slate-400 hover:text-white shrink-0 ml-2"
+                      className="text-slate-400 hover:text-slate-700 shrink-0 ml-2"
                       title="Copy UUID"
                     >
-                      {copiedId ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+                      {copiedId ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
                     </button>
                   </div>
                 </div>
               </div>
 
               {/* Quick Shortcuts Card */}
-              <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-md space-y-3">
-                <h3 className="text-xs font-black uppercase tracking-wider text-slate-400">Navigation Shortcuts</h3>
+              <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm space-y-3">
+                <h3 className="text-xs font-black uppercase tracking-wider text-slate-500">Navigation Shortcuts</h3>
                 <button
                   type="button"
                   onClick={() => {
                     setActiveTab('restaurants');
                     setSearchParams({});
                   }}
-                  className="w-full flex items-center justify-between p-3 rounded-xl bg-slate-950 hover:bg-slate-800 border border-slate-800 text-slate-200 text-xs font-bold transition"
+                  className="w-full flex items-center justify-between p-3 rounded-xl bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-700 text-xs font-bold transition"
                 >
                   <div className="flex items-center gap-2">
-                    <Building2 className="w-4 h-4 text-amber-400" />
+                    <Building2 className="w-4 h-4 text-amber-500" />
                     <span>Back to All Restaurants</span>
                   </div>
                   <ArrowRight className="w-4 h-4 text-slate-400" />
@@ -1596,10 +1596,10 @@ export default function SuperAdminPage({ initialTab = 'restaurants' }: SuperAdmi
                 <button
                   type="button"
                   onClick={() => navigate('/admin')}
-                  className="w-full flex items-center justify-between p-3 rounded-xl bg-slate-950 hover:bg-slate-800 border border-slate-800 text-slate-200 text-xs font-bold transition"
+                  className="w-full flex items-center justify-between p-3 rounded-xl bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-700 text-xs font-bold transition"
                 >
                   <div className="flex items-center gap-2">
-                    <Store className="w-4 h-4 text-emerald-400" />
+                    <Store className="w-4 h-4 text-emerald-500" />
                     <span>Open Restaurant Staff Panel</span>
                   </div>
                   <ArrowRight className="w-4 h-4 text-slate-400" />
