@@ -1,4 +1,4 @@
-import { Star, Clock, MapPin, Search, X, ArrowLeft, UtensilsCrossed } from "lucide-react";
+import { Star, Clock, MapPin, Search, X, ArrowLeft, UtensilsCrossed, Hotel } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import { initials, isWithinOpeningHours, formatMoney } from "@/lib/format";
 import { FoodTypeDot } from "./FoodTypeDot";
@@ -180,7 +180,8 @@ export function MenuHeader({
                 className="inline-flex items-center gap-2 rounded-xl px-3.5 py-2 text-sm font-bold text-brand-contrast shadow-sm"
                 style={{ backgroundColor: "var(--brand)" }}
               >
-                <span>🏨 Delivering to {table?.table_number?.replace(/^room\s*/i, 'Room ') || 'Room'}</span>
+                <Hotel className="size-4 shrink-0" />
+                <span>Delivering to {table?.table_number?.replace(/^room\s*/i, 'Room ') || 'Room'}</span>
               </div>
             ) : table ? (
               <div

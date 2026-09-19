@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { Receipt } from "lucide-react";
+import { Receipt, Hotel } from "lucide-react";
 import { loadMenu, createOrder } from "@/lib/menuService";
 import { CartProvider, useCart } from "@/hooks/useCart";
 import { MenuHeader } from "@/components/menu/MenuHeader";
@@ -305,7 +305,7 @@ function MenuScreen({ qrToken, data }: { qrToken: string; data: MenuPayload }) {
         >
           <div className="max-w-5xl mx-auto flex items-center justify-between">
             <span className="flex items-center gap-2 font-bold text-foreground">
-              <span className="text-sm">🏨</span>
+              <Hotel className="w-4 h-4 shrink-0 text-current" />
               <span>In-Room Dining for <strong>{table?.table_number?.replace(/^room\s*/i, 'Room ') || 'Room'}</strong></span>
             </span>
             <Link

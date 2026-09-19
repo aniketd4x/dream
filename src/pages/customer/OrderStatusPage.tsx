@@ -16,6 +16,8 @@ import {
   AlertCircle,
   CreditCard,
   CheckCircle2,
+  Bike,
+  ShoppingBag,
 } from "lucide-react";
 import { loadMultipleOrderStatuses } from "@/lib/menuService";
 import { formatMoney } from "@/lib/format";
@@ -198,9 +200,9 @@ export function OrderStatusPage() {
                 ? `${primaryOrder.tableNumber ? `Table ${primaryOrder.tableNumber} · ` : ""}${orders.length} Orders Placed`
                 : `Order #${primaryOrder.orderNumber} ${
                     primaryOrder.orderType === "takeaway"
-                      ? "· 🛵 Takeaway"
+                      ? "· Takeaway"
                       : primaryOrder.orderType === "counter"
-                      ? "· 🛍️ Counter"
+                      ? "· Counter"
                       : primaryOrder.tableNumber
                       ? `· Table ${primaryOrder.tableNumber}`
                       : ""
@@ -473,12 +475,14 @@ export function OrderStatusPage() {
                     <h2 className="text-sm font-extrabold">Order #{ord.orderNumber}</h2>
                     {ord.orderType === "takeaway" && (
                       <span className="inline-flex items-center gap-1 rounded-full bg-secondary px-2 py-0.5 text-[10px] font-bold text-muted-foreground">
-                        🛵 Takeaway
+                        <Bike className="size-3" />
+                        <span>Takeaway</span>
                       </span>
                     )}
                     {ord.orderType === "counter" && (
                       <span className="inline-flex items-center gap-1 rounded-full bg-secondary px-2 py-0.5 text-[10px] font-bold text-muted-foreground">
-                        🛍️ Counter
+                        <ShoppingBag className="size-3" />
+                        <span>Counter</span>
                       </span>
                     )}
                     {ord.tableNumber && ord.orderType !== "takeaway" && ord.orderType !== "counter" && (

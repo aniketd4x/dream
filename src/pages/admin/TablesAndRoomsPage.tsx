@@ -41,6 +41,14 @@ import {
   ToggleRight,
   PhoneCall,
   Loader2,
+  Utensils,
+  Bell,
+  Droplets,
+  Shirt,
+  Wrench,
+  Car,
+  AlarmClock,
+  Star,
 } from 'lucide-react';
 import { QRCard } from '@/components/admin/QRCard';
 import CrudPage from '@/components/admin/CrudPage';
@@ -715,11 +723,11 @@ export default function TablesAndRoomsPage() {
                 className="py-2 px-3 rounded-xl bg-slate-50 border border-slate-200 text-xs font-bold text-slate-700 focus:outline-hidden cursor-pointer"
               >
                 <option value="all">All Statuses</option>
-                <option value="AVAILABLE">🟢 Available</option>
-                <option value="OCCUPIED">🔵 Occupied</option>
-                <option value="CLEANING">🟡 Cleaning</option>
-                <option value="MAINTENANCE">🔴 Maintenance</option>
-                <option value="RESERVED">🟣 Reserved</option>
+                <option value="AVAILABLE">Available</option>
+                <option value="OCCUPIED">Occupied</option>
+                <option value="CLEANING">Cleaning</option>
+                <option value="MAINTENANCE">Maintenance</option>
+                <option value="RESERVED">Reserved</option>
               </select>
             </div>
 
@@ -818,11 +826,11 @@ export default function TablesAndRoomsPage() {
                           onChange={(e) => handleQuickStatusChange(room, e.target.value as RoomStatus)}
                           className={`text-xs font-black px-3 py-1.5 rounded-xl border backdrop-blur-md shadow-md cursor-pointer transition focus:outline-hidden ${statusCfg.bg} ${statusCfg.text} ${statusCfg.border}`}
                         >
-                          <option value="AVAILABLE">🟢 Available</option>
-                          <option value="OCCUPIED">🔵 Occupied</option>
-                          <option value="CLEANING">🟡 Cleaning</option>
-                          <option value="MAINTENANCE">🔴 Maintenance</option>
-                          <option value="RESERVED">🟣 Reserved</option>
+                          <option value="AVAILABLE">Available</option>
+                          <option value="OCCUPIED">Occupied</option>
+                          <option value="CLEANING">Cleaning</option>
+                          <option value="MAINTENANCE">Maintenance</option>
+                          <option value="RESERVED">Reserved</option>
                         </select>
                       </div>
 
@@ -1095,11 +1103,11 @@ export default function TablesAndRoomsPage() {
                     onChange={(e) => setFormData({ ...formData, status: e.target.value as RoomStatus })}
                     className="w-full px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-sm font-semibold focus:outline-hidden"
                   >
-                    <option value="AVAILABLE">🟢 Available</option>
-                    <option value="OCCUPIED">🔵 Occupied</option>
-                    <option value="CLEANING">🟡 Cleaning</option>
-                    <option value="MAINTENANCE">🔴 Maintenance</option>
-                    <option value="RESERVED">🟣 Reserved</option>
+                    <option value="AVAILABLE">Available</option>
+                    <option value="OCCUPIED">Occupied</option>
+                    <option value="CLEANING">Cleaning</option>
+                    <option value="MAINTENANCE">Maintenance</option>
+                    <option value="RESERVED">Reserved</option>
                   </select>
                 </div>
 
@@ -1404,19 +1412,20 @@ export default function TablesAndRoomsPage() {
               {/* Service Switches */}
               <div className="space-y-2">
                 {[
-                  { key: 'order_food', label: '🍽️ In-Room Food Ordering', desc: 'Order food from digital menu delivered to room' },
-                  { key: 'room_service', label: '🛎️ General Room Service', desc: 'General staff assistance & room supplies' },
-                  { key: 'housekeeping', label: '🧹 Housekeeping & Cleaning', desc: 'Room cleaning, bed making & fresh linens' },
-                  { key: 'water', label: '💧 Extra Mineral Water', desc: 'Packaged drinking water delivery' },
-                  { key: 'laundry', label: '🧺 Laundry & Ironing', desc: 'Clothes laundry, wash & pressing service' },
-                  { key: 'maintenance', label: '🔧 Maintenance & Repairs', desc: 'AC, plumbing, electrical or appliance fixes' },
-                  { key: 'taxi', label: '🚖 Taxi & Cab Booking', desc: 'Front desk cab reservation assistance' },
-                  { key: 'wakeup', label: '⏰ Wake-up Call', desc: 'Scheduled morning wake-up call from desk' },
-                  { key: 'view_bill', label: '🧾 Live Room Bill & Folio', desc: 'Allow guest to view stay charges & food orders' },
-                  { key: 'reception', label: '📞 Front Desk Direct Call', desc: 'One-tap phone call directly to reception' },
-                  { key: 'feedback', label: '⭐ Guest Feedback & Rating', desc: 'Collect ratings & comments from guests' },
+                  { key: 'order_food', label: 'In-Room Food Ordering', desc: 'Order food from digital menu delivered to room', icon: Utensils, color: 'text-emerald-600 bg-emerald-50' },
+                  { key: 'room_service', label: 'General Room Service', desc: 'General staff assistance & room supplies', icon: Bell, color: 'text-amber-600 bg-amber-50' },
+                  { key: 'housekeeping', label: 'Housekeeping & Cleaning', desc: 'Room cleaning, bed making & fresh linens', icon: Sparkles, color: 'text-blue-600 bg-blue-50' },
+                  { key: 'water', label: 'Extra Mineral Water', desc: 'Packaged drinking water delivery', icon: Droplets, color: 'text-sky-600 bg-sky-50' },
+                  { key: 'laundry', label: 'Laundry & Ironing', desc: 'Clothes laundry, wash & pressing service', icon: Shirt, color: 'text-indigo-600 bg-indigo-50' },
+                  { key: 'maintenance', label: 'Maintenance & Repairs', desc: 'AC, plumbing, electrical or appliance fixes', icon: Wrench, color: 'text-rose-600 bg-rose-50' },
+                  { key: 'taxi', label: 'Taxi & Cab Booking', desc: 'Front desk cab reservation assistance', icon: Car, color: 'text-purple-600 bg-purple-50' },
+                  { key: 'wakeup', label: 'Wake-up Call', desc: 'Scheduled morning wake-up call from desk', icon: AlarmClock, color: 'text-amber-600 bg-amber-50' },
+                  { key: 'view_bill', label: 'Live Room Bill & Folio', desc: 'Allow guest to view stay charges & food orders', icon: Receipt, color: 'text-teal-600 bg-teal-50' },
+                  { key: 'reception', label: 'Front Desk Direct Call', desc: 'One-tap phone call directly to reception', icon: PhoneCall, color: 'text-slate-600 bg-slate-100' },
+                  { key: 'feedback', label: 'Guest Feedback & Rating', desc: 'Collect ratings & comments from guests', icon: Star, color: 'text-yellow-600 bg-yellow-50' },
                 ].map((s) => {
                   const isEnabled = (servicesConfig as any)[s.key] ?? true;
+                  const IconComp = s.icon;
                   return (
                     <div
                       key={s.key}
@@ -1433,9 +1442,14 @@ export default function TablesAndRoomsPage() {
                           : 'bg-slate-100/50 border-slate-200/50 opacity-50'
                       }`}
                     >
-                      <div className="pr-2">
-                        <p className="text-xs font-bold text-slate-900">{s.label}</p>
-                        <p className="text-[11px] text-slate-500">{s.desc}</p>
+                      <div className="flex items-center gap-3 pr-2">
+                        <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 ${s.color}`}>
+                          <IconComp className="w-4 h-4" />
+                        </div>
+                        <div>
+                          <p className="text-xs font-bold text-slate-900">{s.label}</p>
+                          <p className="text-[11px] text-slate-500">{s.desc}</p>
+                        </div>
                       </div>
                       <div className={`shrink-0 transition ${isEnabled ? 'text-emerald-600' : 'text-slate-400'}`}>
                         {isEnabled ? <ToggleRight className="w-7 h-7" /> : <ToggleLeft className="w-7 h-7" />}

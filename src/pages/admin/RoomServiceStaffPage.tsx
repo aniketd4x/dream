@@ -496,10 +496,10 @@ export default function RoomServiceStaffPage() {
                   className="py-2 px-3 rounded-xl bg-slate-50 border border-slate-200 text-xs font-bold text-slate-700 cursor-pointer"
                 >
                   <option value="all">All Statuses</option>
-                  <option value="NEW">🚨 New</option>
-                  <option value="ACCEPTED">👍 Accepted</option>
-                  <option value="IN_PROGRESS">⏳ In Progress</option>
-                  <option value="COMPLETED">✅ Completed</option>
+                  <option value="NEW">New</option>
+                  <option value="ACCEPTED">Accepted</option>
+                  <option value="IN_PROGRESS">In Progress</option>
+                  <option value="COMPLETED">Completed</option>
                 </select>
               </div>
 

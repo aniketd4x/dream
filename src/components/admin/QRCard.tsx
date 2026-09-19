@@ -239,7 +239,7 @@ export function QRCard({
     triggerHaptic('success');
     const success = await copyTextToClipboard(qrValue);
     if (success) {
-      showToast(isRoom ? 'Room portal URL copied to clipboard! 📋' : 'Menu URL copied to clipboard! 📋');
+      showToast(isRoom ? 'Room portal URL copied to clipboard!' : 'Menu URL copied to clipboard!');
     } else {
       showToast('Failed to copy link', 'info');
     }
@@ -884,7 +884,7 @@ export function QRCard({
                 }`}
               >
                 <div>
-                  <p className="text-xs font-bold">🖨️ 80mm POS Thermal Slip</p>
+                  <p className="text-xs font-bold">80mm POS Thermal Slip</p>
                   <p className="text-[10px] text-slate-400">Print directly on receipt paper / stickers</p>
                 </div>
                 {printMode === 'pos80mm' && <Sparkles className="w-4 h-4 text-theme-primary shrink-0" />}
@@ -901,7 +901,7 @@ export function QRCard({
                 }`}
               >
                 <div>
-                  <p className="text-xs font-bold">📄 A4 Page with Cut Border</p>
+                  <p className="text-xs font-bold">A4 Page with Cut Border</p>
                   <p className="text-[10px] text-slate-400">Large print ready to cut and laminate</p>
                 </div>
                 {printMode === 'a4' && <Sparkles className="w-4 h-4 text-theme-primary shrink-0" />}

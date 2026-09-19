@@ -718,7 +718,7 @@ export default function AdminLayout({ active, onNavigate, children }: AdminLayou
               <div className="flex-1 min-w-0">
                 <div className="flex items-center justify-between gap-1">
                   <span className="text-[10px] uppercase font-bold tracking-wider text-blue-400 bg-blue-500/10 px-2 py-0.5 rounded">
-                    🔔 Incoming Order
+                    Incoming Order
                   </span>
                   <span className="text-xs font-bold text-emerald-400">
                     {restaurant?.currency_symbol || restaurant?.currency || '₹'} {orderToast.grand_total.toFixed(2)}
@@ -772,7 +772,7 @@ export default function AdminLayout({ active, onNavigate, children }: AdminLayou
               <div className="flex-1 min-w-0">
                 <div className="flex items-center justify-between gap-1">
                   <span className="text-[10px] uppercase font-bold tracking-wider text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded">
-                    🏨 Room Service Request
+                    Room Service Request
                   </span>
                   <span className="text-xs font-black text-amber-300">
                     Room {roomRequestToast.room_number}

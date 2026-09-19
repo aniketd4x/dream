@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { CartLines, TotalsBlock, type Totals } from "./CartSummary";
-import { Loader2, ShoppingBag } from "lucide-react";
+import { Loader2, ShoppingBag, Hotel } from "lucide-react";
 import type { CartLine, DiningTable, OrderType } from "@/types/menu";
 
 interface Props {
@@ -162,7 +162,7 @@ export function CartDrawer(props: Props) {
                           backgroundColor: "color-mix(in srgb, var(--brand) 16%, var(--card))",
                         }}
                       >
-                        🏨
+                        <Hotel className="w-5 h-5" style={{ color: "var(--brand)" }} />
                       </div>
                       <div className="min-w-0 flex-1">
                         <div

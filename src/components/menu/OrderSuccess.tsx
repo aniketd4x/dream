@@ -1,4 +1,4 @@
-import { Check, Clock } from "lucide-react";
+import { Check, Clock, Bike, ShoppingBag, UtensilsCrossed } from "lucide-react";
 import { Link } from "react-router-dom";
 import { formatMoney } from "@/lib/format";
 import type { PlacedOrder } from "@/types/menu";
@@ -31,14 +31,23 @@ export function OrderSuccess({ order, currencySymbol, onBackToMenu }: Props) {
           </div>
           <div className="flex items-center justify-between">
             <span className="text-muted-foreground">Type</span>
-            <span className="font-semibold capitalize">
-              {order.orderType === "takeaway"
-                ? "🛵 Takeaway / Pickup"
-                : order.orderType === "counter"
-                ? "🛍️ Counter Order"
-                : order.tableNumber
-                ? `🍽️ Dine-In (Table ${order.tableNumber})`
-                : "🍽️ Dine-In"}
+            <span className="inline-flex items-center gap-1.5 font-semibold capitalize">
+              {order.orderType === "takeaway" ? (
+                <>
+                  <Bike className="size-3.5 text-muted-foreground" />
+                  <span>Takeaway / Pickup</span>
+                </>
+              ) : order.orderType === "counter" ? (
+                <>
+                  <ShoppingBag className="size-3.5 text-muted-foreground" />
+                  <span>Counter Order</span>
+                </>
+              ) : (
+                <>
+                  <UtensilsCrossed className="size-3.5 text-muted-foreground" />
+                  <span>{order.tableNumber ? `Dine-In (Table ${order.tableNumber})` : "Dine-In"}</span>
+                </>
+              )}
             </span>
           </div>
           {order.tableNumber && order.orderType !== "takeaway" && order.orderType !== "counter" ? (

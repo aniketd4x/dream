@@ -816,7 +816,7 @@ export default function StaffManagementPage() {
                   onChange={(e) => handleRoleChange(e.target.value as StaffRole)}
                   className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-hidden"
                 >
-                  <optgroup label="🍽️ Restaurant Staff Roles">
+                  <optgroup label="Restaurant Staff Roles">
                     <option value="RESTAURANT_MANAGER">Restaurant Manager</option>
                     <option value="RESTAURANT_SUPERVISOR">Restaurant Supervisor</option>
                     <option value="CAPTAIN">Captain / Head Waiter</option>
@@ -824,7 +824,7 @@ export default function StaffManagementPage() {
                     <option value="KITCHEN_STAFF">Kitchen Staff / Chef</option>
                     <option value="CASHIER">Cashier / Billing</option>
                   </optgroup>
-                  <optgroup label="🛎️ Hotel / Room Roles">
+                  <optgroup label="Hotel / Room Roles">
                     <option value="HOTEL_MANAGER">Hotel Manager</option>
                     <option value="HOTEL_SUPERVISOR">Hotel Supervisor</option>
                     <option value="RECEPTIONIST">Front Desk / Receptionist</option>

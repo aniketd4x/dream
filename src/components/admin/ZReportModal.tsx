@@ -473,7 +473,7 @@ export default function ZReportModal({ onClose, initialDate }: ZReportModalProps
               }}
               className="px-2.5 py-1 rounded-lg bg-white border border-slate-200 text-slate-700 font-bold hover:bg-slate-50 transition native-press text-[11px]"
             >
-              Font: {fontStyle === 'thermal' ? '🖨️ Thermal POS' : '📄 Sans'}
+              Font: {fontStyle === 'thermal' ? 'Thermal POS' : 'Modern Sans'}
             </button>
 
             <button
@@ -594,20 +594,20 @@ export default function ZReportModal({ onClose, initialDate }: ZReportModalProps
                   [TENDER RECONCILIATION]
                 </p>
                 <div className="flex justify-between font-bold text-emerald-800">
-                  <span>💵 Cash in Drawer:</span>
+                  <span>Cash in Drawer:</span>
                   <span>{currencySymbol} {report.cashRevenue.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between font-medium">
-                  <span>💳 Card Swipes:</span>
+                  <span>Card Swipes:</span>
                   <span>{currencySymbol} {report.cardRevenue.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between font-medium">
-                  <span>📱 UPI / Online / QR:</span>
+                  <span>UPI / Online / QR:</span>
                   <span>{currencySymbol} {report.upiRevenue.toFixed(2)}</span>
                 </div>
                 {report.unpaidAmount > 0 && (
                   <div className="flex justify-between font-bold text-amber-700">
-                    <span>🕒 Unsettled / Pending:</span>
+                    <span>Unsettled / Pending:</span>
                     <span>{currencySymbol} {report.unpaidAmount.toFixed(2)}</span>
                   </div>
                 )}

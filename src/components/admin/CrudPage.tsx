@@ -35,6 +35,7 @@ import {
   RefreshCw,
   Tag,
   Check,
+  Upload,
 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { type TableConfig, type FieldConfig, TABLE_MAP } from '@/lib/tables';
@@ -3266,7 +3267,8 @@ function FieldInput({
         <div className="space-y-2">
           <div className="flex items-center justify-between">
             <span className="text-[11px] font-medium text-slate-500">URL or Upload:</span>
-            <label className="text-xs text-theme-primary font-bold cursor-pointer hover:underline">
+            <label className="inline-flex items-center gap-1.5 text-xs text-theme-primary font-bold cursor-pointer hover:underline">
+              <Upload className="w-3.5 h-3.5" />
               Upload File
               <input
                 type="file"

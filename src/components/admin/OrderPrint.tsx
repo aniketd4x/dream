@@ -697,7 +697,7 @@ export default function OrderPrint({ orderId, onClose }: OrderPrintProps) {
               className="px-2.5 py-1.5 rounded-lg bg-white border border-slate-200 text-slate-700 font-bold hover:bg-slate-50 transition native-press text-[11px]"
               title="Toggle Font"
             >
-              {fontStyle === 'thermal' ? '🖨️ POS Font' : '📄 Sans Font'}
+              {fontStyle === 'thermal' ? 'POS Font' : 'Sans Font'}
             </button>
 
             <button

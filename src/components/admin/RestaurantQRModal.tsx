@@ -222,7 +222,7 @@ export function RestaurantQRModal({
     triggerHaptic('success');
     const success = await copyTextToClipboard(menuUrl);
     if (success) {
-      showToast('Restaurant menu link copied! 📋');
+      showToast('Restaurant menu link copied!');
     } else {
       showToast('Failed to copy link', 'info');
     }
@@ -795,7 +795,7 @@ export function RestaurantQRModal({
                   }`}
                 >
                   <div>
-                    <p className="text-xs font-bold">📜 A4 Poster / Window Sign</p>
+                    <p className="text-xs font-bold">A4 Poster / Window Sign</p>
                     <p className="text-[10px] text-slate-400">Great for front glass, wall frames, flyers</p>
                   </div>
                   {printMode === 'a4' && <Sparkles className="w-4 h-4 text-theme-primary shrink-0" />}
@@ -812,7 +812,7 @@ export function RestaurantQRModal({
                   }`}
                 >
                   <div>
-                    <p className="text-xs font-bold">🧾 80mm POS Thermal Receipt / Sticker</p>
+                    <p className="text-xs font-bold">80mm POS Thermal Receipt / Sticker</p>
                     <p className="text-[10px] text-slate-400">Print on thermal paper roll for bags, bills & boxes</p>
                   </div>
                   {printMode === 'pos80mm' && <Sparkles className="w-4 h-4 text-theme-primary shrink-0" />}

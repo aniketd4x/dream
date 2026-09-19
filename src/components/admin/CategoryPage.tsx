@@ -9,6 +9,7 @@ import {
   AlertCircle,
   UtensilsCrossed,
   CheckCircle,
+  Upload,
 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/auth';
@@ -142,7 +143,7 @@ export default function CategoryPage() {
     setForm({
       name: '',
       description: '',
-      icon: '🍽️',
+      icon: '',
       image_url: '',
       is_active: true,
     });
@@ -155,7 +156,7 @@ export default function CategoryPage() {
     setForm({
       name: cat.name,
       description: cat.description || '',
-      icon: cat.icon || '🍽️',
+      icon: cat.icon || '',
       image_url: cat.image_url || '',
       is_active: cat.is_active !== false,
     });
@@ -377,8 +378,8 @@ export default function CategoryPage() {
                 </div>
               ) : (
                 <div className="h-28 bg-theme-light flex items-center justify-center relative">
-                  <div className="text-center">
-                    <div className="text-3xl">{cat.icon || '🍽️'}</div>
+                  <div className="w-14 h-14 rounded-2xl bg-white dark:bg-slate-800 shadow-xs border border-slate-200/60 dark:border-slate-700/60 flex items-center justify-center">
+                    <UtensilsCrossed className="w-6 h-6 text-theme-primary" />
                   </div>
                   <div className="absolute top-2 right-2">
                     <button
@@ -485,15 +486,15 @@ export default function CategoryPage() {
 
                 <div>
                   <label className="block text-xs font-semibold text-slate-700 mb-1.5">
-                    Icon (Emoji)
+                    Category Code / Short Tag
                   </label>
                   <input
                     type="text"
                     value={form.icon}
                     onChange={(e) => setForm({ ...form, icon: e.target.value })}
-                    maxLength={5}
+                    maxLength={10}
                     className="w-full border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-theme-light focus:border-theme-primary"
-                    placeholder="🍽️"
+                    placeholder="e.g. MAIN, STARTER"
                   />
                 </div>
 
@@ -502,7 +503,8 @@ export default function CategoryPage() {
                     <label className="block text-xs font-semibold text-slate-700">
                       Category Image
                     </label>
-                    <label className="text-xs text-theme-primary font-bold cursor-pointer hover:underline">
+                    <label className="inline-flex items-center gap-1.5 text-xs text-theme-primary font-bold cursor-pointer hover:underline">
+                      <Upload className="w-3.5 h-3.5" />
                       Upload File
                       <input
                         type="file"
