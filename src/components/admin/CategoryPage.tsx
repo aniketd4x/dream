@@ -503,7 +503,7 @@ export default function CategoryPage() {
                       Category Image
                     </label>
                     <label className="text-xs text-theme-primary font-bold cursor-pointer hover:underline">
-                      📁 Upload File
+                      Upload File
                       <input
                         type="file"
                         accept="image/*"

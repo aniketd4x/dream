@@ -3267,7 +3267,7 @@ function FieldInput({
           <div className="flex items-center justify-between">
             <span className="text-[11px] font-medium text-slate-500">URL or Upload:</span>
             <label className="text-xs text-theme-primary font-bold cursor-pointer hover:underline">
-              📁 Upload File
+              Upload File
               <input
                 type="file"
                 accept="image/*"

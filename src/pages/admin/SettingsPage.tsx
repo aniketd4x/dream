@@ -179,7 +179,7 @@ export default function SettingsPage() {
           opening_time: '09:00',
           closing_time: '23:00',
           currency: restaurant.currency || 'INR',
-          currency_symbol: restaurant.currency_symbol || 'â‚¹',
+          currency_symbol: restaurant.currency_symbol || '₹',
           rating: 4.9,
           total_reviews: 1420,
           address: '42 Gourmet Avenue, MG Road',
@@ -197,7 +197,7 @@ export default function SettingsPage() {
           opening_time: activeRest.opening_time || '09:00',
           closing_time: activeRest.closing_time || '23:00',
           currency: activeRest.currency || 'INR',
-          currency_symbol: activeRest.currency_symbol || 'â‚¹',
+          currency_symbol: activeRest.currency_symbol || '₹',
           rating: Number(activeRest.rating ?? 4.9),
           total_reviews: Number(activeRest.total_reviews ?? 0),
           address: activeRest.address || '',
@@ -297,7 +297,7 @@ export default function SettingsPage() {
 
       await refetchRestaurant();
       triggerHaptic('success');
-      setSuccessMessage('âœ… Restaurant settings updated successfully!');
+      setSuccessMessage('Restaurant settings updated successfully!');
       setTimeout(() => setSuccessMessage(null), 4000);
     } catch (err) {
       console.error('Error saving restaurant settings:', err);
@@ -366,7 +366,7 @@ export default function SettingsPage() {
 
       if (updateErr) throw updateErr;
 
-      setPasswordSuccess('âœ… Password changed successfully!');
+      setPasswordSuccess('Password changed successfully!');
       setPasswordForm({ currentPassword: '', newPassword: '', confirmPassword: '' });
       setTimeout(() => setPasswordSuccess(null), 4000);
     } catch (err) {
@@ -536,7 +536,7 @@ export default function SettingsPage() {
                 </label>
                 <label className="inline-flex items-center gap-1.5 text-xs text-theme-primary font-bold cursor-pointer hover:underline">
                   <Upload className="w-3.5 h-3.5" />
-                  {uploadingLogo ? 'Uploading...' : 'ðŸ“ Upload Logo File'}
+                  {uploadingLogo ? 'Uploading...' : 'Upload Logo File'}
                   <input
                     type="file"
                     accept="image/*"
@@ -620,7 +620,7 @@ export default function SettingsPage() {
                 </label>
                 <label className="inline-flex items-center gap-1.5 text-xs text-theme-primary font-bold cursor-pointer hover:underline">
                   <Upload className="w-3.5 h-3.5" />
-                  {uploadingCover ? 'Uploading...' : 'ðŸ“ Upload Cover File'}
+                  {uploadingCover ? 'Uploading...' : 'Upload Cover File'}
                   <input
                     type="file"
                     accept="image/*"
@@ -1119,7 +1119,7 @@ export default function SettingsPage() {
                   required
                   value={passwordForm.currentPassword}
                   onChange={(e) => setPasswordForm({ ...passwordForm, currentPassword: e.target.value })}
-                  placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢"
+                  placeholder="Enter current password"
                   className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-9 pr-10 py-2.5 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-theme-light focus:border-theme-primary"
                 />
                 <button
@@ -1145,7 +1145,7 @@ export default function SettingsPage() {
                   minLength={6}
                   value={passwordForm.newPassword}
                   onChange={(e) => setPasswordForm({ ...passwordForm, newPassword: e.target.value })}
-                  placeholder="Min 6 characters"
+                  placeholder="Enter new password (min 6 characters)"
                   className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-9 pr-10 py-2.5 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-theme-light focus:border-theme-primary"
                 />
                 <button
@@ -1170,7 +1170,7 @@ export default function SettingsPage() {
                   required
                   value={passwordForm.confirmPassword}
                   onChange={(e) => setPasswordForm({ ...passwordForm, confirmPassword: e.target.value })}
-                  placeholder="Repeat new password"
+                  placeholder="Confirm new password"
                   className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-9 pr-3 py-2.5 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-theme-light focus:border-theme-primary"
                 />
               </div>
