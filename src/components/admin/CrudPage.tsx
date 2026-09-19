@@ -838,6 +838,34 @@ export default function CrudPage({ table }: CrudPageProps) {
           .from('order_items')
           .update({ menu_item_id: null })
           .eq('menu_item_id', row.id);
+      } else if (config.name === 'restaurants') {
+        // Clean up child tables to prevent foreign key constraint violations
+        try {
+          await supabase.from('restaurant_settings').delete().eq('restaurant_id', row.id);
+          await supabase.from('restaurant_theme_settings').delete().eq('restaurant_id', row.id);
+          await supabase.from('restaurant_subscriptions').delete().eq('restaurant_id', row.id);
+          await supabase.from('staff_table_assignments').delete().eq('restaurant_id', row.id);
+          await supabase.from('staff_room_assignments').delete().eq('restaurant_id', row.id);
+          await supabase.from('staff').delete().eq('restaurant_id', row.id);
+          await supabase.from('room_service_requests').delete().eq('restaurant_id', row.id);
+          await supabase.from('hotel_rooms').delete().eq('restaurant_id', row.id);
+          const { data: ords } = await supabase.from('orders').select('id').eq('restaurant_id', row.id);
+          if (ords && ords.length > 0) {
+            const oIds = ords.map((o: any) => o.id);
+            await supabase.from('order_items').delete().in('order_id', oIds);
+            await supabase.from('orders').delete().eq('restaurant_id', row.id);
+          }
+          const { data: items } = await supabase.from('menu_items').select('id').eq('restaurant_id', row.id);
+          if (items && items.length > 0) {
+            const iIds = items.map((i: any) => i.id);
+            await supabase.from('item_variants').delete().in('menu_item_id', iIds);
+            await supabase.from('menu_items').delete().eq('restaurant_id', row.id);
+          }
+          await supabase.from('categories').delete().eq('restaurant_id', row.id);
+          await supabase.from('dining_tables').delete().eq('restaurant_id', row.id);
+        } catch (cleanErr) {
+          console.warn('Error during restaurant cascading delete in CrudPage:', cleanErr);
+        }
       }
       
       const { error } = await supabase

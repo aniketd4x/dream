@@ -34,6 +34,9 @@ import {
   Copy,
   User,
   Sparkles,
+  Archive,
+  ArchiveRestore,
+  History,
 } from 'lucide-react';
 import bcrypt from 'bcryptjs';
 import { supabase } from '@/lib/supabase';
@@ -56,6 +59,8 @@ export interface RestaurantRecord {
   currency_symbol?: string | null;
   is_active: boolean;
   is_verified?: boolean;
+  is_archived?: boolean;
+  archived_at?: string;
   logo_url?: string | null;
   created_at?: string;
   table_count?: number;
@@ -85,12 +90,30 @@ export default function SuperAdminPage({ initialTab = 'restaurants' }: SuperAdmi
   const [restaurants, setRestaurants] = useState<RestaurantRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
-  const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'inactive' | 'verified'>('all');
+  const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'inactive' | 'archived'>('all');
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [editingRestaurant, setEditingRestaurant] = useState<RestaurantRecord | null>(null);
   const [deletingRestaurant, setDeletingRestaurant] = useState<RestaurantRecord | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
+
+  // Local archive storage for deleted/archived restaurants
+  const ARCHIVED_RESTAURANTS_KEY = 'dishgaze_archived_restaurants_archive';
+
+  const getLocalArchivedRestaurants = (): RestaurantRecord[] => {
+    try {
+      const raw = localStorage.getItem(ARCHIVED_RESTAURANTS_KEY);
+      return raw ? JSON.parse(raw) : [];
+    } catch (_) {
+      return [];
+    }
+  };
+
+  const saveLocalArchivedRestaurants = (list: RestaurantRecord[]) => {
+    try {
+      localStorage.setItem(ARCHIVED_RESTAURANTS_KEY, JSON.stringify(list));
+    } catch (_) {}
+  };
 
   // Super Admin Settings State
   const [profileEmail, setProfileEmail] = useState(user?.email || 'akshay44x@gmail.com');
@@ -182,12 +205,30 @@ export default function SuperAdminPage({ initialTab = 'restaurants' }: SuperAdmi
         itemMap.set(i.restaurant_id, (itemMap.get(i.restaurant_id) || 0) + 1);
       });
 
-      const enriched: RestaurantRecord[] = (rests || []).map((r) => ({
-        ...r,
-        table_count: tableMap.get(r.id) || 0,
-        order_count: orderMap.get(r.id) || 0,
-        item_count: itemMap.get(r.id) || 0,
-      }));
+      const localArchived = getLocalArchivedRestaurants();
+      const localArchivedMap = new Map(localArchived.map((a) => [a.id, a]));
+
+      const enriched: RestaurantRecord[] = (rests || []).map((r) => {
+        const isLocallyArchived = localArchivedMap.has(r.id);
+        return {
+          ...r,
+          is_archived: Boolean(r.is_archived || isLocallyArchived),
+          table_count: tableMap.get(r.id) || 0,
+          order_count: orderMap.get(r.id) || 0,
+          item_count: itemMap.get(r.id) || 0,
+        };
+      });
+
+      // Also append any archived restaurants that were hard deleted from DB
+      localArchived.forEach((archived) => {
+        if (!enriched.some((r) => r.id === archived.id)) {
+          enriched.push({
+            ...archived,
+            is_archived: true,
+            is_active: false,
+          });
+        }
+      });
 
       // Fallback demo if list is empty
       if (enriched.length === 0) {
@@ -214,8 +255,8 @@ export default function SuperAdminPage({ initialTab = 'restaurants' }: SuperAdmi
 
       // Compute summary stats
       setPlatformStats({
-        totalRestaurants: enriched.length,
-        activeRestaurants: enriched.filter((r) => r.is_active).length,
+        totalRestaurants: enriched.filter((r) => !r.is_archived).length,
+        activeRestaurants: enriched.filter((r) => r.is_active && !r.is_archived).length,
         totalTables: (tablesData || []).length || 5,
         totalOrders: (ordersData || []).length || 1,
       });
@@ -246,10 +287,10 @@ export default function SuperAdminPage({ initialTab = 'restaurants' }: SuperAdmi
 
       if (!matchesSearch) return false;
 
-      if (statusFilter === 'active') return r.is_active;
-      if (statusFilter === 'inactive') return !r.is_active;
-      if (statusFilter === 'verified') return Boolean(r.is_verified);
-      return true;
+      if (statusFilter === 'active') return r.is_active && !r.is_archived;
+      if (statusFilter === 'inactive') return !r.is_active && !r.is_archived;
+      if (statusFilter === 'archived') return Boolean(r.is_archived);
+      return !r.is_archived;
     });
   }, [restaurants, search, statusFilter]);
 
@@ -440,21 +481,161 @@ export default function SuperAdminPage({ initialTab = 'restaurants' }: SuperAdmi
     }
   };
 
-  // Delete Restaurant
+  // Archive Restaurant (Soft Delete)
+  const handleArchiveRestaurant = async (target: RestaurantRecord) => {
+    triggerHaptic('medium');
+    setSubmitting(true);
+    try {
+      // 1. Attempt database update
+      try {
+        await supabase
+          .from('restaurants')
+          .update({
+            is_active: false,
+            is_archived: true,
+            updated_at: new Date().toISOString(),
+          })
+          .eq('id', target.id);
+      } catch (dbErr) {
+        console.warn('DB does not have is_archived yet or update failed, using local archive storage:', dbErr);
+      }
+
+      // 2. Save snapshot to local archive store
+      const list = getLocalArchivedRestaurants();
+      if (!list.some((a) => a.id === target.id)) {
+        list.unshift({
+          ...target,
+          is_active: false,
+          is_archived: true,
+          archived_at: new Date().toISOString(),
+        });
+        saveLocalArchivedRestaurants(list);
+      }
+
+      setDeletingRestaurant(null);
+      triggerHaptic('success');
+      await fetchAllData();
+    } catch (err: any) {
+      console.error('Error archiving restaurant:', err);
+      alert(`Could not archive restaurant: ${err.message}`);
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  // Restore Restaurant from Archive
+  const handleRestoreRestaurant = async (target: RestaurantRecord) => {
+    triggerHaptic('medium');
+    setSubmitting(true);
+    try {
+      // 1. Attempt database update
+      try {
+        await supabase
+          .from('restaurants')
+          .update({
+            is_active: true,
+            is_archived: false,
+            updated_at: new Date().toISOString(),
+          })
+          .eq('id', target.id);
+      } catch (dbErr) {
+        console.warn('DB update error during restore:', dbErr);
+      }
+
+      // 2. Remove from local archive store
+      const list = getLocalArchivedRestaurants().filter((a) => a.id !== target.id);
+      saveLocalArchivedRestaurants(list);
+
+      triggerHaptic('success');
+      await fetchAllData();
+    } catch (err: any) {
+      console.error('Error restoring restaurant:', err);
+      alert(`Could not restore restaurant: ${err.message}`);
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  // Permanently Delete Restaurant with clean Foreign-Key Cascading
   const confirmDeleteRestaurant = async () => {
     if (!deletingRestaurant) return;
     setSubmitting(true);
+    const restId = deletingRestaurant.id;
     try {
+      // 1. Save an archive snapshot so the restaurant history is preserved after delete
+      const list = getLocalArchivedRestaurants();
+      if (!list.some((a) => a.id === restId)) {
+        list.unshift({
+          ...deletingRestaurant,
+          is_active: false,
+          is_archived: true,
+          archived_at: new Date().toISOString(),
+        });
+        saveLocalArchivedRestaurants(list);
+      }
+
+      // 2. Clean up child tables to prevent foreign key constraint violations
+      // 2a. restaurant_settings
+      await supabase.from('restaurant_settings').delete().eq('restaurant_id', restId);
+
+      // 2b. restaurant_theme_settings
+      try {
+        await supabase.from('restaurant_theme_settings').delete().eq('restaurant_id', restId);
+      } catch (_) {}
+
+      // 2c. restaurant_subscriptions
+      try {
+        await supabase.from('restaurant_subscriptions').delete().eq('restaurant_id', restId);
+      } catch (_) {}
+
+      // 2d. staff assignments & staff
+      try {
+        await supabase.from('staff_table_assignments').delete().eq('restaurant_id', restId);
+        await supabase.from('staff_room_assignments').delete().eq('restaurant_id', restId);
+        await supabase.from('staff').delete().eq('restaurant_id', restId);
+      } catch (_) {}
+
+      // 2e. room service requests & hotel rooms
+      try {
+        await supabase.from('room_service_requests').delete().eq('restaurant_id', restId);
+        await supabase.from('hotel_rooms').delete().eq('restaurant_id', restId);
+      } catch (_) {}
+
+      // 2f. orders & order_items
+      try {
+        const { data: ords } = await supabase.from('orders').select('id').eq('restaurant_id', restId);
+        if (ords && ords.length > 0) {
+          const oIds = ords.map((o: any) => o.id);
+          await supabase.from('order_items').delete().in('order_id', oIds);
+          await supabase.from('orders').delete().eq('restaurant_id', restId);
+        }
+      } catch (_) {}
+
+      // 2g. menu items, item variants, categories, dining tables
+      try {
+        const { data: items } = await supabase.from('menu_items').select('id').eq('restaurant_id', restId);
+        if (items && items.length > 0) {
+          const iIds = items.map((i: any) => i.id);
+          await supabase.from('item_variants').delete().in('menu_item_id', iIds);
+          await supabase.from('menu_items').delete().eq('restaurant_id', restId);
+        }
+        await supabase.from('categories').delete().eq('restaurant_id', restId);
+        await supabase.from('dining_tables').delete().eq('restaurant_id', restId);
+      } catch (_) {}
+
+      // 3. Finally delete the parent restaurant record
       const { error } = await supabase
         .from('restaurants')
         .delete()
-        .eq('id', deletingRestaurant.id);
+        .eq('id', restId);
 
       if (error) throw error;
 
       setDeletingRestaurant(null);
+      triggerHaptic('success');
       await fetchAllData();
     } catch (err: any) {
+      console.error('Could not delete restaurant:', err);
       alert(`Could not delete restaurant: ${err.message}`);
     } finally {
       setSubmitting(false);
@@ -810,19 +991,37 @@ export default function SuperAdminPage({ initialTab = 'restaurants' }: SuperAdmi
         </div>
 
         <div className="flex items-center gap-1.5 w-full md:w-auto overflow-x-auto pb-1 md:pb-0">
-          {(['all', 'active', 'inactive', 'verified'] as const).map((tab) => (
-            <button
-              key={tab}
-              onClick={() => setStatusFilter(tab)}
-              className={`px-3 py-1.5 rounded-lg text-xs font-semibold capitalize whitespace-nowrap transition-all ${
-                statusFilter === tab
-                  ? 'bg-slate-900 text-white shadow-xs'
-                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-              }`}
-            >
-              {tab === 'all' ? `All (${restaurants.length})` : tab}
-            </button>
-          ))}
+          {(['all', 'active', 'inactive', 'archived'] as const).map((tab) => {
+            const count =
+              tab === 'all'
+                ? restaurants.filter((r) => !r.is_archived).length
+                : tab === 'active'
+                ? restaurants.filter((r) => r.is_active && !r.is_archived).length
+                : tab === 'inactive'
+                ? restaurants.filter((r) => !r.is_active && !r.is_archived).length
+                : restaurants.filter((r) => r.is_archived).length;
+
+            return (
+              <button
+                key={tab}
+                onClick={() => setStatusFilter(tab)}
+                className={`px-3 py-1.5 rounded-lg text-xs font-semibold capitalize whitespace-nowrap transition-all flex items-center gap-1.5 ${
+                  statusFilter === tab
+                    ? 'bg-slate-900 text-white shadow-xs'
+                    : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                }`}
+              >
+                <span>{tab}</span>
+                <span
+                  className={`text-[10px] px-1.5 py-0.2 rounded-full font-bold ${
+                    statusFilter === tab ? 'bg-white/20 text-white' : 'bg-slate-200/80 text-slate-600'
+                  }`}
+                >
+                  {count}
+                </span>
+              </button>
+            );
+          })}
         </div>
       </div>
 
@@ -941,65 +1140,99 @@ export default function SuperAdminPage({ initialTab = 'restaurants' }: SuperAdmi
                         </div>
                       </td>
 
-                      {/* Active Toggle */}
+                      {/* Active Toggle or Archived Status */}
                       <td className="py-4 px-4">
-                        <button
-                          onClick={() => handleToggleStatus(r)}
-                          className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold transition-all shadow-2xs ${
-                            r.is_active
-                              ? 'bg-emerald-100 text-emerald-800 hover:bg-emerald-200'
-                              : 'bg-rose-100 text-rose-800 hover:bg-rose-200'
-                          }`}
-                          title="Click to toggle status"
-                        >
-                          <span
-                            className={`w-1.5 h-1.5 rounded-full ${
-                              r.is_active ? 'bg-emerald-600 animate-pulse' : 'bg-rose-600'
+                        {r.is_archived ? (
+                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800 border border-amber-200 shadow-2xs">
+                            <Archive className="w-3 h-3 text-amber-700" />
+                            Archived
+                          </span>
+                        ) : (
+                          <button
+                            onClick={() => handleToggleStatus(r)}
+                            className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold transition-all shadow-2xs ${
+                              r.is_active
+                                ? 'bg-emerald-100 text-emerald-800 hover:bg-emerald-200'
+                                : 'bg-rose-100 text-rose-800 hover:bg-rose-200'
                             }`}
-                          />
-                          {r.is_active ? 'Active' : 'Suspended'}
-                        </button>
+                            title="Click to toggle status"
+                          >
+                            <span
+                              className={`w-1.5 h-1.5 rounded-full ${
+                                r.is_active ? 'bg-emerald-600 animate-pulse' : 'bg-rose-600'
+                              }`}
+                            />
+                            {r.is_active ? 'Active' : 'Suspended'}
+                          </button>
+                        )}
                       </td>
 
                       {/* Actions */}
                       <td className="py-4 px-4 text-right">
                         <div className="flex items-center justify-end gap-1.5">
-                          {/* Manage Restaurant Button */}
-                          <button
-                            onClick={() => handleManageRestaurant(r)}
-                            className="px-3 py-1.5 bg-slate-900 hover:bg-slate-800 text-white rounded-lg text-xs font-bold flex items-center gap-1 transition-all active:scale-95 shadow-xs"
-                            title="Switch entire admin panel into this restaurant"
-                          >
-                            <span>Manage</span>
-                            <ArrowRight className="w-3.5 h-3.5" />
-                          </button>
+                          {r.is_archived ? (
+                            <>
+                              {/* Restore Restaurant Button */}
+                              <button
+                                onClick={() => handleRestoreRestaurant(r)}
+                                disabled={submitting}
+                                className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold flex items-center gap-1.5 transition-all active:scale-95 shadow-xs"
+                                title="Restore Restaurant from Archive"
+                              >
+                                <ArchiveRestore className="w-3.5 h-3.5" />
+                                <span>Restore</span>
+                              </button>
 
-                          {/* Live Menu Shortcut */}
-                          <button
-                            onClick={() => window.open(getRestaurantDirectMenuUrl(r), '_blank')}
-                            className="p-1.5 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-colors"
-                            title="Preview Customer Digital Menu"
-                          >
-                            <ExternalLink className="w-4 h-4" />
-                          </button>
+                              {/* Permanently Delete */}
+                              <button
+                                onClick={() => setDeletingRestaurant(r)}
+                                disabled={submitting}
+                                className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                                title="Permanently Delete"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </button>
+                            </>
+                          ) : (
+                            <>
+                              {/* Manage Restaurant Button */}
+                              <button
+                                onClick={() => handleManageRestaurant(r)}
+                                className="px-3 py-1.5 bg-slate-900 hover:bg-slate-800 text-white rounded-lg text-xs font-bold flex items-center gap-1 transition-all active:scale-95 shadow-xs"
+                                title="Switch entire admin panel into this restaurant"
+                              >
+                                <span>Manage</span>
+                                <ArrowRight className="w-3.5 h-3.5" />
+                              </button>
 
-                          {/* Edit Details */}
-                          <button
-                            onClick={() => openEditModal(r)}
-                            className="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                            title="Edit Restaurant Details"
-                          >
-                            <Edit2 className="w-4 h-4" />
-                          </button>
+                              {/* Live Menu Shortcut */}
+                              <button
+                                onClick={() => window.open(getRestaurantDirectMenuUrl(r), '_blank')}
+                                className="p-1.5 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-colors"
+                                title="Preview Customer Digital Menu"
+                              >
+                                <ExternalLink className="w-4 h-4" />
+                              </button>
 
-                          {/* Delete Restaurant */}
-                          <button
-                            onClick={() => setDeletingRestaurant(r)}
-                            className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                            title="Delete Restaurant"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </button>
+                              {/* Edit Details */}
+                              <button
+                                onClick={() => openEditModal(r)}
+                                className="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                                title="Edit Restaurant Details"
+                              >
+                                <Edit2 className="w-4 h-4" />
+                              </button>
+
+                              {/* Delete Restaurant */}
+                              <button
+                                onClick={() => setDeletingRestaurant(r)}
+                                className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                                title="Archive or Delete Restaurant"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </button>
+                            </>
+                          )}
                         </div>
                       </td>
                     </tr>
@@ -1712,30 +1945,55 @@ export default function SuperAdminPage({ initialTab = 'restaurants' }: SuperAdmi
         </div>
       )}
 
-      {/* DELETE CONFIRMATION MODAL */}
+      {/* DELETE / ARCHIVE CONFIRMATION MODAL */}
       {deletingRestaurant && (
         <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 animate-fade-in">
-          <div className="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl border border-slate-200 text-center">
-            <div className="w-12 h-12 rounded-full bg-red-100 text-red-600 flex items-center justify-center mx-auto mb-4">
-              <Trash2 className="w-6 h-6" />
+          <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-200 text-center">
+            <div className="w-14 h-14 rounded-2xl bg-amber-50 border border-amber-100 text-amber-600 flex items-center justify-center mx-auto mb-4">
+              <Archive className="w-7 h-7" />
             </div>
-            <h3 className="text-lg font-black text-slate-900 mb-1">Delete Restaurant?</h3>
-            <p className="text-xs text-slate-500 mb-5">
-              Are you sure you want to remove <span className="font-bold text-slate-800">{deletingRestaurant.name}</span>? This will permanently delete their menu, tables, and orders.
+            <h3 className="text-lg font-black text-slate-900 mb-1">
+              {deletingRestaurant.is_archived ? 'Delete Permanently?' : 'Delete or Archive Restaurant?'}
+            </h3>
+            <p className="text-xs text-slate-500 mb-6 leading-relaxed">
+              {deletingRestaurant.is_archived ? (
+                <>
+                  You are about to permanently purge <span className="font-bold text-slate-800">{deletingRestaurant.name}</span> and all associated menu items, tables, orders, and settings. This cannot be undone.
+                </>
+              ) : (
+                <>
+                  What would you like to do with <span className="font-bold text-slate-800">{deletingRestaurant.name}</span>? You can safely archive it to preserve all history, or delete it permanently.
+                </>
+              )}
             </p>
-            <div className="flex items-center justify-center gap-2">
+            <div className="flex flex-col gap-2.5">
+              {!deletingRestaurant.is_archived && (
+                <button
+                  type="button"
+                  onClick={() => handleArchiveRestaurant(deletingRestaurant)}
+                  disabled={submitting}
+                  className="w-full py-2.5 px-4 bg-amber-600 hover:bg-amber-700 text-white rounded-xl text-xs font-bold flex items-center justify-center gap-2 shadow-xs transition-all active:scale-[0.98]"
+                >
+                  {submitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Archive className="w-4 h-4" />}
+                  <span>Archive Restaurant (Recommended)</span>
+                </button>
+              )}
               <button
-                onClick={() => setDeletingRestaurant(null)}
-                className="px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded-xl"
-              >
-                Cancel
-              </button>
-              <button
+                type="button"
                 onClick={confirmDeleteRestaurant}
                 disabled={submitting}
-                className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-xs font-bold rounded-xl shadow-xs"
+                className="w-full py-2.5 px-4 bg-red-600 hover:bg-red-700 text-white rounded-xl text-xs font-bold flex items-center justify-center gap-2 shadow-xs transition-all active:scale-[0.98]"
               >
-                {submitting ? 'Deleting...' : 'Yes, Delete'}
+                {submitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
+                <span>{deletingRestaurant.is_archived ? 'Confirm Permanent Delete' : 'Delete Permanently (Cascade & Archive)'}</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setDeletingRestaurant(null)}
+                disabled={submitting}
+                className="w-full py-2 text-xs font-semibold text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-xl transition-colors"
+              >
+                Cancel
               </button>
             </div>
           </div>
