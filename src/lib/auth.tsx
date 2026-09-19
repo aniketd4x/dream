@@ -1,11 +1,14 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
 import bcrypt from 'bcryptjs';
 import { supabase } from '@/lib/supabase';
+import type { StaffMember, StaffRole, AccessScope } from '@/types/staff';
+import { authenticateStaff } from '@/lib/staffService';
 
 interface AuthContextValue {
   user: User | null;
   loading: boolean;
   signIn: (email: string, password: string) => Promise<{ error: string | null }>;
+  staffSignIn: (mobile: string, password: string) => Promise<{ error: string | null; staff?: StaffMember }>;
   signOut: () => Promise<void>;
   signUp: (data: SignUpData) => Promise<{ error: string | null }>;
   resetPassword: (email: string, newPassword: string) => Promise<{ error: string | null; restaurantName?: string }>;
@@ -13,6 +16,8 @@ interface AuthContextValue {
   refetchRestaurant: () => Promise<void>;
   isSuperAdmin: boolean;
   isManagingDifferentRestaurant: boolean;
+  isStaff: boolean;
+  staffRole: StaffRole | null;
   switchRestaurant: (restaurantId: string) => Promise<void>;
   resetToSuperAdmin: () => Promise<void>;
   updateUserSession: (data: Partial<User>) => void;
@@ -25,6 +30,14 @@ export interface User {
   username?: string;
   mobile?: string;
   role?: string;
+  is_staff?: boolean;
+  staff_role?: StaffRole;
+  staff_department?: string;
+  access_scope?: AccessScope;
+  permissions?: string[];
+  assigned_tables?: string[];
+  assigned_rooms?: string[];
+  restaurant_id?: string;
 }
 
 interface SignUpData {
@@ -66,6 +79,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     isSuperAdmin && activeRestaurantId && user && activeRestaurantId !== user.id
   );
 
+  const isStaff = Boolean(user?.is_staff);
+  const staffRole = (user?.staff_role as StaffRole) || null;
+
   useEffect(() => {
     // Check localStorage for existing session
     const storedUser = localStorage.getItem('user');
@@ -76,6 +92,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const savedManagedId = sessionStorage.getItem('superadmin_active_restaurant');
         if (savedManagedId) {
           fetchRestaurant(savedManagedId);
+        } else if (userData.is_staff && userData.restaurant_id) {
+          fetchRestaurant(userData.restaurant_id);
         } else {
           fetchRestaurant(userData.id);
         }
@@ -231,6 +249,53 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       console.error('Login error:', fallbackError);
       const msg = fallbackError instanceof Error ? fallbackError.message : 'Unknown error';
       return { error: `Authentication error: ${msg}` };
+    }
+  }
+
+  async function staffSignIn(mobile: string, password: string): Promise<{ error: string | null; staff?: StaffMember }> {
+    try {
+      const res = await authenticateStaff(mobile, password);
+      if (!res.success || !res.staff) {
+        return { error: res.error || 'Invalid credentials' };
+      }
+
+      const staff = res.staff;
+      const userData: User = {
+        id: staff.id,
+        email: `${staff.mobile}@staff.dishgaze`,
+        name: staff.full_name,
+        mobile: staff.mobile,
+        role: staff.role,
+        is_staff: true,
+        staff_role: staff.role,
+        staff_department: staff.department,
+        access_scope: staff.access_scope,
+        permissions: staff.permissions || [],
+        assigned_tables: staff.assigned_tables || [],
+        assigned_rooms: staff.assigned_rooms || [],
+        restaurant_id: staff.restaurant_id,
+      };
+
+      setUser(userData);
+      localStorage.setItem('user', JSON.stringify(userData));
+
+      if (res.restaurant) {
+        setRestaurant({
+          id: res.restaurant.id,
+          name: res.restaurant.name,
+          slug: res.restaurant.slug,
+          currency: res.restaurant.currency || 'INR',
+          currency_symbol: res.restaurant.currency_symbol || '₹',
+          logo_url: res.restaurant.logo_url || '/logo.png',
+        });
+      } else {
+        await fetchRestaurant(staff.restaurant_id);
+      }
+
+      return { error: null, staff };
+    } catch (err: any) {
+      console.error('Staff signin exception:', err);
+      return { error: err.message || 'Staff authentication error' };
     }
   }
 
@@ -492,12 +557,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       user, 
       loading, 
       signIn, 
+      staffSignIn,
       signOut,
       signUp,
       resetPassword,
       restaurant,
       isSuperAdmin,
       isManagingDifferentRestaurant,
+      isStaff,
+      staffRole,
       switchRestaurant,
       resetToSuperAdmin,
       updateUserSession,

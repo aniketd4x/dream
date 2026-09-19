@@ -29,6 +29,9 @@ import SettingsPage from '@/pages/admin/SettingsPage';
 import ThemeSettingsPage from '@/pages/admin/ThemeSettingsPage';
 import ReportsPage from '@/pages/admin/ReportsPage';
 import SuperAdminPage from '@/pages/admin/SuperAdminPage';
+import StaffManagementPage from '@/pages/admin/StaffManagementPage';
+import StaffLoginPage from '@/pages/staff/StaffLoginPage';
+import StaffPortalPage from '@/pages/staff/StaffPortalPage';
 import { ThemeProvider } from '@/lib/themeContext';
 
 function AdminApp() {
@@ -38,6 +41,7 @@ function AdminApp() {
 
   // Map route pathname to AdminLayout active tab string
   const getActiveFromPath = (pathname: string): string => {
+    if (pathname.includes('/admin/staff')) return 'staff_management';
     if (pathname.includes('/admin/categories')) return 'table:categories';
     if (pathname.includes('/admin/menu')) return 'table:menu_items';
     if (pathname.includes('/admin/tables') || pathname.includes('/admin/rooms')) return 'table:dining_tables';
@@ -61,6 +65,8 @@ function AdminApp() {
   const handleNavigate = (newSection: string) => {
     if (newSection === 'dashboard') {
       navigate('/admin');
+    } else if (newSection === 'staff_management') {
+      navigate('/admin/staff');
     } else if (newSection === 'reports') {
       navigate('/admin/reports');
     } else if (newSection === 'table:categories') {
@@ -141,6 +147,7 @@ function AdminApp() {
   useEffect(() => {
     const titles: Record<string, string> = {
       dashboard: 'Dashboard',
+      staff_management: 'Staff & Roles',
       'table:orders': 'Orders',
       reports: 'Reports & Analytics',
       'table:dining_tables': 'Tables & Rooms',
@@ -171,6 +178,7 @@ function AdminApp() {
     <>
       <AdminLayout active={active} onNavigate={handleNavigate}>
         {active === 'dashboard' && <Dashboard onNavigate={handleNavigate} />}
+        {active === 'staff_management' && <StaffManagementPage />}
         {active === 'table:orders' && <CrudPage table="orders" />}
         {active === 'reports' && <ReportsPage />}
         {active === 'table:categories' && <CategoryPage />}
@@ -290,6 +298,24 @@ function FullScreenSplash({ onFinish }: { onFinish: () => void }) {
   );
 }
 
+function StaffPortalGate() {
+  const { user, loading } = useAuth();
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-slate-50 dark:bg-[#0B1220] p-4 sm:p-6 max-w-7xl mx-auto flex items-center justify-center">
+        <DashboardSkeleton />
+      </div>
+    );
+  }
+
+  if (!user) {
+    return <StaffLoginPage />;
+  }
+
+  return <StaffPortalPage />;
+}
+
 export default function App() {
   const [showSplash, setShowSplash] = useState(() => Capacitor.isNativePlatform());
 
@@ -309,6 +335,11 @@ export default function App() {
           <Route path="/menu/:qrToken" element={<QRMenuPage />} />
           <Route path="/room/:qrToken" element={<RoomServiceLandingPage />} />
           <Route path="/order/:orderId" element={<OrderStatusPage />} />
+
+          {/* Dedicated Staff Mobile Portal & Login Routes */}
+          <Route path="/staff/login" element={<StaffLoginPage />} />
+          <Route path="/staff" element={<StaffPortalGate />} />
+          <Route path="/staff/*" element={<StaffPortalGate />} />
 
           {/* Separate Dedicated Super Admin Routes */}
           <Route path="/superadmin" element={<SuperAdminGate />} />

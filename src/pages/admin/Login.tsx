@@ -215,6 +215,20 @@ export default function Login() {
               </p>
             </div>
 
+            {/* Staff Portal Link Banner */}
+            <div className="mb-4">
+              <Link
+                to="/staff/login"
+                className="w-full flex items-center justify-between p-2.5 rounded-xl bg-blue-50 hover:bg-blue-100 border border-blue-200 text-blue-800 transition native-press text-xs font-bold"
+              >
+                <div className="flex items-center gap-2">
+                  <Phone className="w-3.5 h-3.5 text-blue-600" />
+                  <span>Restaurant & Hotel Staff? Sign in here</span>
+                </div>
+                <span className="text-blue-600 font-extrabold">Staff Login →</span>
+              </Link>
+            </div>
+
             {/* Mode Switcher Tabs */}
             <div className="flex rounded-2xl bg-slate-100/90 p-1 mb-6 border border-slate-200/60">
               <button

@@ -35,7 +35,10 @@ import {
   ShieldCheck,
   BellRing,
   Palette,
+  Users,
+  Smartphone,
 } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { useAuth } from '@/lib/auth';
 import { TABLES } from '@/lib/tables';
 import { supabase } from '@/lib/supabase';
@@ -412,6 +415,18 @@ export default function AdminLayout({ active, onNavigate, children }: AdminLayou
     fetchSubscription();
   }, [restaurant]);
 
+  // Staff Role & Permission Checks
+  const isOperationalStaff = Boolean(
+    user?.is_staff &&
+    !['RESTAURANT_MANAGER', 'HOTEL_MANAGER', 'RESTAURANT_SUPERVISOR', 'HOTEL_SUPERVISOR'].includes(user?.staff_role || '')
+  );
+  const canManageStaff = !user?.is_staff || ['RESTAURANT_MANAGER', 'HOTEL_MANAGER'].includes(user?.staff_role || '') || user?.permissions?.includes('staff:manage');
+  const canManageSettings = !user?.is_staff || ['RESTAURANT_MANAGER', 'HOTEL_MANAGER'].includes(user?.staff_role || '') || user?.permissions?.includes('settings:manage');
+  const canViewReports = !user?.is_staff || ['RESTAURANT_MANAGER', 'HOTEL_MANAGER', 'RESTAURANT_SUPERVISOR', 'HOTEL_SUPERVISOR', 'CASHIER'].includes(user?.staff_role || '') || user?.permissions?.includes('reports:view');
+  const canViewMenu = !user?.is_staff || !['ROOM_SERVICE', 'HOUSEKEEPING', 'MAINTENANCE'].includes(user?.staff_role || '');
+  const canViewHospitality = !user?.is_staff || user?.access_scope === 'hotel' || user?.access_scope === 'both' || ['HOTEL_MANAGER', 'HOTEL_SUPERVISOR', 'ROOM_SERVICE', 'HOUSEKEEPING', 'MAINTENANCE', 'RECEPTIONIST'].includes(user?.staff_role || '');
+  const canViewRestaurant = !user?.is_staff || user?.access_scope === 'restaurant' || user?.access_scope === 'both' || !['HOUSEKEEPING', 'MAINTENANCE'].includes(user?.staff_role || '');
+
   // Grouped Navigation Sections (Linear/Stripe SaaS Hierarchy)
   const navSections = [
     {
@@ -420,27 +435,40 @@ export default function AdminLayout({ active, onNavigate, children }: AdminLayou
         { key: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
       ],
     },
-    {
-      title: 'Restaurant',
-      items: [
-        { key: 'table:orders', label: 'Orders', icon: ShoppingBag, badge: pendingCount },
-        { key: 'table:dining_tables', label: 'Tables & Rooms', icon: Table2 },
-        { key: 'table:menu_items', label: 'Menu Items', icon: UtensilsCrossed },
-        { key: 'table:categories', label: 'Categories', icon: FolderTree },
-      ],
-    },
-    {
-      title: 'Hospitality',
-      items: [
-        { key: 'operations:room_service', label: 'Room Service', icon: BellRing, badge: pendingRoomRequestsCount },
-      ],
-    },
+    ...(canViewRestaurant
+      ? [
+          {
+            title: 'Restaurant',
+            items: [
+              { key: 'table:orders', label: 'Orders', icon: ShoppingBag, badge: pendingCount },
+              { key: 'table:dining_tables', label: 'Tables & Rooms', icon: Table2 },
+              ...(canViewMenu
+                ? [
+                    { key: 'table:menu_items', label: 'Menu Items', icon: UtensilsCrossed },
+                    { key: 'table:categories', label: 'Categories', icon: FolderTree },
+                  ]
+                : []),
+            ],
+          },
+        ]
+      : []),
+    ...(canViewHospitality
+      ? [
+          {
+            title: 'Hospitality',
+            items: [
+              { key: 'operations:room_service', label: 'Room Service', icon: BellRing, badge: pendingRoomRequestsCount },
+            ],
+          },
+        ]
+      : []),
     {
       title: 'Management & Settings',
       items: [
-        { key: 'reports', label: 'Reports', icon: BarChart3 },
-        { key: 'theme_settings', label: 'Theme & Design', icon: Palette },
-        { key: 'table:restaurant_settings', label: 'Settings', icon: Settings },
+        ...(canManageStaff ? [{ key: 'staff_management', label: 'Staff & Roles', icon: Users }] : []),
+        ...(canViewReports ? [{ key: 'reports', label: 'Reports', icon: BarChart3 }] : []),
+        ...(!user?.is_staff ? [{ key: 'theme_settings', label: 'Theme & Design', icon: Palette }] : []),
+        ...(canManageSettings ? [{ key: 'table:restaurant_settings', label: 'Settings', icon: Settings }] : []),
       ],
     },
   ];
@@ -586,6 +614,16 @@ export default function AdminLayout({ active, onNavigate, children }: AdminLayou
 
           {/* Right Header Action Items */}
           <div className="flex items-center gap-2 shrink-0">
+            {/* Staff Mobile Portal Shortcut */}
+            <Link
+              to="/staff"
+              className="flex items-center gap-1.5 text-xs font-semibold px-2.5 sm:px-3 py-1.5 rounded-lg border border-purple-200 dark:border-purple-800 bg-purple-50 dark:bg-purple-950/40 text-purple-700 dark:text-purple-300 hover:bg-purple-100 dark:hover:bg-purple-900/60 transition shadow-xs native-press"
+              title="Open Staff Mobile Portal"
+            >
+              <Smartphone className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400 shrink-0" />
+              <span className="hidden sm:inline">Staff Portal</span>
+            </Link>
+
             {/* Restaurant Menu QR Code (Fixed 1 Barcode) */}
             {restaurant && (
               <button
@@ -1065,6 +1103,18 @@ export default function AdminLayout({ active, onNavigate, children }: AdminLayou
 
             {/* Quick Links */}
             <div className="space-y-2 mb-5">
+              <Link
+                to="/staff"
+                onClick={() => setProfileModalOpen(false)}
+                className="w-full flex items-center justify-between p-3 rounded-lg bg-purple-50 dark:bg-purple-950/40 hover:bg-purple-100 dark:hover:bg-purple-900/50 border border-purple-200 dark:border-purple-800 text-purple-800 dark:text-purple-200 transition native-press"
+              >
+                <div className="flex items-center gap-2.5">
+                  <Smartphone className="w-4 h-4 text-purple-600 dark:text-purple-400" />
+                  <span className="text-xs font-bold text-purple-900 dark:text-purple-200">Open Staff Mobile Portal</span>
+                </div>
+                <ChevronRight className="w-4 h-4 text-purple-400" />
+              </Link>
+
               <button
                 type="button"
                 onClick={() => {
