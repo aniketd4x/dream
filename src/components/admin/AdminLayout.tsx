@@ -34,6 +34,7 @@ import {
   Building2,
   ShieldCheck,
   BellRing,
+  Palette,
 } from 'lucide-react';
 import { useAuth } from '@/lib/auth';
 import { TABLES } from '@/lib/tables';
@@ -42,6 +43,7 @@ import { playOrderChime, startOrderRinging, stopOrderRinging } from '@/lib/audio
 import { triggerHaptic } from '@/lib/haptics';
 import PullToRefresh from './PullToRefresh';
 import { RestaurantQRModal } from './RestaurantQRModal';
+import { ThemeToggle } from '@/components/ui/ThemeToggle';
 
 const ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
   LayoutDashboard,
@@ -419,6 +421,7 @@ export default function AdminLayout({ active, onNavigate, children }: AdminLayou
     { key: 'table:dining_tables', label: 'Tables & Rooms', icon: Table2 },
     { key: 'table:menu_items', label: 'Menu', icon: UtensilsCrossed },
     { key: 'table:categories', label: 'Categories', icon: FolderTree },
+    { key: 'theme_settings', label: 'Theme & Colors', icon: Palette },
     { key: 'table:restaurant_settings', label: 'Settings', icon: Settings },
   ];
 
@@ -591,6 +594,9 @@ export default function AdminLayout({ active, onNavigate, children }: AdminLayou
               {soundMuted ? <VolumeX className="w-3.5 h-3.5 text-slate-400" /> : <Volume2 className="w-3.5 h-3.5 text-emerald-600 animate-pulse" />}
               <span className="hidden sm:inline">{soundMuted ? 'Muted' : 'Live Ring'}</span>
             </button>
+
+            {/* Light / Dark / System Theme Toggle */}
+            <ThemeToggle />
 
             {/* Header Notification Bell Icon Button */}
             <button
@@ -913,6 +919,26 @@ export default function AdminLayout({ active, onNavigate, children }: AdminLayou
                   <div className="text-left">
                     <p className="text-sm font-bold text-slate-900">Restaurant Menu QR</p>
                     <p className="text-xs text-slate-500 font-normal">Fixed 1 barcode for direct digital menu</p>
+                  </div>
+                </div>
+                <ChevronRight className="w-4 h-4 text-slate-400" />
+              </button>
+
+              <button
+                onClick={() => handleNav('theme_settings')}
+                className={`w-full flex items-center justify-between p-3.5 rounded-2xl border transition native-press ${
+                  active === 'theme_settings'
+                    ? 'bg-theme-light border-theme-light text-theme-primary font-bold'
+                    : 'bg-slate-50 hover:bg-slate-100 border-slate-200 text-slate-800'
+                }`}
+              >
+                <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 rounded-xl bg-white border border-slate-200 flex items-center justify-center text-slate-700 shadow-xs">
+                    <Palette className="w-5 h-5 text-theme-primary" />
+                  </div>
+                  <div className="text-left">
+                    <p className="text-sm font-bold">Theme & Colors</p>
+                    <p className="text-xs text-slate-500 font-normal">Light, dark mode & 18 custom UI colors</p>
                   </div>
                 </div>
                 <ChevronRight className="w-4 h-4 text-slate-400" />

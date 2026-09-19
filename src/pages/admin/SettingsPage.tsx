@@ -30,24 +30,18 @@ import {
   MessageCircle,
   RotateCcw,
   Sliders,
+  Shield,
 } from 'lucide-react';
 import bcrypt from 'bcryptjs';
 import { QRCodeCanvas } from 'qrcode.react';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/auth';
-import {
-  ThemeConfig,
-  DEFAULT_THEME_CONFIG,
-  THEME_PALETTES,
-  parseThemeConfig,
-  serializeThemeConfig,
-  applyThemeToDOM,
-} from '@/lib/theme';
 import { triggerHaptic } from '@/lib/haptics';
 import { SettingsSkeleton } from '@/components/admin/Skeleton';
 import { RestaurantQRModal } from '@/components/admin/RestaurantQRModal';
 import { getRestaurantDirectMenuUrl } from '@/lib/qrCanvasGenerator';
 import { copyTextToClipboard, openWhatsAppShare } from '@/lib/fileExport';
+import ThemeSettingsPage from './ThemeSettingsPage';
 
 export default function SettingsPage() {
   const { restaurant, refetchRestaurant } = useAuth();
@@ -64,31 +58,7 @@ export default function SettingsPage() {
   const [passwordError, setPasswordError] = useState<string | null>(null);
   const [showQRModal, setShowQRModal] = useState(false);
   const [copiedLink, setCopiedLink] = useState(false);
-
-  // Theme config state â€” full per-element control
-  const [themeConfig, setThemeConfig] = useState<ThemeConfig>({ ...DEFAULT_THEME_CONFIG });
-
-  // Update a single theme element slot live
-  function handleThemeSlotChange(slot: keyof ThemeConfig, value: string) {
-    triggerHaptic('selection');
-    const updated = { ...themeConfig, [slot]: value };
-    setThemeConfig(updated);
-    applyThemeToDOM(updated);
-  }
-
-  // Apply a full palette preset
-  function handleApplyPalette(config: ThemeConfig) {
-    triggerHaptic('selection');
-    setThemeConfig(config);
-    applyThemeToDOM(config);
-  }
-
-  // Reset to defaults
-  function handleResetTheme() {
-    triggerHaptic('light');
-    setThemeConfig({ ...DEFAULT_THEME_CONFIG });
-    applyThemeToDOM({ ...DEFAULT_THEME_CONFIG });
-  }
+  const [activeTab, setActiveTab] = useState<'general' | 'theme' | 'security'>('general');
 
   // File Upload Helper (Supabase Storage + DataURL fallback)
   async function handleFileUpload(file: File, field: 'logo_url' | 'cover_image_url') {
@@ -237,11 +207,6 @@ export default function SettingsPage() {
           whatsapp_number: settingsData?.whatsapp_number || '+919876543210',
           support_number: settingsData?.support_number || '+919876543210',
         });
-
-        // Parse and apply theme config
-        const loaded = parseThemeConfig(settingsData?.theme_color || null);
-        setThemeConfig(loaded);
-        applyThemeToDOM(loaded);
       } catch (err) {
         console.error('Error loading settings:', err);
         setErrorMessage('Failed to load settings');
@@ -304,7 +269,6 @@ export default function SettingsPage() {
         await supabase
           .from('restaurant_settings')
           .update({
-            theme_color: serializeThemeConfig(themeConfig),
             gst_percent: Number(form.gst_percent),
             service_charge: Number(form.service_charge),
             accept_orders: form.accept_orders,
@@ -317,7 +281,6 @@ export default function SettingsPage() {
       } else {
         await supabase.from('restaurant_settings').insert({
           restaurant_id: restaurant.id,
-          theme_color: serializeThemeConfig(themeConfig),
           gst_percent: Number(form.gst_percent),
           service_charge: Number(form.service_charge),
           accept_orders: form.accept_orders,
@@ -432,7 +395,51 @@ export default function SettingsPage() {
         </div>
       </div>
 
-      {/* Main Settings Form */}
+      {/* Settings Navigation Tabs */}
+      <div className="flex items-center gap-2 p-1.5 bg-slate-100 dark:bg-slate-800/80 rounded-2xl border border-slate-200 dark:border-slate-700 w-fit">
+        <button
+          type="button"
+          onClick={() => { triggerHaptic('selection'); setActiveTab('general'); }}
+          className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition native-press ${
+            activeTab === 'general'
+              ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-xs'
+              : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+          }`}
+        >
+          <Store className="w-4 h-4 text-theme-primary" />
+          <span>General Settings</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => { triggerHaptic('selection'); setActiveTab('theme'); }}
+          className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition native-press ${
+            activeTab === 'theme'
+              ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-xs'
+              : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+          }`}
+        >
+          <Palette className="w-4 h-4 text-theme-primary" />
+          <span>Theme & Colors</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => { triggerHaptic('selection'); setActiveTab('security'); }}
+          className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition native-press ${
+            activeTab === 'security'
+              ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-xs'
+              : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+          }`}
+        >
+          <Shield className="w-4 h-4 text-theme-primary" />
+          <span>Change Password</span>
+        </button>
+      </div>
+
+      {activeTab === 'theme' && <ThemeSettingsPage />}
+
+      {activeTab === 'general' && (
       <form onSubmit={handleSaveSettings} className="space-y-6">
         {/* Global Notifications */}
         {successMessage && (
@@ -828,284 +835,31 @@ export default function SettingsPage() {
           </div>
         )}
 
-        {/* 4. Brand Theme Studio â€” Full Element Control */}
-        <div className="bg-white rounded-2xl border border-slate-200 shadow-xs p-6 space-y-6">
-          {/* Header */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-4">
+        {/* Theme & Colors Banner */}
+        <div className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 rounded-2xl border border-slate-700/80 p-6 text-white shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 rounded-xl bg-theme-primary/20 border border-theme-primary/40 flex items-center justify-center text-theme-primary shrink-0 shadow-theme">
+              <Palette className="w-6 h-6" />
+            </div>
             <div>
-              <h3 className="text-base font-bold text-slate-800 flex items-center gap-2">
-                <Sliders className="w-5 h-5 text-theme-primary" />
-                Brand Theme Studio
-              </h3>
-              <p className="text-xs text-slate-500 mt-0.5">
-                Full per-element color control with live preview. Every color applies instantly.
+              <h3 className="text-base font-bold">Theme & Color Customization</h3>
+              <p className="text-xs text-slate-300 mt-0.5">
+                Customize 18 UI colors, switch between Light, Dark, or System mode, and preview changes live.
               </p>
             </div>
-            <button
-              type="button"
-              onClick={handleResetTheme}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-xs font-semibold text-slate-600 transition native-press shrink-0"
-            >
-              <RotateCcw className="w-3.5 h-3.5" />
-              Reset to Default
-            </button>
           </div>
-
-          {/* Quick Palette Presets */}
-          <div className="space-y-2">
-            <p className="text-xs font-bold uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
-              <Sparkles className="w-3.5 h-3.5 text-theme-primary" />
-              Quick Palettes â€” one click applies all colors
-            </p>
-            <div className="flex flex-wrap gap-2">
-              {THEME_PALETTES.map((palette) => {
-                const isActive =
-                  themeConfig.primaryColor.toLowerCase() === palette.config.primaryColor.toLowerCase() &&
-                  themeConfig.sidebarBg.toLowerCase() === palette.config.sidebarBg.toLowerCase();
-                return (
-                  <button
-                    key={palette.id}
-                    type="button"
-                    onClick={() => handleApplyPalette(palette.config)}
-                    title={palette.description}
-                    className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-xl border text-xs font-semibold transition native-press ${
-                      isActive
-                        ? 'border-transparent text-white shadow-theme scale-[1.02]'
-                        : 'border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:shadow-sm'
-                    }`}
-                    style={isActive ? { backgroundColor: palette.preview } : {}}
-                  >
-                    <span
-                      className="w-3 h-3 rounded-full border border-white/50 shadow-xs shrink-0"
-                      style={{ backgroundColor: palette.preview }}
-                    />
-                    {palette.name}
-                    {isActive && <Check className="w-3 h-3 stroke-[3]" />}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* Main Studio: Controls + Preview */}
-          <div className="grid grid-cols-1 xl:grid-cols-12 gap-6">
-            {/* Left: Per-Element Color Controls */}
-            <div className="xl:col-span-5 space-y-3">
-              <p className="text-xs font-bold uppercase tracking-wider text-slate-500">
-                Element Controls
-              </p>
-
-              {(
-                [
-                  // ── Brand ──────────────────────────────────────────
-                  { slot: 'primaryColor'    as keyof ThemeConfig, label: 'Primary Color',             hint: 'Buttons, active nav, CTA highlights',      group: 'Brand' },
-                  { slot: 'secondaryColor'  as keyof ThemeConfig, label: 'Secondary / Gradient End',  hint: 'Button gradient end, hover accents',        group: 'Brand' },
-                  { slot: 'accentColor'     as keyof ThemeConfig, label: 'Accent Color',              hint: 'Badges, count chips, tags',                 group: 'Brand' },
-                  { slot: 'cardBorderColor' as keyof ThemeConfig, label: 'Card Border Accent',        hint: 'Card left-border, panel accent lines',      group: 'Brand' },
-                  // ── Navigation ─────────────────────────────────────
-                  { slot: 'sidebarBg'       as keyof ThemeConfig, label: 'Sidebar Background',        hint: 'Desktop sidebar background',                group: 'Navigation' },
-                  { slot: 'sidebarText'     as keyof ThemeConfig, label: 'Sidebar Text',              hint: 'Sidebar inactive link color',               group: 'Navigation' },
-                  { slot: 'headerBg'        as keyof ThemeConfig, label: 'Top Header Background',     hint: 'Desktop top bar background color',          group: 'Navigation' },
-                  { slot: 'mobileNavBg'     as keyof ThemeConfig, label: 'Mobile Nav Background',     hint: 'Mobile bottom nav bar background',          group: 'Navigation' },
-                  // ── Status ─────────────────────────────────────────
-                  { slot: 'successColor'    as keyof ThemeConfig, label: 'Success Color',             hint: 'Open status, positive states',              group: 'Status' },
-                  { slot: 'dangerColor'     as keyof ThemeConfig, label: 'Danger Color',              hint: 'Closed status, destructive actions',        group: 'Status' },
-                  { slot: 'warningColor'    as keyof ThemeConfig, label: 'Warning Color',             hint: 'Expiring soon, caution states',             group: 'Status' },
-                  // ── Page ───────────────────────────────────────────
-                  { slot: 'pageBg'          as keyof ThemeConfig, label: 'Page Background',           hint: 'Main content area background',              group: 'Page' },
-                  { slot: 'textPrimary'     as keyof ThemeConfig, label: 'Primary Text',              hint: 'Main body / heading text color',            group: 'Page' },
-                  { slot: 'textMuted'       as keyof ThemeConfig, label: 'Muted Text',                hint: 'Secondary / helper text color',             group: 'Page' },
-                ] as { slot: keyof ThemeConfig; label: string; hint: string; group: string }[]
-              ).reduce<{ group: string; items: { slot: keyof ThemeConfig; label: string; hint: string }[] }[]>((acc, item) => {
-                const existing = acc.find(g => g.group === item.group);
-                if (existing) existing.items.push(item);
-                else acc.push({ group: item.group, items: [item] });
-                return acc;
-              }, []).map(({ group, items }) => (
-                <div key={group} className="space-y-1.5">
-                  <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 px-1 pt-1">{group}</p>
-                  {items.map(({ slot, label, hint }) => (
-                    <div
-                      key={slot}
-                      className="flex items-center gap-3 bg-slate-50 border border-slate-200/80 rounded-xl px-3 py-2.5"
-                    >
-                      {/* Color picker */}
-                      <input
-                        type="color"
-                        value={themeConfig[slot] || '#000000'}
-                        onChange={(e) => handleThemeSlotChange(slot, e.target.value)}
-                        className="w-9 h-9 rounded-lg border-2 border-white shadow-md cursor-pointer p-0.5 bg-white shrink-0"
-                        title={`Pick ${label}`}
-                      />
-                      {/* Label */}
-                      <div className="flex-1 min-w-0">
-                        <p className="text-xs font-bold text-slate-800 leading-tight truncate">{label}</p>
-                        <p className="text-[10px] text-slate-400 leading-tight truncate">{hint}</p>
-                      </div>
-                      {/* Hex input */}
-                      <input
-                        type="text"
-                        value={themeConfig[slot] || ''}
-                        onChange={(e) => handleThemeSlotChange(slot, e.target.value)}
-                        maxLength={7}
-                        className="w-[80px] shrink-0 bg-white border border-slate-200 rounded-lg px-2 py-1 text-[11px] font-mono font-bold text-slate-700 focus:outline-none focus:ring-2 focus:ring-theme-light focus:border-theme-primary uppercase"
-                      />
-                      {/* Swatch */}
-                      <span
-                        className="w-5 h-5 rounded-full border-2 border-white shadow shrink-0"
-                        style={{ backgroundColor: themeConfig[slot] || '#000' }}
-                      />
-                    </div>
-                  ))}
-                </div>
-              ))}
-            </div>
-
-            {/* Right: Live Preview */}
-            <div className="xl:col-span-7 space-y-3">
-              <p className="text-xs font-bold uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
-                <Eye className="w-3.5 h-3.5" />
-                Live Preview — Full Admin UI
-              </p>
-
-              <div className="rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
-                {/* Simulated Admin Layout */}
-                <div className="flex" style={{ height: '360px', backgroundColor: themeConfig.pageBg }}>
-
-                  {/* Mini Sidebar */}
-                  <div
-                    className="w-28 flex-col flex shrink-0"
-                    style={{ backgroundColor: themeConfig.sidebarBg }}
-                  >
-                    {/* Sidebar Header */}
-                    <div className="flex items-center gap-1.5 px-2.5 py-2 border-b border-white/10">
-                      <div
-                        className="w-5 h-5 rounded-md flex items-center justify-center text-[9px] font-black text-white shrink-0"
-                        style={{ backgroundColor: themeConfig.primaryColor }}
-                      >
-                        {(form.name || 'R')[0].toUpperCase()}
-                      </div>
-                      <span className="text-[9px] font-bold truncate" style={{ color: '#fff' }}>
-                        {form.name || 'Restaurant'}
-                      </span>
-                    </div>
-                    {/* Sidebar Nav */}
-                    <div className="flex-1 p-1.5 space-y-0.5">
-                      {['Dashboard', 'Orders', 'Menu', 'Tables', 'Settings'].map((item, i) => (
-                        <div
-                          key={item}
-                          className="flex items-center gap-1.5 px-2 py-1.5 rounded-lg text-[9px] font-semibold transition-colors"
-                          style={
-                            i === 0
-                              ? { backgroundColor: themeConfig.primaryColor + '22', color: themeConfig.primaryColor }
-                              : { color: themeConfig.sidebarText }
-                          }
-                        >
-                          <span className="w-1.5 h-1.5 rounded-full shrink-0" style={{ backgroundColor: i === 0 ? themeConfig.primaryColor : themeConfig.sidebarText }} />
-                          {item}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Main content area */}
-                  <div className="flex-1 flex flex-col min-w-0">
-                    {/* Top Header */}
-                    <div
-                      className="flex items-center justify-between px-3 py-2 border-b border-slate-200/60 shrink-0"
-                      style={{ backgroundColor: themeConfig.headerBg }}
-                    >
-                      <span className="text-[10px] font-bold" style={{ color: themeConfig.textPrimary }}>Dashboard</span>
-                      <div className="flex items-center gap-1.5">
-                        <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full text-white" style={{ backgroundColor: themeConfig.successColor }}>Open</span>
-                        <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full text-white" style={{ backgroundColor: themeConfig.dangerColor }}>Closed</span>
-                        <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full text-white" style={{ backgroundColor: themeConfig.warningColor }}>Soon</span>
-                        <div className="w-5 h-5 rounded-md flex items-center justify-center text-white text-[9px] font-black" style={{ background: `linear-gradient(135deg,${themeConfig.primaryColor},${themeConfig.secondaryColor})` }}>A</div>
-                      </div>
-                    </div>
-
-                    {/* Page content */}
-                    <div className="flex-1 p-3 space-y-2 overflow-hidden" style={{ backgroundColor: themeConfig.pageBg }}>
-                      {/* Stats row */}
-                      <div className="grid grid-cols-3 gap-1.5">
-                        {[
-                          { label: 'Orders', val: '24', color: themeConfig.primaryColor },
-                          { label: 'Revenue', val: `${form.currency_symbol || 'AED'} 1.2k`, color: themeConfig.successColor },
-                          { label: 'Tables', val: '8/12', color: themeConfig.accentColor },
-                        ].map(s => (
-                          <div key={s.label} className="bg-white rounded-lg p-2 border text-center shadow-xs" style={{ borderColor: themeConfig.cardBorderColor }}>
-                            <p className="text-[11px] font-black" style={{ color: s.color }}>{s.val}</p>
-                            <p className="text-[8px] font-medium" style={{ color: themeConfig.textMuted }}>{s.label}</p>
-                          </div>
-                        ))}
-                      </div>
-
-                      {/* Category pills */}
-                      <div className="flex items-center gap-1 flex-wrap">
-                        <span className="text-[9px] font-bold text-white px-2 py-0.5 rounded-full" style={{ backgroundColor: themeConfig.primaryColor }}>All</span>
-                        {['Starters', 'Main', 'Drinks'].map(c => (
-                          <span key={c} className="text-[9px] font-medium px-2 py-0.5 rounded-full bg-white border" style={{ color: themeConfig.textMuted, borderColor: themeConfig.cardBorderColor }}>{c}</span>
-                        ))}
-                        <span className="text-[9px] font-bold text-white px-1.5 py-0.5 rounded-full ml-auto" style={{ backgroundColor: themeConfig.accentColor }}>12</span>
-                      </div>
-
-                      {/* Orders */}
-                      {['Butter Chicken', 'Paneer Tikka'].map((dish, i) => (
-                        <div key={dish} className="bg-white rounded-lg p-2 flex items-center justify-between shadow-xs border-l-2" style={{ borderColor: themeConfig.cardBorderColor }}>
-                          <div>
-                            <p className="text-[9px] font-bold" style={{ color: themeConfig.textPrimary }}>{dish}</p>
-                            <p className="text-[8px]" style={{ color: themeConfig.textMuted }}>{form.currency_symbol || 'AED'} {i === 0 ? '320' : '240'}</p>
-                          </div>
-                          <button
-                            type="button"
-                            className="text-[9px] font-bold text-white px-2 py-0.5 rounded-md"
-                            style={{ background: `linear-gradient(135deg,${themeConfig.primaryColor},${themeConfig.secondaryColor})` }}
-                          >
-                            + Add
-                          </button>
-                        </div>
-                      ))}
-                    </div>
-
-                    {/* Mobile bottom nav simulation */}
-                    <div
-                      className="flex items-center justify-around px-2 py-1.5 border-t border-slate-200/60 shrink-0"
-                      style={{ backgroundColor: themeConfig.mobileNavBg }}
-                    >
-                      {['Home', 'Orders', 'Tables', 'More'].map((t, i) => (
-                        <div key={t} className="flex flex-col items-center gap-0.5">
-                          <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: i === 0 ? themeConfig.primaryColor : themeConfig.textMuted, opacity: i === 0 ? 1 : 0.5 }} />
-                          <span className="text-[7px] font-bold" style={{ color: i === 0 ? themeConfig.primaryColor : themeConfig.textMuted }}>{t}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Color legend strip */}
-                <div className="flex flex-wrap gap-x-3 gap-y-1 px-3 py-2 bg-slate-50 border-t border-slate-200">
-                  {(
-                    [
-                      { label: 'Primary',    color: themeConfig.primaryColor },
-                      { label: 'Secondary',  color: themeConfig.secondaryColor },
-                      { label: 'Accent',     color: themeConfig.accentColor },
-                      { label: 'Sidebar',    color: themeConfig.sidebarBg },
-                      { label: 'Header',     color: themeConfig.headerBg },
-                      { label: 'Page BG',    color: themeConfig.pageBg },
-                      { label: 'Success',    color: themeConfig.successColor },
-                      { label: 'Danger',     color: themeConfig.dangerColor },
-                      { label: 'Warning',    color: themeConfig.warningColor },
-                    ] as { label: string; color: string }[]
-                  ).map(({ label, color }) => (
-                    <span key={label} className="inline-flex items-center gap-1 text-[9px] text-slate-500 font-medium">
-                      <span className="w-2.5 h-2.5 rounded-full border border-slate-300 shrink-0" style={{ backgroundColor: color }} />
-                      {label}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
+          <button
+            type="button"
+            onClick={() => {
+              triggerHaptic('selection');
+              setActiveTab('theme');
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
+            className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-theme-primary hover:brightness-110 text-white text-xs font-bold transition shadow-theme shrink-0"
+          >
+            <Palette className="w-4 h-4" />
+            <span>Open Theme & Colors Studio</span>
+          </button>
         </div>
 
 
@@ -1324,8 +1078,10 @@ export default function SettingsPage() {
           </button>
         </div>
       </form>
+      )}
 
       {/* 7. Security & Change Password Section */}
+      {(activeTab === 'general' || activeTab === 'security') && (
       <div className="bg-white rounded-2xl border border-slate-200 shadow-xs p-6 space-y-4 mt-8">
         <h3 className="text-base font-bold text-slate-800 flex items-center gap-2 border-b border-slate-100 pb-3">
           <ShieldCheck className="w-5 h-5 text-theme-primary" />
@@ -1430,6 +1186,7 @@ export default function SettingsPage() {
           </div>
         </form>
       </div>
+      )}
 
       {/* FIXED 1 BARCODE / RESTAURANT MENU QR CODE MODAL */}
       {showQRModal && restaurant && (

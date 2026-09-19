@@ -35,59 +35,81 @@
   --color-ring: var(--ring);
 }
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 :root {
   --radius: 0.75rem;
-  --background: oklch(0.985 0.008 90);
-  --foreground: oklch(0.19 0.02 60);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.19 0.02 60);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.19 0.02 60);
-  --primary: oklch(0.58 0.16 152);
-  --primary-foreground: oklch(0.99 0.005 120);
-  --secondary: oklch(0.955 0.012 85);
-  --secondary-foreground: oklch(0.24 0.02 60);
-  --muted: oklch(0.955 0.012 85);
-  --muted-foreground: oklch(0.53 0.02 70);
-  --accent: oklch(0.94 0.03 90);
-  --accent-foreground: oklch(0.24 0.02 60);
-  --destructive: oklch(0.577 0.245 27.325);
-  --destructive-foreground: oklch(0.984 0.003 247.858);
-  --border: oklch(0.915 0.012 85);
-  --input: oklch(0.915 0.012 85);
-  --ring: oklch(0.58 0.16 152);
-  --veg: oklch(0.6 0.16 150);
-  --nonveg: oklch(0.58 0.2 27);
-  --brand: #16a34a;
-  --brand-contrast: #ffffff;
 
-  /* Admin Theme Variables — full per-element control */
-  --theme-primary: #f97316;
-  --theme-secondary: #ea580c;
-  --theme-accent: #fb923c;
-  --theme-card-border: #fed7aa;
+  /* Centralized Theme & Color Customization Design Tokens */
+  --color-primary: #16A34A;
+  --color-secondary: #0F172A;
+  --color-accent: #22C55E;
+  --color-background: #FFFFFF;
+  --color-surface: #FFFFFF;
+  --color-sidebar: #FFFFFF;
+  --color-navbar: #FFFFFF;
+  --color-text: #111827;
+  --color-muted-text: #6B7280;
+  --color-border: #E5E7EB;
+  --color-button: #16A34A;
+  --color-button-hover: #15803D;
+  --color-success: #22C55E;
+  --color-warning: #F59E0B;
+  --color-danger: #EF4444;
+  --color-info: #3B82F6;
+  --color-link: #2563EB;
+  --color-badge: #16A34A;
 
-  /* Navigation */
-  --theme-sidebar-bg: #0f172a;
-  --theme-sidebar-text: #94a3b8;
-  --theme-header-bg: #ffffff;
-  --theme-mobile-nav-bg: #ffffff;
+  /* Button & Badge Contrast Text */
+  --color-button-text: #FFFFFF;
+  --color-badge-text: #FFFFFF;
 
-  /* Status */
-  --theme-success: #059669;
-  --theme-danger: #e11d48;
-  --theme-warning: #d97706;
+  /* Derived Primary Glow / Alphas */
+  --theme-rgb: 22, 163, 74;
+  --theme-light: rgba(22, 163, 74, 0.12);
+  --theme-border: rgba(22, 163, 74, 0.25);
+  --theme-glow: rgba(22, 163, 74, 0.35);
 
-  /* Page */
-  --theme-page-bg: #f8fafc;
-  --theme-text-primary: #0f172a;
-  --theme-text-muted: #64748b;
+  /* Tailwind Core Tokens Mapped Directly to Centralized Design Tokens */
+  --primary: var(--color-primary);
+  --primary-foreground: var(--color-button-text);
+  --secondary: var(--color-secondary);
+  --secondary-foreground: #FFFFFF;
+  --accent: var(--color-accent);
+  --accent-foreground: #FFFFFF;
+  --background: var(--color-background);
+  --foreground: var(--color-text);
+  --card: var(--color-surface);
+  --card-foreground: var(--color-text);
+  --popover: var(--color-surface);
+  --popover-foreground: var(--color-text);
+  --muted: var(--color-background);
+  --muted-foreground: var(--color-muted-text);
+  --border: var(--color-border);
+  --input: var(--color-border);
+  --ring: var(--color-primary);
+  --destructive: var(--color-danger);
+  --destructive-foreground: #FFFFFF;
+  --brand: var(--color-primary);
+  --brand-contrast: var(--color-button-text);
+  --veg: var(--color-success);
+  --nonveg: var(--color-danger);
 
-  /* Derived from primary */
-  --theme-rgb: 249, 115, 22;
-  --theme-light: rgba(249, 115, 22, 0.12);
-  --theme-border: rgba(249, 115, 22, 0.25);
-  --theme-glow: rgba(249, 115, 22, 0.35);
+  /* Backward Compatibility Aliases for Existing UI Components */
+  --theme-primary: var(--color-primary);
+  --theme-secondary: var(--color-secondary);
+  --theme-accent: var(--color-accent);
+  --theme-card-border: var(--color-border);
+  --theme-sidebar-bg: var(--color-sidebar);
+  --theme-sidebar-text: var(--color-muted-text);
+  --theme-header-bg: var(--color-navbar);
+  --theme-mobile-nav-bg: var(--color-navbar);
+  --theme-page-bg: var(--color-background);
+  --theme-text-primary: var(--color-text);
+  --theme-text-muted: var(--color-muted-text);
+  --theme-success: var(--color-success);
+  --theme-danger: var(--color-danger);
+  --theme-warning: var(--color-warning);
 }
 
 /* Native Mobile Feel & Tap Optimizations */
@@ -136,6 +158,16 @@ html, body {
 .bg-theme-page { background-color: var(--theme-page-bg) !important; }
 .text-theme-body { color: var(--theme-text-primary) !important; }
 .text-theme-muted { color: var(--theme-text-muted) !important; }
+
+/* New Design Token Utility Classes */
+.bg-theme-surface { background-color: var(--color-surface) !important; }
+.bg-theme-navbar { background-color: var(--color-navbar) !important; }
+.bg-theme-button { background-color: var(--color-button) !important; color: var(--color-button-text) !important; }
+.bg-theme-button-hover:hover { background-color: var(--color-button-hover) !important; }
+.bg-theme-badge { background-color: var(--color-badge) !important; color: var(--color-badge-text) !important; }
+.text-theme-link { color: var(--color-link) !important; }
+.text-theme-info { color: var(--color-info) !important; }
+.border-theme-base { border-color: var(--color-border) !important; }
 
 
 /* Tactile Spring Buttons */

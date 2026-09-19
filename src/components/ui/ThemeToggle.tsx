@@ -1,48 +1,43 @@
-import { useEffect, useState } from "react";
-import { Moon, Sun } from "lucide-react";
+// src/components/ui/ThemeToggle.tsx
+// Centralized Theme Toggle (Light / Dark / System)
 
-export function ThemeToggle({ className = "" }: { className?: string }) {
-  const [theme, setTheme] = useState<"light" | "dark">(() => {
-    if (typeof window === "undefined") return "light";
-    try {
-      const saved = window.localStorage.getItem("dishgaze-theme");
-      if (saved === "dark" || saved === "light") return saved;
-    } catch {
-      /* ignore */
-    }
-    return "light"; // Default is ALWAYS Light Mode
-  });
+import { Sun, Moon, Laptop } from 'lucide-react';
+import { useTheme } from '@/lib/themeContext';
+import { triggerHaptic } from '@/lib/haptics';
 
-  useEffect(() => {
-    const root = document.documentElement;
-    if (theme === "dark") {
-      root.classList.add("dark");
+export function ThemeToggle({ className = '' }: { className?: string }) {
+  const { theme, effectiveTheme, setTheme } = useTheme();
+
+  const cycleTheme = () => {
+    triggerHaptic('selection');
+    if (theme === 'light') {
+      setTheme('dark');
+    } else if (theme === 'dark') {
+      setTheme('system');
     } else {
-      root.classList.remove("dark");
+      setTheme('light');
     }
-    try {
-      window.localStorage.setItem("dishgaze-theme", theme);
-    } catch {
-      /* ignore */
-    }
-  }, [theme]);
+  };
 
-  const toggleTheme = () => {
-    setTheme((prev) => (prev === "light" ? "dark" : "light"));
+  const getLabel = () => {
+    if (theme === 'system') return `System Theme (${effectiveTheme})`;
+    return `${theme === 'light' ? 'Light' : 'Dark'} Mode`;
   };
 
   return (
     <button
       type="button"
-      onClick={toggleTheme}
-      aria-label={`Switch to ${theme === "light" ? "dark" : "light"} mode`}
-      title={`Switch to ${theme === "light" ? "dark" : "light"} mode`}
-      className={`inline-flex size-9 items-center justify-center rounded-full border border-border/70 bg-card text-foreground shadow-sm transition-all hover:bg-secondary active:scale-95 ${className}`}
+      onClick={cycleTheme}
+      aria-label={`Current theme: ${getLabel()}. Click to change`}
+      title={`Theme: ${getLabel()} (Click to toggle Light / Dark / System)`}
+      className={`inline-flex size-9 items-center justify-center rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 shadow-xs transition-all hover:bg-slate-100 dark:hover:bg-slate-700 active:scale-95 ${className}`}
     >
-      {theme === "light" ? (
-        <Moon className="size-4 text-slate-700 dark:text-slate-200" />
+      {theme === 'system' ? (
+        <Laptop className="size-4 text-emerald-500" />
+      ) : effectiveTheme === 'dark' ? (
+        <Moon className="size-4 text-indigo-400" />
       ) : (
-        <Sun className="size-4 text-amber-400" />
+        <Sun className="size-4 text-amber-500" />
       )}
     </button>
   );

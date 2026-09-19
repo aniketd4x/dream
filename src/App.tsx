@@ -26,8 +26,10 @@ import RoomServiceStaffPage from '@/pages/admin/RoomServiceStaffPage';
 import CategoryPage from '@/components/admin/CategoryPage';
 import MenuItemPage from '@/components/admin/MenuItemPage';
 import SettingsPage from '@/pages/admin/SettingsPage';
+import ThemeSettingsPage from '@/pages/admin/ThemeSettingsPage';
 import ReportsPage from '@/pages/admin/ReportsPage';
 import SuperAdminPage from '@/pages/admin/SuperAdminPage';
+import { ThemeProvider } from '@/lib/themeContext';
 
 function AdminApp() {
   const { loading, restaurant } = useAuth();
@@ -42,6 +44,7 @@ function AdminApp() {
     if (pathname.includes('/admin/room-service')) return 'operations:room_service';
     if (pathname.includes('/admin/orders')) return 'table:orders';
     if (pathname.includes('/admin/reports')) return 'reports';
+    if (pathname.includes('/admin/theme')) return 'theme_settings';
     if (pathname.includes('/admin/settings')) return 'table:restaurant_settings';
     if (pathname.includes('/admin/crud/')) {
       const parts = pathname.split('/admin/crud/');
@@ -70,6 +73,8 @@ function AdminApp() {
       navigate('/admin/room-service');
     } else if (newSection === 'table:orders') {
       navigate('/admin/orders');
+    } else if (newSection === 'theme_settings') {
+      navigate('/admin/theme');
     } else if (newSection === 'table:restaurant_settings') {
       navigate('/admin/settings');
     } else if (newSection.startsWith('table:')) {
@@ -142,6 +147,7 @@ function AdminApp() {
       'operations:room_service': 'Room Service & Housekeeping',
       'table:menu_items': 'Menu Items',
       'table:categories': 'Categories',
+      theme_settings: 'Theme & Colors',
       'table:restaurant_settings': 'Settings',
     };
     const currentTitle =
@@ -171,6 +177,7 @@ function AdminApp() {
         {active === 'table:menu_items' && <MenuItemPage />}
         {active === 'table:dining_tables' && <TablesAndRoomsPage />}
         {active === 'operations:room_service' && <RoomServiceStaffPage />}
+        {active === 'theme_settings' && <ThemeSettingsPage />}
         {active === 'table:restaurant_settings' && <SettingsPage />}
         {active.startsWith('table:') &&
           active !== 'table:categories' &&
@@ -291,31 +298,33 @@ export default function App() {
 
   return (
     <AuthProvider>
-      {showSplash && <FullScreenSplash onFinish={() => setShowSplash(false)} />}
-      <Routes>
-        {/* Customer Facing Routes */}
-        <Route
-          path="/"
-          element={isNative ? <Navigate to="/admin" replace /> : <ScannerLandingPage />}
-        />
-        <Route path="/menu/:qrToken" element={<QRMenuPage />} />
-        <Route path="/room/:qrToken" element={<RoomServiceLandingPage />} />
-        <Route path="/order/:orderId" element={<OrderStatusPage />} />
+      <ThemeProvider>
+        {showSplash && <FullScreenSplash onFinish={() => setShowSplash(false)} />}
+        <Routes>
+          {/* Customer Facing Routes */}
+          <Route
+            path="/"
+            element={isNative ? <Navigate to="/admin" replace /> : <ScannerLandingPage />}
+          />
+          <Route path="/menu/:qrToken" element={<QRMenuPage />} />
+          <Route path="/room/:qrToken" element={<RoomServiceLandingPage />} />
+          <Route path="/order/:orderId" element={<OrderStatusPage />} />
 
-        {/* Separate Dedicated Super Admin Routes */}
-        <Route path="/superadmin" element={<SuperAdminGate />} />
-        <Route path="/superadmin/settings" element={<SuperAdminGate initialTab="settings" />} />
-        <Route path="/super-admin" element={<Navigate to="/superadmin" replace />} />
-        <Route path="/super-admin/settings" element={<Navigate to="/superadmin/settings" replace />} />
+          {/* Separate Dedicated Super Admin Routes */}
+          <Route path="/superadmin" element={<SuperAdminGate />} />
+          <Route path="/superadmin/settings" element={<SuperAdminGate initialTab="settings" />} />
+          <Route path="/super-admin" element={<Navigate to="/superadmin" replace />} />
+          <Route path="/super-admin/settings" element={<Navigate to="/superadmin/settings" replace />} />
 
-        {/* Restaurant Staff & Manager Portal Routes */}
-        <Route path="/admin" element={<AdminGate />} />
-        <Route path="/admin/*" element={<AdminGate />} />
-        <Route path="/login" element={<Navigate to="/admin" replace />} />
+          {/* Restaurant Staff & Manager Portal Routes */}
+          <Route path="/admin" element={<AdminGate />} />
+          <Route path="/admin/*" element={<AdminGate />} />
+          <Route path="/login" element={<Navigate to="/admin" replace />} />
 
-        {/* Fallback */}
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
+          {/* Fallback */}
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </ThemeProvider>
     </AuthProvider>
   );
 }
