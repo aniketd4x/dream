@@ -555,7 +555,7 @@ export function RestaurantQRModal({
           {/* Direct Link Preview Bar */}
           <div className="mt-3 flex items-center justify-between gap-2 px-1 py-1 rounded-xl bg-slate-100/80 border border-slate-200/60">
             <span className="text-[11px] font-mono text-slate-600 truncate pl-2">
-              {menuUrl.replace('https://', '')}
+              {menuUrl.replace(/^https?:\/\//, '')}
             </span>
             <div className="flex items-center gap-1 shrink-0">
               <button

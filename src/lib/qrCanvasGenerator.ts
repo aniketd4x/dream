@@ -1,4 +1,5 @@
 import QRCode from 'qrcode';
+import { getBaseUrl } from './baseUrl';
 
 export interface QRCardRenderParams {
   tableNumber: string;
@@ -20,7 +21,7 @@ export interface RestaurantQRCardRenderParams {
  * Returns the permanent direct digital menu URL for a restaurant.
  */
 export function getRestaurantDirectMenuUrl(restaurant: { id: string; slug?: string }): string {
-  const baseUrl = 'https://dishgaze.com';
+  const baseUrl = getBaseUrl();
   const identifier = restaurant.slug && restaurant.slug.trim() ? restaurant.slug.trim() : restaurant.id;
   return `${baseUrl}/menu/${identifier}`;
 }
@@ -955,7 +956,7 @@ export function getSingleRestaurantQRPrintHtml(
   cardDataUrl: string,
   rawQrDataUrl: string,
   restaurantName = 'Smart Restaurant',
-  menuUrl = 'https://dishgaze.com',
+  menuUrl = getBaseUrl(),
   mode: 'standee' | 'pos80mm' | 'a4' = 'standee'
 ): string {
   if (mode === 'pos80mm') {

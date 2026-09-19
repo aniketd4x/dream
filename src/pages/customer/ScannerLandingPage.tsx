@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import { getBaseUrl } from "@/lib/baseUrl";
 import { BrowserQRCodeReader, type IScannerControls } from "@zxing/browser";
 import {
   Camera,
@@ -100,7 +101,7 @@ export function ScannerLandingPage() {
               navigate(`/room/${decodeURIComponent(roomMatch[1])}`);
               return;
             }
-            if (url.origin === window.location.origin) {
+            if (url.origin === window.location.origin || url.origin === getBaseUrl()) {
               window.location.href = url.href;
               return;
             }

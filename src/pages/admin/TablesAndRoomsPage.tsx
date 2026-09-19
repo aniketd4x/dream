@@ -45,6 +45,7 @@ import {
 import { QRCard } from '@/components/admin/QRCard';
 import CrudPage from '@/components/admin/CrudPage';
 import { useAuth } from '@/lib/auth';
+import { getBaseUrl } from '@/lib/baseUrl';
 import {
   fetchHotelRooms,
   createHotelRoom,
@@ -1244,7 +1245,7 @@ export default function TablesAndRoomsPage() {
             floorNumber={qrModalRoom.floor_number}
             restaurantName={restaurant?.name || 'Hotel & Suites'}
             logoUrl={restaurant?.logo_url}
-            qrValue={`${window.location.origin}/room/${qrModalRoom.qr_token}`}
+            qrValue={`${getBaseUrl()}/room/${qrModalRoom.qr_token}`}
             previewUrl={`/room/${qrModalRoom.qr_token}`}
             onRegenerateToken={handleRegenerateQR}
             onClose={() => setQrModalRoom(null)}

@@ -41,6 +41,7 @@ import { type TableConfig, type FieldConfig, TABLE_MAP } from '@/lib/tables';
 import { useAuth } from '@/lib/auth';
 import { playOrderChime, stopOrderRinging } from '@/lib/audio';
 import { triggerHaptic } from '@/lib/haptics';
+import { getBaseUrl } from '@/lib/baseUrl';
 import OrderPrint from './OrderPrint';
 import { QRCard } from './QRCard';
 import { BulkQRPrintModal } from './BulkQRPrintModal';
@@ -168,7 +169,7 @@ export default function CrudPage({ table }: CrudPageProps) {
   }, [restaurant]);
 
   const getTableQRUrl = useCallback((token: string) => {
-    const baseUrl = 'https://dishgaze.com';
+    const baseUrl = getBaseUrl();
     return `${baseUrl}/menu/${token}`;
   }, []);
 
