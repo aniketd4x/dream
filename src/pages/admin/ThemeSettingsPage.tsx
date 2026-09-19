@@ -6,7 +6,6 @@ import {
   Palette,
   Sun,
   Moon,
-  Laptop,
   RotateCcw,
   Save,
   Check,
@@ -54,7 +53,7 @@ export default function ThemeSettingsPage() {
     triggerHaptic('selection');
     try {
       await setTheme(mode);
-      showNotification('success', `Theme switched to ${mode === 'system' ? 'System / Auto' : mode.toUpperCase()} mode.`);
+      showNotification('success', `Theme switched to ${mode === 'light' ? 'LIGHT (Default)' : 'DARK'} mode.`);
     } catch {
       showNotification('error', 'Failed to save theme selection.');
     }
@@ -225,36 +224,43 @@ export default function ThemeSettingsPage() {
           <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
             Choose how your restaurant dashboard renders. Currently active:{' '}
             <span className="font-bold text-slate-900 dark:text-white capitalize">
-              {theme} {theme === 'system' ? `(rendering ${effectiveTheme})` : ''}
+              {theme === 'light' ? 'Light (Default)' : 'Dark'}
             </span>
           </p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {/* Light Theme */}
           <button
             type="button"
             onClick={() => handleModeChange('light')}
-            className={`p-4 rounded-2xl border text-left transition-all native-press relative flex flex-col justify-between gap-3 ${
+            className={`p-5 rounded-2xl border text-left transition-all native-press relative flex flex-col justify-between gap-4 ${
               theme === 'light'
-                ? 'border-theme-primary bg-theme-light/40 shadow-sm ring-2 ring-theme-primary/30'
-                : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/60 hover:border-slate-300 dark:hover:border-slate-700'
+                ? 'border-blue-500 bg-blue-50/50 dark:bg-blue-950/20 shadow-sm ring-2 ring-blue-500/30'
+                : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-slate-300 dark:hover:border-slate-700'
             }`}
           >
             <div className="flex items-center justify-between">
-              <div className="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-500 flex items-center justify-center">
-                <Sun className="w-5 h-5" />
+              <div className="w-11 h-11 rounded-xl bg-amber-500/10 text-amber-500 flex items-center justify-center border border-amber-500/20 shadow-xs">
+                <Sun className="w-6 h-6" />
               </div>
-              {theme === 'light' && (
-                <span className="w-5 h-5 rounded-full bg-theme-primary text-white flex items-center justify-center text-[10px] font-bold shadow-xs">
-                  <Check className="w-3 h-3 stroke-[3]" />
+              <div className="flex items-center gap-1.5">
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700">
+                  Default
                 </span>
-              )}
+                {theme === 'light' && (
+                  <span className="w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center text-xs font-bold shadow-xs">
+                    <Check className="w-3.5 h-3.5 stroke-[3]" />
+                  </span>
+                )}
+              </div>
             </div>
             <div>
-              <p className="text-sm font-bold text-slate-900 dark:text-white">Light Theme</p>
-              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                Clean light interface using your configured restaurant colors.
+              <div className="flex items-center gap-2">
+                <p className="text-base font-bold text-slate-900 dark:text-white">Light Theme</p>
+              </div>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                Clean, high-contrast light interface optimized for daily restaurant operations and POS counters.
               </p>
             </div>
           </button>
@@ -263,54 +269,26 @@ export default function ThemeSettingsPage() {
           <button
             type="button"
             onClick={() => handleModeChange('dark')}
-            className={`p-4 rounded-2xl border text-left transition-all native-press relative flex flex-col justify-between gap-3 ${
+            className={`p-5 rounded-2xl border text-left transition-all native-press relative flex flex-col justify-between gap-4 ${
               theme === 'dark'
-                ? 'border-theme-primary bg-theme-light/40 shadow-sm ring-2 ring-theme-primary/30'
-                : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/60 hover:border-slate-300 dark:hover:border-slate-700'
+                ? 'border-blue-500 bg-blue-50/50 dark:bg-blue-950/20 shadow-sm ring-2 ring-blue-500/30'
+                : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-slate-300 dark:hover:border-slate-700'
             }`}
           >
             <div className="flex items-center justify-between">
-              <div className="w-10 h-10 rounded-xl bg-indigo-500/10 text-indigo-500 flex items-center justify-center">
-                <Moon className="w-5 h-5" />
+              <div className="w-11 h-11 rounded-xl bg-indigo-500/10 text-indigo-400 flex items-center justify-center border border-indigo-500/20 shadow-xs">
+                <Moon className="w-6 h-6" />
               </div>
               {theme === 'dark' && (
-                <span className="w-5 h-5 rounded-full bg-theme-primary text-white flex items-center justify-center text-[10px] font-bold shadow-xs">
-                  <Check className="w-3 h-3 stroke-[3]" />
+                <span className="w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center text-xs font-bold shadow-xs">
+                  <Check className="w-3.5 h-3.5 stroke-[3]" />
                 </span>
               )}
             </div>
             <div>
-              <p className="text-sm font-bold text-slate-900 dark:text-white">Dark Theme</p>
-              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                Dark interface automatically ensuring high contrast & readability.
-              </p>
-            </div>
-          </button>
-
-          {/* System / Auto Theme */}
-          <button
-            type="button"
-            onClick={() => handleModeChange('system')}
-            className={`p-4 rounded-2xl border text-left transition-all native-press relative flex flex-col justify-between gap-3 ${
-              theme === 'system'
-                ? 'border-theme-primary bg-theme-light/40 shadow-sm ring-2 ring-theme-primary/30'
-                : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/60 hover:border-slate-300 dark:hover:border-slate-700'
-            }`}
-          >
-            <div className="flex items-center justify-between">
-              <div className="w-10 h-10 rounded-xl bg-emerald-500/10 text-emerald-500 flex items-center justify-center">
-                <Laptop className="w-5 h-5" />
-              </div>
-              {theme === 'system' && (
-                <span className="w-5 h-5 rounded-full bg-theme-primary text-white flex items-center justify-center text-[10px] font-bold shadow-xs">
-                  <Check className="w-3 h-3 stroke-[3]" />
-                </span>
-              )}
-            </div>
-            <div>
-              <p className="text-sm font-bold text-slate-900 dark:text-white">System / Auto Theme</p>
-              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                Automatically follows the user device's Light or Dark preference.
+              <p className="text-base font-bold text-slate-900 dark:text-white">Dark Theme</p>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                Sleek dark interface with high-contrast borders and surfaces for dim environments and evening service.
               </p>
             </div>
           </button>

@@ -1,5 +1,5 @@
-// src/lib/themeContext.tsx
-// Centralized React Context for Theme & Color Customization
+﻿// src/lib/themeContext.tsx
+// Centralized React Context for Theme & Color Design System (Light & Dark Only)
 
 import React, { createContext, useContext, useEffect, useState, useMemo, useCallback } from 'react';
 import {
@@ -22,6 +22,7 @@ interface ThemeContextValue {
   isSaving: boolean;
   hasUnsavedChanges: boolean;
   setTheme: (mode: ThemeMode) => Promise<void>;
+  toggleTheme: () => Promise<void>;
   setColor: (key: keyof ThemeColors, value: string) => void;
   resetColor: (key: keyof ThemeColors) => void;
   resetAllColors: () => Promise<void>;
@@ -34,23 +35,26 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const { restaurant } = useAuth();
   const restaurantId = restaurant?.id || '';
 
-  const [theme, setThemeState] = useState<ThemeMode>('light');
+  // Initialize theme: strictly 'light' | 'dark', default is 'light'
+  const [theme, setThemeState] = useState<ThemeMode>(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const saved = window.localStorage.getItem('dishgaze-theme');
+        if (saved === 'dark') return 'dark';
+      } catch {
+        /* ignore */
+      }
+    }
+    return 'light';
+  });
+
   const [colors, setColorsState] = useState<ThemeColors>({ ...DEFAULT_THEME_COLORS });
   const [savedColors, setSavedColors] = useState<ThemeColors>({ ...DEFAULT_THEME_COLORS });
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
-  const [systemIsDark, setSystemIsDark] = useState<boolean>(() => {
-    if (typeof window === 'undefined') return false;
-    return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-  });
 
-  // Calculate effective mode: 'light' | 'dark'
-  const effectiveTheme: 'light' | 'dark' = useMemo(() => {
-    if (theme === 'system') {
-      return systemIsDark ? 'dark' : 'light';
-    }
-    return theme;
-  }, [theme, systemIsDark]);
+  // Effective theme is 1:1 with theme ('light' or 'dark')
+  const effectiveTheme: 'light' | 'dark' = theme;
 
   // Check if there are unsaved color changes
   const hasUnsavedChanges = useMemo(() => {
@@ -60,29 +64,10 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     });
   }, [colors, savedColors]);
 
-  // Listen to OS prefers-color-scheme changes in real-time
+  // Apply CSS variables & dark mode to DOM dynamically whenever colors or theme change
   useEffect(() => {
-    if (typeof window === 'undefined' || !window.matchMedia) return;
-
-    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-    const handler = (e: MediaQueryListEvent) => {
-      setSystemIsDark(e.matches);
-    };
-
-    if (mediaQuery.addEventListener) {
-      mediaQuery.addEventListener('change', handler);
-      return () => mediaQuery.removeEventListener('change', handler);
-    } else if ('addListener' in mediaQuery) {
-      // Legacy browser support
-      (mediaQuery as any).addListener(handler);
-      return () => (mediaQuery as any).removeListener(handler);
-    }
-  }, []);
-
-  // Apply CSS variables & dark mode to DOM dynamically whenever colors or effective theme change
-  useEffect(() => {
-    applyThemeToDOM(colors, effectiveTheme);
-  }, [colors, effectiveTheme]);
+    applyThemeToDOM(colors, theme);
+  }, [colors, theme]);
 
   // Fetch theme configuration per restaurant
   useEffect(() => {
@@ -90,8 +75,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
     async function loadTheme() {
       if (!restaurantId) {
-        // Fallback for non-restaurant views or initial render
-        applyThemeToDOM(DEFAULT_THEME_COLORS, effectiveTheme);
+        applyThemeToDOM(DEFAULT_THEME_COLORS, theme);
         setIsLoading(false);
         return;
       }
@@ -100,7 +84,16 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
       try {
         const settings = await fetchRestaurantThemeSettings(restaurantId);
         if (!cancelled) {
-          setThemeState(settings.theme || 'light');
+          const loadedTheme: ThemeMode = settings.theme === 'dark' ? 'dark' : 'light';
+          setThemeState(loadedTheme);
+          if (typeof window !== 'undefined') {
+            try {
+              window.localStorage.setItem('dishgaze-theme', loadedTheme);
+            } catch {
+              /* ignore */
+            }
+          }
+
           const loadedColors: ThemeColors = {
             primary_color: settings.primary_color,
             secondary_color: settings.secondary_color,
@@ -123,7 +116,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
           };
           setColorsState(loadedColors);
           setSavedColors(loadedColors);
-          applyThemeToDOM(loadedColors, settings.theme === 'system' ? (systemIsDark ? 'dark' : 'light') : settings.theme);
+          applyThemeToDOM(loadedColors, loadedTheme);
         }
       } catch (err) {
         console.error('Failed to load restaurant theme:', err);
@@ -139,26 +132,39 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     return () => {
       cancelled = true;
     };
-  }, [restaurantId, systemIsDark]);
+  }, [restaurantId]);
 
-  // Update theme mode and persist to DB immediately
+  // Update theme mode and persist to localStorage + DB
   const setTheme = useCallback(
     async (newMode: ThemeMode) => {
-      setThemeState(newMode);
-      const targetEffective = newMode === 'system' ? (systemIsDark ? 'dark' : 'light') : newMode;
-      applyThemeToDOM(colors, targetEffective);
+      const mode: ThemeMode = newMode === 'dark' ? 'dark' : 'light';
+      setThemeState(mode);
+      if (typeof window !== 'undefined') {
+        try {
+          window.localStorage.setItem('dishgaze-theme', mode);
+        } catch {
+          /* ignore */
+        }
+      }
+      applyThemeToDOM(colors, mode);
 
       if (restaurantId) {
         const payload: RestaurantThemeSettings = {
           restaurant_id: restaurantId,
-          theme: newMode,
+          theme: mode,
           ...colors,
         };
         await saveRestaurantThemeSettings(payload);
       }
     },
-    [colors, restaurantId, systemIsDark]
+    [colors, restaurantId]
   );
+
+  // Toggle between Light and Dark
+  const toggleTheme = useCallback(async () => {
+    const next = theme === 'light' ? 'dark' : 'light';
+    await setTheme(next);
+  }, [setTheme, theme]);
 
   // Update a single color immediately in UI & DOM
   const setColor = useCallback(
@@ -166,11 +172,11 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
       const normalized = normalizeHex(value, colors[key]);
       setColorsState((prev) => {
         const next = { ...prev, [key]: normalized };
-        applyThemeToDOM(next, effectiveTheme);
+        applyThemeToDOM(next, theme);
         return next;
       });
     },
-    [colors, effectiveTheme]
+    [colors, theme]
   );
 
   // Reset an individual color setting to default
@@ -179,11 +185,11 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
       const defaultValue = DEFAULT_THEME_COLORS[key];
       setColorsState((prev) => {
         const next = { ...prev, [key]: defaultValue };
-        applyThemeToDOM(next, effectiveTheme);
+        applyThemeToDOM(next, theme);
         return next;
       });
     },
-    [effectiveTheme]
+    [theme]
   );
 
   // Reset all colors to default palette, update DB, update UI immediately
@@ -191,7 +197,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     const defaultColors = { ...DEFAULT_THEME_COLORS };
     setColorsState(defaultColors);
     setSavedColors(defaultColors);
-    applyThemeToDOM(defaultColors, effectiveTheme);
+    applyThemeToDOM(defaultColors, theme);
 
     if (restaurantId) {
       setIsSaving(true);
@@ -206,7 +212,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
         setIsSaving(false);
       }
     }
-  }, [effectiveTheme, restaurantId, theme]);
+  }, [restaurantId, theme]);
 
   // Save current color configuration
   const saveColors = useCallback(async () => {
@@ -237,6 +243,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
       isSaving,
       hasUnsavedChanges,
       setTheme,
+      toggleTheme,
       setColor,
       resetColor,
       resetAllColors,
@@ -250,6 +257,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
       isSaving,
       hasUnsavedChanges,
       setTheme,
+      toggleTheme,
       setColor,
       resetColor,
       resetAllColors,

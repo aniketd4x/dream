@@ -412,18 +412,40 @@ export default function AdminLayout({ active, onNavigate, children }: AdminLayou
     fetchSubscription();
   }, [restaurant]);
 
-  // Navigation Items (Room Service placed right after Orders)
-  const navItems = [
-    { key: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
-    { key: 'table:orders', label: 'Orders', icon: ShoppingBag, badge: pendingCount },
-    { key: 'operations:room_service', label: 'Room Service', icon: BellRing, badge: pendingRoomRequestsCount },
-    { key: 'reports', label: 'Reports', icon: BarChart3 },
-    { key: 'table:dining_tables', label: 'Tables & Rooms', icon: Table2 },
-    { key: 'table:menu_items', label: 'Menu', icon: UtensilsCrossed },
-    { key: 'table:categories', label: 'Categories', icon: FolderTree },
-    { key: 'theme_settings', label: 'Theme & Colors', icon: Palette },
-    { key: 'table:restaurant_settings', label: 'Settings', icon: Settings },
+  // Grouped Navigation Sections (Linear/Stripe SaaS Hierarchy)
+  const navSections = [
+    {
+      title: 'Main',
+      items: [
+        { key: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
+      ],
+    },
+    {
+      title: 'Restaurant',
+      items: [
+        { key: 'table:orders', label: 'Orders', icon: ShoppingBag, badge: pendingCount },
+        { key: 'table:dining_tables', label: 'Tables & Rooms', icon: Table2 },
+        { key: 'table:menu_items', label: 'Menu Items', icon: UtensilsCrossed },
+        { key: 'table:categories', label: 'Categories', icon: FolderTree },
+      ],
+    },
+    {
+      title: 'Hospitality',
+      items: [
+        { key: 'operations:room_service', label: 'Room Service', icon: BellRing, badge: pendingRoomRequestsCount },
+      ],
+    },
+    {
+      title: 'Management & Settings',
+      items: [
+        { key: 'reports', label: 'Reports', icon: BarChart3 },
+        { key: 'theme_settings', label: 'Theme & Design', icon: Palette },
+        { key: 'table:restaurant_settings', label: 'Settings', icon: Settings },
+      ],
+    },
   ];
+
+  const navItems = navSections.flatMap((s) => s.items);
 
   // Mobile Bottom Bar Primary Tabs (Top 4 most used + More)
   const mobilePrimaryTabs = [
@@ -442,90 +464,98 @@ export default function AdminLayout({ active, onNavigate, children }: AdminLayou
   }
 
   return (
-    <div className="min-h-screen bg-theme-page flex font-sans antialiased text-slate-900 selection:bg-theme-light selection:text-theme-primary">
+    <div className="min-h-screen bg-slate-50 dark:bg-[#0B1220] flex font-sans antialiased text-slate-900 dark:text-slate-100 selection:bg-blue-100 dark:selection:bg-blue-900/40 selection:text-blue-600 dark:selection:text-blue-400">
       {/* Sidebar - Desktop Only (Hidden on Mobile) */}
-      <aside className="hidden lg:flex sticky top-0 left-0 z-40 h-screen w-64 bg-theme-sidebar flex-col shrink-0" style={{ color: 'var(--theme-sidebar-text)' }}>
-        <div className="flex items-center gap-3 px-5 h-16 border-b border-white/10 shrink-0">
+      <aside className="hidden lg:flex sticky top-0 left-0 z-40 h-screen w-64 bg-white dark:bg-[#111827] border-r border-slate-200 dark:border-slate-800 flex-col shrink-0">
+        <div className="flex items-center gap-3 px-5 h-16 border-b border-slate-200 dark:border-slate-800 shrink-0">
           <img
             src={restaurant?.logo_url || '/logo.png'}
             alt={restaurant?.name || 'Dishgaze'}
-            className="w-9 h-9 rounded-xl object-contain bg-white/10 border border-white/10 shadow-theme shrink-0"
+            className="w-9 h-9 rounded-xl object-contain bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-xs shrink-0"
             onError={(e) => { (e.currentTarget as HTMLImageElement).src = '/logo.png'; }}
           />
           <div className="min-w-0 flex-1">
-            <p className="text-white font-bold text-sm leading-tight truncate">{restaurant?.name || 'Dishgaze'}</p>
-            <p className="text-slate-400 text-xs truncate">Manager Panel</p>
+            <p className="text-slate-900 dark:text-white font-bold text-sm leading-tight truncate">{restaurant?.name || 'Dishgaze'}</p>
+            <p className="text-slate-500 dark:text-slate-400 text-xs truncate font-normal">Manager Panel</p>
           </div>
         </div>
 
-        <nav className="flex-1 overflow-y-auto py-4 px-3 space-y-1.5 scrollbar-none">
-          {navItems.map((item) => {
-            const Icon = item.icon;
-            const isActive = active === item.key;
-            return (
-              <button
-                key={item.key}
-                onClick={() => handleNav(item.key)}
-                className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all native-press ${
-                  isActive
-                    ? 'bg-theme-light text-theme-primary border border-theme-light font-bold shadow-xs'
-                    : 'hover:bg-white/10'
-                }`}
-                style={!isActive ? { color: 'var(--theme-sidebar-text)' } : {}}
-              >
-                <div className="flex items-center gap-3 min-w-0">
-                  <Icon className="w-4.5 h-4.5 shrink-0" />
-                  <span className="truncate">{item.label}</span>
-                </div>
-                {item.badge !== undefined && item.badge > 0 && (
-                  <span className="ml-2 bg-red-500 text-white text-[10px] font-black rounded-full h-5 min-w-[20px] px-1.5 flex items-center justify-center animate-live-pulse shadow-sm">
-                    {item.badge}
-                  </span>
-                )}
-              </button>
-            );
-          })}
+        <nav className="flex-1 overflow-y-auto py-4 px-3 space-y-4 scrollbar-none">
+          {navSections.map((section) => (
+            <div key={section.title} className="space-y-1">
+              <p className="px-3 text-[11px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
+                {section.title}
+              </p>
+              <div className="space-y-0.5">
+                {section.items.map((item) => {
+                  const Icon = item.icon;
+                  const isActive = active === item.key;
+                  return (
+                    <button
+                      key={item.key}
+                      onClick={() => handleNav(item.key)}
+                      className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition-all ${
+                        isActive
+                          ? 'bg-blue-50 dark:bg-[#172554] text-blue-600 dark:text-blue-400 font-semibold'
+                          : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-slate-100'
+                      }`}
+                    >
+                      <div className="flex items-center gap-2.5 min-w-0">
+                        <Icon className="w-4 h-4 shrink-0" />
+                        <span className="truncate">{item.label}</span>
+                      </div>
+                      {item.badge !== undefined && item.badge > 0 && (
+                        <span className="ml-2 bg-blue-600 text-white text-[10px] font-bold rounded-full h-5 min-w-[20px] px-1.5 flex items-center justify-center">
+                          {item.badge}
+                        </span>
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          ))}
         </nav>
 
         {/* Subscription Plan Info in Sidebar */}
         {!loading && restaurant && subscription && (
-          <div className="px-3 py-3 border-t border-slate-800 shrink-0">
+          <div className="px-3 py-3 border-t border-slate-200 dark:border-slate-800 shrink-0">
             <div className={`rounded-xl p-3 ${
               subscription.is_expired
-                ? 'bg-red-500/10 border border-red-500/30'
+                ? 'bg-red-500/10 border border-red-500/30 text-red-700 dark:text-red-300'
                 : subscription.is_expiring_soon
-                ? 'bg-amber-500/10 border border-amber-500/30'
-                : 'bg-emerald-500/10 border border-emerald-500/30'
+                ? 'bg-amber-500/10 border border-amber-500/30 text-amber-700 dark:text-amber-300'
+                : 'bg-emerald-500/10 border border-emerald-500/30 text-emerald-700 dark:text-emerald-300'
             }`}>
               <div className="flex items-center gap-2 mb-1.5">
                 <Crown className={`w-4 h-4 ${
                   subscription.is_expired
-                    ? 'text-red-400'
+                    ? 'text-red-500'
                     : subscription.is_expiring_soon
-                    ? 'text-amber-400'
-                    : 'text-emerald-400'
+                    ? 'text-amber-500'
+                    : 'text-emerald-500'
                 }`} />
-                <span className="text-xs font-semibold text-slate-300">Plan</span>
+                <span className="text-xs font-semibold">Plan</span>
               </div>
-              <p className="text-sm font-bold text-white truncate">
+              <p className="text-sm font-bold text-slate-900 dark:text-white truncate">
                 {subscription.plan_name}
               </p>
               <div className="flex items-center justify-between mt-1.5">
                 {!subscription.is_expired ? (
                   <span className={`text-[11px] font-medium ${
-                    subscription.is_expiring_soon ? 'text-amber-400' : 'text-emerald-400'
+                    subscription.is_expiring_soon ? 'text-amber-600 dark:text-amber-400' : 'text-emerald-600 dark:text-emerald-400'
                   }`}>
                     {subscription.days_remaining} days left
                   </span>
                 ) : (
-                  <span className="text-[11px] text-red-400 flex items-center gap-1 font-semibold">
+                  <span className="text-[11px] text-red-500 flex items-center gap-1 font-semibold">
                     <AlertCircle className="w-3 h-3" />
                     Expired
                   </span>
                 )}
                 <button
                   onClick={() => handleNav('table:subscription_plans')}
-                  className="text-xs text-theme-primary hover:underline font-bold"
+                  className="text-xs text-blue-600 dark:text-blue-400 hover:underline font-bold"
                 >
                   {subscription.is_expired ? 'Renew' : 'Upgrade'}
                 </button>
@@ -539,18 +569,18 @@ export default function AdminLayout({ active, onNavigate, children }: AdminLayou
       {/* Main Container */}
       <div className="flex-1 flex flex-col min-w-0">
         {/* Modern App Header - Clean on Mobile, No Hamburger Menu */}
-        <header className="sticky top-0 z-30 min-h-16 h-auto py-2.5 backdrop-blur-xl border-b border-slate-200/80 flex items-center justify-between px-4 lg:px-8 gap-3 pt-safe bg-theme-header">
+        <header className="sticky top-0 z-30 min-h-16 h-auto py-2.5 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 flex items-center justify-between px-4 lg:px-8 gap-3 pt-safe bg-white/95 dark:bg-[#111827]/95">
           <div className="flex items-center gap-3 min-w-0">
             {/* Mobile Header Logo/Icon */}
             <img
               src={restaurant?.logo_url || '/logo.png'}
               alt={restaurant?.name || 'Dishgaze'}
-              className="lg:hidden w-8 h-8 rounded-lg object-contain bg-white/10 border border-slate-200 shadow-xs shrink-0"
+              className="lg:hidden w-8 h-8 rounded-lg object-contain bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-xs shrink-0"
               onError={(e) => { (e.currentTarget as HTMLImageElement).src = '/logo.png'; }}
             />
             <div className="min-w-0">
-              <h1 className="text-base sm:text-lg font-bold text-slate-900 truncate tracking-tight">{activeLabel}</h1>
-              <p className="text-[11px] text-slate-500 font-medium hidden sm:block truncate">{restaurant?.name || 'Restaurant Admin'}</p>
+              <h1 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white truncate tracking-tight">{activeLabel}</h1>
+              <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium hidden sm:block truncate">{restaurant?.name || 'Restaurant Admin'}</p>
             </div>
           </div>
 
@@ -564,10 +594,10 @@ export default function AdminLayout({ active, onNavigate, children }: AdminLayou
                   triggerHaptic('light');
                   setShowStoreQRModal(true);
                 }}
-                className="flex items-center gap-1.5 text-xs font-black px-2.5 sm:px-3 py-1.5 rounded-xl border border-theme-border bg-theme-light text-theme-primary transition hover:brightness-95 shadow-xs native-press"
+                className="flex items-center gap-1.5 text-xs font-semibold px-2.5 sm:px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-200 transition hover:bg-slate-100 dark:hover:bg-slate-700 shadow-xs native-press"
                 title="View & Print Fixed Restaurant Menu QR Code"
               >
-                <QrCode className="w-3.5 h-3.5 text-theme-primary shrink-0" />
+                <QrCode className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400 shrink-0" />
                 <span className="hidden sm:inline">Menu QR</span>
               </button>
             )}
@@ -584,18 +614,18 @@ export default function AdminLayout({ active, onNavigate, children }: AdminLayou
                   stopOrderRinging();
                 }
               }}
-              className={`flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-xl border transition native-press ${
+              className={`flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-lg border transition native-press ${
                 soundMuted
-                  ? 'bg-slate-100 text-slate-500 border-slate-200'
-                  : 'bg-emerald-50 text-emerald-700 border-emerald-200/80 shadow-xs'
+                  ? 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 border-slate-200 dark:border-slate-700'
+                  : 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800/60 shadow-xs'
               }`}
               title={soundMuted ? 'Order Sound Muted (Tap to Unmute)' : 'Order Sound Active (Tap to Mute)'}
             >
-              {soundMuted ? <VolumeX className="w-3.5 h-3.5 text-slate-400" /> : <Volume2 className="w-3.5 h-3.5 text-emerald-600 animate-pulse" />}
+              {soundMuted ? <VolumeX className="w-3.5 h-3.5 text-slate-400" /> : <Volume2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 animate-pulse" />}
               <span className="hidden sm:inline">{soundMuted ? 'Muted' : 'Live Ring'}</span>
             </button>
 
-            {/* Light / Dark / System Theme Toggle */}
+            {/* Light / Dark Theme Toggle */}
             <ThemeToggle />
 
             {/* Header Notification Bell Icon Button */}
@@ -605,12 +635,12 @@ export default function AdminLayout({ active, onNavigate, children }: AdminLayou
                 triggerHaptic('selection');
                 handleNav('table:orders');
               }}
-              className="relative p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 transition native-press"
+              className="relative p-2 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition native-press border border-slate-200 dark:border-slate-700"
               title={pendingCount > 0 ? `${pendingCount} Pending Order Notifications` : 'Order Notifications'}
             >
-              <Bell className={`w-4 h-4 ${pendingCount > 0 ? 'text-red-500 animate-bounce' : 'text-slate-600'}`} />
+              <Bell className={`w-4 h-4 ${pendingCount > 0 ? 'text-red-500 animate-bounce' : 'text-slate-600 dark:text-slate-400'}`} />
               {pendingCount > 0 && (
-                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[9px] font-black rounded-full h-4 min-w-[16px] px-1 flex items-center justify-center animate-live-pulse shadow-xs border border-white">
+                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[9px] font-black rounded-full h-4 min-w-[16px] px-1 flex items-center justify-center animate-live-pulse shadow-xs border border-white dark:border-slate-900">
                   {pendingCount}
                 </span>
               )}
@@ -623,17 +653,17 @@ export default function AdminLayout({ active, onNavigate, children }: AdminLayou
                 triggerHaptic('light');
                 setProfileModalOpen(true);
               }}
-              className="flex items-center gap-2 p-1 sm:pl-2 sm:pr-2.5 sm:py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200/90 text-slate-800 transition native-press border border-slate-200/80 shadow-xs"
+              className="flex items-center gap-2 p-1 sm:pl-2 sm:pr-2.5 sm:py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200/90 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 transition native-press border border-slate-200 dark:border-slate-700 shadow-xs"
               title="Account & Sign Out"
             >
-              <div className="w-7 h-7 rounded-lg bg-theme-gradient flex items-center justify-center text-white text-xs font-bold shadow-xs shrink-0">
+              <div className="w-7 h-7 rounded-lg bg-blue-600 dark:bg-blue-500 flex items-center justify-center text-white text-xs font-bold shadow-xs shrink-0">
                 {(user?.email ?? 'A')[0].toUpperCase()}
               </div>
               <div className="hidden sm:flex flex-col text-left leading-tight">
-                <span className="text-xs font-bold text-slate-800 max-w-[110px] truncate">
+                <span className="text-xs font-bold text-slate-800 dark:text-slate-200 max-w-[110px] truncate">
                   {user?.email?.split('@')[0]}
                 </span>
-                <span className="text-[10px] text-slate-500 font-medium">Account</span>
+                <span className="text-[10px] text-slate-500 dark:text-slate-400 font-medium">Account</span>
               </div>
               <ChevronDown className="w-3.5 h-3.5 text-slate-400 hidden sm:block ml-0.5" />
             </button>
@@ -643,13 +673,13 @@ export default function AdminLayout({ active, onNavigate, children }: AdminLayou
         {/* Global Live New Order Toast Alert Banner (elevated cleanly above bottom nav bar) */}
         {orderToast && (
           <div className="fixed bottom-[calc(5rem+env(safe-area-inset-bottom,0px)+14px)] sm:bottom-28 lg:bottom-8 right-3 sm:right-6 left-3 sm:left-auto z-50 animate-bottom-sheet max-w-sm sm:max-w-md">
-            <div className="bg-slate-950 text-white p-4 rounded-2xl shadow-2xl border border-theme-border flex items-center gap-3.5 backdrop-blur-2xl">
-              <div className="w-11 h-11 rounded-xl bg-theme-gradient flex items-center justify-center shrink-0 shadow-theme">
+            <div className="bg-slate-900 dark:bg-[#111827] text-white p-4 rounded-2xl shadow-2xl border border-slate-700 dark:border-slate-700 flex items-center gap-3.5 backdrop-blur-2xl">
+              <div className="w-11 h-11 rounded-xl bg-blue-600 flex items-center justify-center shrink-0 shadow-xs">
                 <Bell className="w-5 h-5 text-white animate-bounce" />
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center justify-between gap-1">
-                  <span className="text-[10px] uppercase font-black tracking-wider text-theme-primary bg-theme-light px-2 py-0.5 rounded">
+                  <span className="text-[10px] uppercase font-bold tracking-wider text-blue-400 bg-blue-500/10 px-2 py-0.5 rounded">
                     🔔 Incoming Order
                   </span>
                   <span className="text-xs font-bold text-emerald-400">
@@ -686,7 +716,7 @@ export default function AdminLayout({ active, onNavigate, children }: AdminLayou
                     }
                   }
                 }}
-                className="px-3.5 py-2 bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-500 hover:to-green-500 text-white text-xs font-bold rounded-xl transition shrink-0 shadow-md shadow-emerald-500/30 flex items-center gap-1 native-press"
+                className="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-lg transition shrink-0 shadow-sm flex items-center gap-1 native-press"
               >
                 Accept
               </button>
@@ -697,13 +727,13 @@ export default function AdminLayout({ active, onNavigate, children }: AdminLayou
         {/* Global Live Room Service Request Toast Alert Banner */}
         {roomRequestToast && !orderToast && (
           <div className="fixed bottom-[calc(5rem+env(safe-area-inset-bottom,0px)+14px)] sm:bottom-28 lg:bottom-8 right-3 sm:right-6 left-3 sm:left-auto z-50 animate-bottom-sheet max-w-sm sm:max-w-md">
-            <div className="bg-slate-950 text-white p-4 rounded-2xl shadow-2xl border border-amber-500/40 flex items-center gap-3.5 backdrop-blur-2xl">
-              <div className="w-11 h-11 rounded-xl bg-amber-500 text-slate-950 flex items-center justify-center shrink-0 shadow-lg font-black">
+            <div className="bg-slate-900 dark:bg-[#111827] text-white p-4 rounded-2xl shadow-2xl border border-amber-500/40 flex items-center gap-3.5 backdrop-blur-2xl">
+              <div className="w-11 h-11 rounded-xl bg-amber-500 text-slate-950 flex items-center justify-center shrink-0 shadow-xs font-bold">
                 <BellRing className="w-5 h-5 text-white animate-bounce" />
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center justify-between gap-1">
-                  <span className="text-[10px] uppercase font-black tracking-wider text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded">
+                  <span className="text-[10px] uppercase font-bold tracking-wider text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded">
                     🏨 Room Service Request
                   </span>
                   <span className="text-xs font-black text-amber-300">
@@ -726,7 +756,7 @@ export default function AdminLayout({ active, onNavigate, children }: AdminLayou
                   setRoomRequestToast(null);
                   handleNav('operations:room_service');
                 }}
-                className="px-3.5 py-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 text-xs font-bold rounded-xl transition shrink-0 shadow-md flex items-center gap-1 native-press"
+                className="px-3.5 py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-bold rounded-lg transition shrink-0 shadow-sm flex items-center gap-1 native-press"
               >
                 View
               </button>
@@ -750,7 +780,7 @@ export default function AdminLayout({ active, onNavigate, children }: AdminLayou
       {/* ========================================================================= */}
       {/* NATIVE MOBILE BOTTOM NAVIGATION BAR (Thumb Friendly, iOS/Android style)   */}
       {/* ========================================================================= */}
-      <nav className="lg:hidden fixed bottom-0 inset-x-0 z-40 bg-theme-mobile-nav backdrop-blur-2xl border-t border-slate-200/90 shadow-[0_-4px_25px_rgba(0,0,0,0.06)] pb-safe">
+      <nav className="lg:hidden fixed bottom-0 inset-x-0 z-40 bg-white/95 dark:bg-[#111827]/95 backdrop-blur-xl border-t border-slate-200 dark:border-slate-800 shadow-[0_-4px_25px_rgba(0,0,0,0.06)] pb-safe">
         <div className="grid grid-cols-5 items-center h-16 px-1">
           {mobilePrimaryTabs.map((tab) => {
             const Icon = tab.icon;
@@ -761,22 +791,22 @@ export default function AdminLayout({ active, onNavigate, children }: AdminLayou
                 type="button"
                 onClick={() => handleNav(tab.key)}
                 className={`relative flex flex-col items-center justify-center h-full py-1 transition-all native-press ${
-                  isActive ? 'text-theme-primary font-bold' : 'text-slate-400 hover:text-slate-600'
+                  isActive ? 'text-blue-600 dark:text-blue-400 font-bold' : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
                 }`}
               >
                 <div className="relative">
-                  <Icon className={`w-5 h-5 transition-transform ${isActive ? 'scale-110 text-theme-primary' : ''}`} />
+                  <Icon className={`w-5 h-5 transition-transform ${isActive ? 'scale-110 text-blue-600 dark:text-blue-400' : ''}`} />
                   {tab.badge !== undefined && tab.badge > 0 && (
                     <span className="absolute -top-1.5 -right-2 bg-red-500 text-white text-[9px] font-black rounded-full h-4 min-w-[16px] px-1 flex items-center justify-center animate-live-pulse shadow-xs">
                       {tab.badge}
                     </span>
                   )}
                 </div>
-                <span className={`text-[10px] mt-1 tracking-tight ${isActive ? 'font-black text-theme-primary' : 'font-medium'}`}>
+                <span className={`text-[10px] mt-1 tracking-tight ${isActive ? 'font-bold text-blue-600 dark:text-blue-400' : 'font-medium'}`}>
                   {tab.label}
                 </span>
                 {isActive && (
-                  <span className="absolute bottom-1 w-6 h-0.5 rounded-full bg-theme-primary" />
+                  <span className="absolute bottom-1 w-6 h-0.5 rounded-full bg-blue-600 dark:bg-blue-400" />
                 )}
               </button>
             );
@@ -791,8 +821,8 @@ export default function AdminLayout({ active, onNavigate, children }: AdminLayou
             }}
             className={`relative flex flex-col items-center justify-center h-full py-1 transition-all native-press ${
               active === 'table:categories' || active === 'table:restaurant_settings' || moreSheetOpen
-                ? 'text-theme-primary font-bold'
-                : 'text-slate-400 hover:text-slate-600'
+                ? 'text-blue-600 dark:text-blue-400 font-bold'
+                : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
             }`}
           >
             <div className="relative">
@@ -800,7 +830,7 @@ export default function AdminLayout({ active, onNavigate, children }: AdminLayou
             </div>
             <span className="text-[10px] mt-1 font-medium tracking-tight">More</span>
             {(active === 'table:categories' || active === 'table:restaurant_settings') && (
-              <span className="absolute bottom-1 w-6 h-0.5 rounded-full bg-theme-primary" />
+              <span className="absolute bottom-1 w-6 h-0.5 rounded-full bg-blue-600 dark:bg-blue-400" />
             )}
           </button>
         </div>
@@ -818,26 +848,26 @@ export default function AdminLayout({ active, onNavigate, children }: AdminLayou
           />
 
           {/* Bottom Sheet Modal Body */}
-          <div className="relative bg-white rounded-t-[28px] p-6 shadow-2xl border-t border-slate-200 animate-bottom-sheet max-h-[85vh] overflow-y-auto pb-safe">
+          <div className="relative bg-white dark:bg-[#111827] rounded-t-[28px] p-6 shadow-2xl border-t border-slate-200 dark:border-slate-800 animate-bottom-sheet max-h-[85vh] overflow-y-auto pb-safe">
             {/* Grab Handle */}
-            <div className="w-12 h-1.5 bg-slate-300 rounded-full mx-auto mb-4" />
+            <div className="w-12 h-1.5 bg-slate-300 dark:bg-slate-700 rounded-full mx-auto mb-4" />
 
-            <div className="flex items-center justify-between pb-3 border-b border-slate-100 mb-4">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800 mb-4">
               <div className="flex items-center gap-2.5">
                 <img
                   src={restaurant?.logo_url || '/logo.png'}
                   alt={restaurant?.name || 'Dishgaze'}
-                  className="w-8 h-8 rounded-lg object-contain bg-slate-100 border border-slate-200 shadow-xs shrink-0"
+                  className="w-8 h-8 rounded-lg object-contain bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-xs shrink-0"
                   onError={(e) => { (e.currentTarget as HTMLImageElement).src = '/logo.png'; }}
                 />
                 <div>
-                  <h3 className="text-base font-bold text-slate-900">More Management</h3>
-                  <p className="text-[11px] text-slate-500 font-medium">{restaurant?.name || 'Dishgaze'}</p>
+                  <h3 className="text-base font-bold text-slate-900 dark:text-white">More Management</h3>
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">{restaurant?.name || 'Dishgaze'}</p>
                 </div>
               </div>
               <button
                 onClick={() => setMoreSheetOpen(false)}
-                className="p-1.5 text-slate-400 hover:text-slate-700 rounded-full bg-slate-100"
+                className="p-1.5 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 rounded-full bg-slate-100 dark:bg-slate-800 transition"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -847,19 +877,19 @@ export default function AdminLayout({ active, onNavigate, children }: AdminLayou
             <div className="space-y-2">
               <button
                 onClick={() => handleNav('reports')}
-                className={`w-full flex items-center justify-between p-3.5 rounded-2xl border transition native-press ${
+                className={`w-full flex items-center justify-between p-3.5 rounded-xl border transition native-press ${
                   active === 'reports'
-                    ? 'bg-theme-light border-theme-light text-theme-primary font-bold'
-                    : 'bg-slate-50 hover:bg-slate-100 border-slate-200 text-slate-800'
+                    ? 'bg-blue-50 dark:bg-[#172554] border-blue-200 dark:border-blue-900 text-blue-600 dark:text-blue-400 font-bold'
+                    : 'bg-slate-50 dark:bg-slate-800/60 hover:bg-slate-100 dark:hover:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200'
                 }`}
               >
                 <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-xl bg-white border border-slate-200 flex items-center justify-center text-slate-700 shadow-xs">
-                    <BarChart3 className="w-5 h-5 text-theme-primary" />
+                  <div className="w-9 h-9 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center text-blue-600 dark:text-blue-400 shadow-xs">
+                    <BarChart3 className="w-5 h-5" />
                   </div>
                   <div className="text-left">
-                    <p className="text-sm font-bold">Reports & Analytics</p>
-                    <p className="text-xs text-slate-500 font-normal">Daily sales, orders & CSV export</p>
+                    <p className="text-sm font-bold text-slate-900 dark:text-white">Reports & Analytics</p>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 font-normal">Daily sales, orders & CSV export</p>
                   </div>
                 </div>
                 <ChevronRight className="w-4 h-4 text-slate-400" />
@@ -867,19 +897,19 @@ export default function AdminLayout({ active, onNavigate, children }: AdminLayou
 
               <button
                 onClick={() => handleNav('operations:room_service')}
-                className={`w-full flex items-center justify-between p-3.5 rounded-2xl border transition native-press ${
+                className={`w-full flex items-center justify-between p-3.5 rounded-xl border transition native-press ${
                   active === 'operations:room_service'
-                    ? 'bg-theme-light border-theme-light text-theme-primary font-bold'
-                    : 'bg-slate-50 hover:bg-slate-100 border-slate-200 text-slate-800'
+                    ? 'bg-blue-50 dark:bg-[#172554] border-blue-200 dark:border-blue-900 text-blue-600 dark:text-blue-400 font-bold'
+                    : 'bg-slate-50 dark:bg-slate-800/60 hover:bg-slate-100 dark:hover:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200'
                 }`}
               >
                 <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-xl bg-white border border-slate-200 flex items-center justify-center text-slate-700 shadow-xs">
-                    <BellRing className="w-5 h-5 text-theme-primary" />
+                  <div className="w-9 h-9 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center text-blue-600 dark:text-blue-400 shadow-xs">
+                    <BellRing className="w-5 h-5" />
                   </div>
                   <div className="text-left">
-                    <p className="text-sm font-bold">Room Service</p>
-                    <p className="text-xs text-slate-500 font-normal">Guest requests, housekeeping & room food</p>
+                    <p className="text-sm font-bold text-slate-900 dark:text-white">Room Service</p>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 font-normal">Guest requests, housekeeping & room food</p>
                   </div>
                 </div>
                 <ChevronRight className="w-4 h-4 text-slate-400" />
@@ -887,19 +917,19 @@ export default function AdminLayout({ active, onNavigate, children }: AdminLayou
 
               <button
                 onClick={() => handleNav('table:categories')}
-                className={`w-full flex items-center justify-between p-3.5 rounded-2xl border transition native-press ${
+                className={`w-full flex items-center justify-between p-3.5 rounded-xl border transition native-press ${
                   active === 'table:categories'
-                    ? 'bg-theme-light border-theme-light text-theme-primary font-bold'
-                    : 'bg-slate-50 hover:bg-slate-100 border-slate-200 text-slate-800'
+                    ? 'bg-blue-50 dark:bg-[#172554] border-blue-200 dark:border-blue-900 text-blue-600 dark:text-blue-400 font-bold'
+                    : 'bg-slate-50 dark:bg-slate-800/60 hover:bg-slate-100 dark:hover:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200'
                 }`}
               >
                 <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-xl bg-white border border-slate-200 flex items-center justify-center text-slate-700 shadow-xs">
-                    <FolderTree className="w-5 h-5 text-theme-primary" />
+                  <div className="w-9 h-9 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center text-blue-600 dark:text-blue-400 shadow-xs">
+                    <FolderTree className="w-5 h-5" />
                   </div>
                   <div className="text-left">
-                    <p className="text-sm font-bold">Categories</p>
-                    <p className="text-xs text-slate-500 font-normal">Organize menu items & food courses</p>
+                    <p className="text-sm font-bold text-slate-900 dark:text-white">Categories</p>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 font-normal">Organize menu items & food courses</p>
                   </div>
                 </div>
                 <ChevronRight className="w-4 h-4 text-slate-400" />
@@ -910,15 +940,15 @@ export default function AdminLayout({ active, onNavigate, children }: AdminLayou
                   setMoreSheetOpen(false);
                   setShowStoreQRModal(true);
                 }}
-                className="w-full flex items-center justify-between p-3.5 rounded-2xl border border-theme-border bg-theme-light/40 hover:bg-theme-light text-slate-800 transition native-press"
+                className="w-full flex items-center justify-between p-3.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/60 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-800 dark:text-slate-200 transition native-press"
               >
                 <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-xl bg-white border border-slate-200 flex items-center justify-center text-theme-primary shadow-xs">
+                  <div className="w-9 h-9 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center text-blue-600 dark:text-blue-400 shadow-xs">
                     <QrCode className="w-5 h-5" />
                   </div>
                   <div className="text-left">
-                    <p className="text-sm font-bold text-slate-900">Restaurant Menu QR</p>
-                    <p className="text-xs text-slate-500 font-normal">Fixed 1 barcode for direct digital menu</p>
+                    <p className="text-sm font-bold text-slate-900 dark:text-white">Restaurant Menu QR</p>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 font-normal">Fixed 1 barcode for direct digital menu</p>
                   </div>
                 </div>
                 <ChevronRight className="w-4 h-4 text-slate-400" />
@@ -926,19 +956,19 @@ export default function AdminLayout({ active, onNavigate, children }: AdminLayou
 
               <button
                 onClick={() => handleNav('theme_settings')}
-                className={`w-full flex items-center justify-between p-3.5 rounded-2xl border transition native-press ${
+                className={`w-full flex items-center justify-between p-3.5 rounded-xl border transition native-press ${
                   active === 'theme_settings'
-                    ? 'bg-theme-light border-theme-light text-theme-primary font-bold'
-                    : 'bg-slate-50 hover:bg-slate-100 border-slate-200 text-slate-800'
+                    ? 'bg-blue-50 dark:bg-[#172554] border-blue-200 dark:border-blue-900 text-blue-600 dark:text-blue-400 font-bold'
+                    : 'bg-slate-50 dark:bg-slate-800/60 hover:bg-slate-100 dark:hover:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200'
                 }`}
               >
                 <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-xl bg-white border border-slate-200 flex items-center justify-center text-slate-700 shadow-xs">
-                    <Palette className="w-5 h-5 text-theme-primary" />
+                  <div className="w-9 h-9 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center text-blue-600 dark:text-blue-400 shadow-xs">
+                    <Palette className="w-5 h-5" />
                   </div>
                   <div className="text-left">
-                    <p className="text-sm font-bold">Theme & Colors</p>
-                    <p className="text-xs text-slate-500 font-normal">Light, dark mode & 18 custom UI colors</p>
+                    <p className="text-sm font-bold text-slate-900 dark:text-white">Theme & Design</p>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 font-normal">Light & dark mode design system</p>
                   </div>
                 </div>
                 <ChevronRight className="w-4 h-4 text-slate-400" />
@@ -946,19 +976,19 @@ export default function AdminLayout({ active, onNavigate, children }: AdminLayou
 
               <button
                 onClick={() => handleNav('table:restaurant_settings')}
-                className={`w-full flex items-center justify-between p-3.5 rounded-2xl border transition native-press ${
+                className={`w-full flex items-center justify-between p-3.5 rounded-xl border transition native-press ${
                   active === 'table:restaurant_settings'
-                    ? 'bg-theme-light border-theme-light text-theme-primary font-bold'
-                    : 'bg-slate-50 hover:bg-slate-100 border-slate-200 text-slate-800'
+                    ? 'bg-blue-50 dark:bg-[#172554] border-blue-200 dark:border-blue-900 text-blue-600 dark:text-blue-400 font-bold'
+                    : 'bg-slate-50 dark:bg-slate-800/60 hover:bg-slate-100 dark:hover:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200'
                 }`}
               >
                 <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-xl bg-white border border-slate-200 flex items-center justify-center text-slate-700 shadow-xs">
-                    <Settings className="w-5 h-5 text-theme-primary" />
+                  <div className="w-9 h-9 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center text-blue-600 dark:text-blue-400 shadow-xs">
+                    <Settings className="w-5 h-5" />
                   </div>
                   <div className="text-left">
-                    <p className="text-sm font-bold">Restaurant Settings</p>
-                    <p className="text-xs text-slate-500 font-normal">Brand theme, hours, tax & currency</p>
+                    <p className="text-sm font-bold text-slate-900 dark:text-white">Restaurant Settings</p>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 font-normal">Brand theme, hours, tax & currency</p>
                   </div>
                 </div>
                 <ChevronRight className="w-4 h-4 text-slate-400" />
@@ -966,15 +996,15 @@ export default function AdminLayout({ active, onNavigate, children }: AdminLayou
 
               <button
                 onClick={() => handleNav('table:subscription_plans')}
-                className="w-full flex items-center justify-between p-3.5 rounded-2xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-800 transition native-press"
+                className="w-full flex items-center justify-between p-3.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/60 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-800 dark:text-slate-200 transition native-press"
               >
                 <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-xl bg-white border border-slate-200 flex items-center justify-center text-amber-500 shadow-xs">
+                  <div className="w-9 h-9 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center text-amber-500 shadow-xs">
                     <Crown className="w-5 h-5" />
                   </div>
                   <div className="text-left">
-                    <p className="text-sm font-bold">Subscription & Billing</p>
-                    <p className="text-xs text-slate-500 font-normal">{subscription?.plan_name || 'View plans'}</p>
+                    <p className="text-sm font-bold text-slate-900 dark:text-white">Subscription & Billing</p>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 font-normal">{subscription?.plan_name || 'View plans'}</p>
                   </div>
                 </div>
                 <ChevronRight className="w-4 h-4 text-slate-400" />
@@ -983,6 +1013,7 @@ export default function AdminLayout({ active, onNavigate, children }: AdminLayou
           </div>
         </div>
       )}
+
       {/* ========================================================================= */}
       {/* HEADER USER PROFILE & SIGN OUT MODAL POPOVER                             */}
       {/* ========================================================================= */}
@@ -995,40 +1026,40 @@ export default function AdminLayout({ active, onNavigate, children }: AdminLayou
           />
 
           {/* Modal Card */}
-          <div className="relative w-full max-w-sm sm:max-w-md bg-white rounded-t-[28px] sm:rounded-3xl p-6 shadow-2xl border-t sm:border border-slate-200 animate-bottom-sheet sm:animate-scale-in z-10 pb-safe sm:pb-6 mx-auto">
+          <div className="relative w-full max-w-sm sm:max-w-md bg-white dark:bg-[#111827] rounded-t-[28px] sm:rounded-2xl p-6 shadow-2xl border-t sm:border border-slate-200 dark:border-slate-800 animate-bottom-sheet sm:animate-scale-in z-10 pb-safe sm:pb-6 mx-auto">
             {/* Grab Handle for Mobile */}
-            <div className="sm:hidden w-12 h-1.5 bg-slate-300 rounded-full mx-auto mb-4" />
+            <div className="sm:hidden w-12 h-1.5 bg-slate-300 dark:bg-slate-700 rounded-full mx-auto mb-4" />
 
             {/* Header */}
-            <div className="flex items-center justify-between pb-3.5 border-b border-slate-100 mb-4">
+            <div className="flex items-center justify-between pb-3.5 border-b border-slate-100 dark:border-slate-800 mb-4">
               <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-xl bg-theme-gradient flex items-center justify-center shadow-xs">
+                <div className="w-8 h-8 rounded-lg bg-blue-600 dark:bg-blue-500 flex items-center justify-center shadow-xs">
                   <User className="w-4 h-4 text-white" />
                 </div>
                 <div>
-                  <h3 className="text-base font-bold text-slate-900">User Account</h3>
-                  <p className="text-[11px] text-slate-500 font-medium">{restaurant?.name || 'Dishgaze POS'}</p>
+                  <h3 className="text-base font-bold text-slate-900 dark:text-white">User Account</h3>
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">{restaurant?.name || 'Dishgaze POS'}</p>
                 </div>
               </div>
               <button
                 type="button"
                 onClick={() => setProfileModalOpen(false)}
-                className="p-1.5 text-slate-400 hover:text-slate-700 rounded-full bg-slate-100 transition native-press"
+                className="p-1.5 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 rounded-full bg-slate-100 dark:bg-slate-800 transition native-press"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
 
             {/* User Info Box */}
-            <div className="bg-slate-50 border border-slate-200/80 rounded-2xl p-4 mb-4 flex items-center gap-3.5">
-              <div className="w-12 h-12 rounded-2xl bg-theme-gradient text-white font-black text-lg flex items-center justify-center shadow-theme shrink-0">
+            <div className="bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-800 rounded-xl p-4 mb-4 flex items-center gap-3.5">
+              <div className="w-12 h-12 rounded-xl bg-blue-600 dark:bg-blue-500 text-white font-bold text-lg flex items-center justify-center shadow-xs shrink-0">
                 {(user?.email ?? 'A')[0].toUpperCase()}
               </div>
               <div className="min-w-0 flex-1">
-                <p className="text-sm font-bold text-slate-900 truncate">{user?.email}</p>
+                <p className="text-sm font-bold text-slate-900 dark:text-white truncate">{user?.email}</p>
                 <div className="flex items-center gap-1.5 mt-0.5">
                   <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                  <span className="text-[11px] font-semibold text-slate-600">Active Staff Session</span>
+                  <span className="text-[11px] font-semibold text-slate-600 dark:text-slate-400">Active Staff Session</span>
                 </div>
               </div>
             </div>
@@ -1041,11 +1072,11 @@ export default function AdminLayout({ active, onNavigate, children }: AdminLayou
                   setProfileModalOpen(false);
                   setShowStoreQRModal(true);
                 }}
-                className="w-full flex items-center justify-between p-3 rounded-xl bg-theme-light/40 hover:bg-theme-light border border-theme-border text-slate-800 transition native-press"
+                className="w-full flex items-center justify-between p-3 rounded-lg bg-slate-50 dark:bg-slate-800/60 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 transition native-press"
               >
                 <div className="flex items-center gap-2.5">
-                  <QrCode className="w-4 h-4 text-theme-primary" />
-                  <span className="text-xs font-bold text-slate-900">Restaurant Menu QR</span>
+                  <QrCode className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                  <span className="text-xs font-bold text-slate-900 dark:text-white">Restaurant Menu QR</span>
                 </div>
                 <ChevronRight className="w-4 h-4 text-slate-400" />
               </button>
@@ -1056,11 +1087,11 @@ export default function AdminLayout({ active, onNavigate, children }: AdminLayou
                   setProfileModalOpen(false);
                   handleNav('table:restaurant_settings');
                 }}
-                className="w-full flex items-center justify-between p-3 rounded-xl bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-800 transition native-press"
+                className="w-full flex items-center justify-between p-3 rounded-lg bg-slate-50 dark:bg-slate-800/60 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 transition native-press"
               >
                 <div className="flex items-center gap-2.5">
-                  <Settings className="w-4 h-4 text-slate-600" />
-                  <span className="text-xs font-bold">Restaurant Settings</span>
+                  <Settings className="w-4 h-4 text-slate-600 dark:text-slate-400" />
+                  <span className="text-xs font-bold text-slate-900 dark:text-white">Restaurant Settings</span>
                 </div>
                 <ChevronRight className="w-4 h-4 text-slate-400" />
               </button>
@@ -1071,11 +1102,11 @@ export default function AdminLayout({ active, onNavigate, children }: AdminLayou
                   setProfileModalOpen(false);
                   handleNav('table:subscription_plans');
                 }}
-                className="w-full flex items-center justify-between p-3 rounded-xl bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-800 transition native-press"
+                className="w-full flex items-center justify-between p-3 rounded-lg bg-slate-50 dark:bg-slate-800/60 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 transition native-press"
               >
                 <div className="flex items-center gap-2.5">
                   <Crown className="w-4 h-4 text-amber-500" />
-                  <span className="text-xs font-bold">Subscription & Plan</span>
+                  <span className="text-xs font-bold text-slate-900 dark:text-white">Subscription & Plan</span>
                 </div>
                 <ChevronRight className="w-4 h-4 text-slate-400" />
               </button>
@@ -1089,7 +1120,7 @@ export default function AdminLayout({ active, onNavigate, children }: AdminLayou
                 setProfileModalOpen(false);
                 signOut();
               }}
-              className="w-full flex items-center justify-center gap-2 py-3.5 px-4 rounded-2xl text-sm font-bold text-red-600 bg-red-50 hover:bg-red-100 border border-red-200 transition native-press shadow-xs"
+              className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl text-sm font-bold text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-950/30 hover:bg-red-100 dark:hover:bg-red-950/50 border border-red-200 dark:border-red-900/50 transition native-press shadow-xs"
             >
               <LogOut className="w-4 h-4" />
               <span>Sign Out of Dishgaze</span>

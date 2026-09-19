@@ -491,10 +491,10 @@ export default function Dashboard({ onNavigate }: { onNavigate: (key: string) =>
 
   if (!restaurant) {
     return (
-      <div className="bg-white rounded-2xl border border-slate-200 p-8 text-center shadow-xs max-w-md mx-auto my-12">
-        <Store className="w-12 h-12 text-slate-300 mx-auto mb-3" />
-        <h3 className="text-base font-bold text-slate-800">No Restaurant Found</h3>
-        <p className="text-xs text-slate-500 mt-1">Your account is not linked to a restaurant profile.</p>
+      <div className="bg-white dark:bg-[#111827] rounded-2xl border border-slate-200 dark:border-slate-800 p-8 text-center shadow-xs max-w-md mx-auto my-12">
+        <Store className="w-12 h-12 text-slate-300 dark:text-slate-600 mx-auto mb-3" />
+        <h3 className="text-base font-bold text-slate-800 dark:text-white">No Restaurant Found</h3>
+        <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Your account is not linked to a restaurant profile.</p>
       </div>
     );
   }
@@ -590,11 +590,11 @@ export default function Dashboard({ onNavigate }: { onNavigate: (key: string) =>
       {/* ========================================================================= */}
       {/* 2. LIVE ORDER PIPELINE CARDS (STEP-BY-STEP STAGES)                         */}
       {/* ========================================================================= */}
-      <div className="bg-white rounded-3xl border border-slate-200/80 p-4 sm:p-5 shadow-2xs">
+      <div className="bg-white dark:bg-[#111827] rounded-3xl border border-slate-200/80 dark:border-slate-800 p-4 sm:p-5 shadow-2xs">
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
             <div className="w-2.5 h-2.5 rounded-full bg-theme-primary animate-ping" />
-            <h2 className="text-xs sm:text-sm font-black text-slate-900 uppercase tracking-wider">
+            <h2 className="text-xs sm:text-sm font-black text-slate-900 dark:text-white uppercase tracking-wider">
               Live Order Stages
             </h2>
           </div>
@@ -618,11 +618,11 @@ export default function Dashboard({ onNavigate }: { onNavigate: (key: string) =>
             className={`p-3 sm:p-4 rounded-2xl text-left transition-all duration-200 cursor-pointer native-press border relative overflow-hidden group ${
               selectedOrderFilter === 'pending'
                 ? 'bg-amber-500 text-white border-amber-600 shadow-md ring-2 ring-amber-400 scale-[1.02]'
-                : 'bg-amber-50/90 border-amber-200/80 hover:bg-amber-100 hover:border-amber-300 text-amber-900 hover:shadow-xs'
+                : 'bg-amber-50/90 dark:bg-amber-950/30 border-amber-200/80 dark:border-amber-900/50 hover:bg-amber-100 dark:hover:bg-amber-950/50 text-amber-900 dark:text-amber-200 hover:shadow-xs'
             }`}
           >
             <div className="flex items-center justify-between mb-1.5">
-              <span className={`text-[11px] font-bold ${selectedOrderFilter === 'pending' ? 'text-white' : 'text-amber-700'}`}>
+              <span className={`text-[11px] font-bold ${selectedOrderFilter === 'pending' ? 'text-white' : 'text-amber-700 dark:text-amber-300'}`}>
                 1. Pending
               </span>
               {pipelineCounts.pending > 0 && (
@@ -632,7 +632,7 @@ export default function Dashboard({ onNavigate }: { onNavigate: (key: string) =>
             <p className="text-2xl sm:text-3xl font-black tracking-tight leading-none">
               {pipelineCounts.pending}
             </p>
-            <p className={`text-[10px] font-semibold mt-1 flex items-center justify-between ${selectedOrderFilter === 'pending' ? 'text-amber-100' : 'text-amber-700/80'}`}>
+            <p className={`text-[10px] font-semibold mt-1 flex items-center justify-between ${selectedOrderFilter === 'pending' ? 'text-amber-100' : 'text-amber-700/80 dark:text-amber-300/80'}`}>
               <span>Needs Acceptance</span>
               <ChevronRight className={`w-3 h-3 transition-transform ${selectedOrderFilter === 'pending' ? 'rotate-90 text-white' : 'opacity-40 group-hover:opacity-100'}`} />
             </p>
@@ -645,19 +645,19 @@ export default function Dashboard({ onNavigate }: { onNavigate: (key: string) =>
             className={`p-3 sm:p-4 rounded-2xl text-left transition-all duration-200 cursor-pointer native-press border relative overflow-hidden group ${
               selectedOrderFilter === 'preparing'
                 ? 'bg-blue-600 text-white border-blue-700 shadow-md ring-2 ring-blue-400 scale-[1.02]'
-                : 'bg-blue-50/90 border-blue-200/80 hover:bg-blue-100 hover:border-blue-300 text-blue-900 hover:shadow-xs'
+                : 'bg-blue-50/90 dark:bg-blue-950/30 border-blue-200/80 dark:border-blue-900/50 hover:bg-blue-100 dark:hover:bg-blue-950/50 text-blue-900 dark:text-blue-200 hover:shadow-xs'
             }`}
           >
             <div className="flex items-center justify-between mb-1.5">
-              <span className={`text-[11px] font-bold ${selectedOrderFilter === 'preparing' ? 'text-white' : 'text-blue-700'}`}>
+              <span className={`text-[11px] font-bold ${selectedOrderFilter === 'preparing' ? 'text-white' : 'text-blue-700 dark:text-blue-300'}`}>
                 2. Kitchen
               </span>
-              <ChefHat className={`w-3.5 h-3.5 ${selectedOrderFilter === 'preparing' ? 'text-white' : 'text-blue-600'}`} />
+              <ChefHat className={`w-3.5 h-3.5 ${selectedOrderFilter === 'preparing' ? 'text-white' : 'text-blue-600 dark:text-blue-400'}`} />
             </div>
             <p className="text-2xl sm:text-3xl font-black tracking-tight leading-none">
               {pipelineCounts.preparing}
             </p>
-            <p className={`text-[10px] font-semibold mt-1 flex items-center justify-between ${selectedOrderFilter === 'preparing' ? 'text-blue-100' : 'text-blue-700/80'}`}>
+            <p className={`text-[10px] font-semibold mt-1 flex items-center justify-between ${selectedOrderFilter === 'preparing' ? 'text-blue-100' : 'text-blue-700/80 dark:text-blue-300/80'}`}>
               <span>In Preparation</span>
               <ChevronRight className={`w-3 h-3 transition-transform ${selectedOrderFilter === 'preparing' ? 'rotate-90 text-white' : 'opacity-40 group-hover:opacity-100'}`} />
             </p>
@@ -670,19 +670,19 @@ export default function Dashboard({ onNavigate }: { onNavigate: (key: string) =>
             className={`p-3 sm:p-4 rounded-2xl text-left transition-all duration-200 cursor-pointer native-press border relative overflow-hidden group ${
               selectedOrderFilter === 'ready'
                 ? 'bg-purple-600 text-white border-purple-700 shadow-md ring-2 ring-purple-400 scale-[1.02]'
-                : 'bg-purple-50/90 border-purple-200/80 hover:bg-purple-100 hover:border-purple-300 text-purple-900 hover:shadow-xs'
+                : 'bg-purple-50/90 dark:bg-purple-950/30 border-purple-200/80 dark:border-purple-900/50 hover:bg-purple-100 dark:hover:bg-purple-950/50 text-purple-900 dark:text-purple-200 hover:shadow-xs'
             }`}
           >
             <div className="flex items-center justify-between mb-1.5">
-              <span className={`text-[11px] font-bold ${selectedOrderFilter === 'ready' ? 'text-white' : 'text-purple-700'}`}>
+              <span className={`text-[11px] font-bold ${selectedOrderFilter === 'ready' ? 'text-white' : 'text-purple-700 dark:text-purple-300'}`}>
                 3. Ready
               </span>
-              <CheckCircle2 className={`w-3.5 h-3.5 ${selectedOrderFilter === 'ready' ? 'text-white' : 'text-purple-600'}`} />
+              <CheckCircle2 className={`w-3.5 h-3.5 ${selectedOrderFilter === 'ready' ? 'text-white' : 'text-purple-600 dark:text-purple-400'}`} />
             </div>
             <p className="text-2xl sm:text-3xl font-black tracking-tight leading-none">
               {pipelineCounts.ready + pipelineCounts.served}
             </p>
-            <p className={`text-[10px] font-semibold mt-1 flex items-center justify-between ${selectedOrderFilter === 'ready' ? 'text-purple-100' : 'text-purple-700/80'}`}>
+            <p className={`text-[10px] font-semibold mt-1 flex items-center justify-between ${selectedOrderFilter === 'ready' ? 'text-purple-100' : 'text-purple-700/80 dark:text-purple-300/80'}`}>
               <span>Ready to Settle</span>
               <ChevronRight className={`w-3 h-3 transition-transform ${selectedOrderFilter === 'ready' ? 'rotate-90 text-white' : 'opacity-40 group-hover:opacity-100'}`} />
             </p>
@@ -695,19 +695,19 @@ export default function Dashboard({ onNavigate }: { onNavigate: (key: string) =>
             className={`p-3 sm:p-4 rounded-2xl text-left transition-all duration-200 cursor-pointer native-press border relative overflow-hidden group ${
               selectedOrderFilter === 'completed'
                 ? 'bg-emerald-600 text-white border-emerald-700 shadow-md ring-2 ring-emerald-400 scale-[1.02]'
-                : 'bg-emerald-50/90 border-emerald-200/80 hover:bg-emerald-100 hover:border-emerald-300 text-emerald-900 hover:shadow-xs'
+                : 'bg-emerald-50/90 dark:bg-emerald-950/30 border-emerald-200/80 dark:border-emerald-900/50 hover:bg-emerald-100 dark:hover:bg-emerald-950/50 text-emerald-900 dark:text-emerald-200 hover:shadow-xs'
             }`}
           >
             <div className="flex items-center justify-between mb-1.5">
-              <span className={`text-[11px] font-bold ${selectedOrderFilter === 'completed' ? 'text-white' : 'text-emerald-700'}`}>
+              <span className={`text-[11px] font-bold ${selectedOrderFilter === 'completed' ? 'text-white' : 'text-emerald-700 dark:text-emerald-300'}`}>
                 4. Completed
               </span>
-              <TrendingUp className={`w-3.5 h-3.5 ${selectedOrderFilter === 'completed' ? 'text-white' : 'text-emerald-600'}`} />
+              <TrendingUp className={`w-3.5 h-3.5 ${selectedOrderFilter === 'completed' ? 'text-white' : 'text-emerald-600 dark:text-emerald-400'}`} />
             </div>
             <p className="text-2xl sm:text-3xl font-black tracking-tight leading-none">
               {pipelineCounts.completed}
             </p>
-            <p className={`text-[10px] font-semibold mt-1 flex items-center justify-between ${selectedOrderFilter === 'completed' ? 'text-emerald-100' : 'text-emerald-700/80'}`}>
+            <p className={`text-[10px] font-semibold mt-1 flex items-center justify-between ${selectedOrderFilter === 'completed' ? 'text-emerald-100' : 'text-emerald-700/80 dark:text-emerald-300/80'}`}>
               <span>Settled & Done</span>
               <ChevronRight className={`w-3 h-3 transition-transform ${selectedOrderFilter === 'completed' ? 'rotate-90 text-white' : 'opacity-40 group-hover:opacity-100'}`} />
             </p>
@@ -720,36 +720,36 @@ export default function Dashboard({ onNavigate }: { onNavigate: (key: string) =>
       {/* ========================================================================= */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         {/* Today's Sales */}
-        <div className="bg-white rounded-2xl sm:rounded-3xl p-4 sm:p-5 border border-slate-200/80 shadow-2xs flex flex-col justify-between">
+        <div className="bg-white dark:bg-[#111827] rounded-2xl sm:rounded-3xl p-4 sm:p-5 border border-slate-200/80 dark:border-slate-800 shadow-2xs flex flex-col justify-between">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold text-slate-500">Today's Sales</span>
-            <div className="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold">
+            <span className="text-xs font-bold text-slate-500 dark:text-slate-400">Today's Sales</span>
+            <div className="w-8 h-8 rounded-xl bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400 flex items-center justify-center font-bold">
               <DollarSign className="w-4 h-4" />
             </div>
           </div>
           <div className="mt-2">
-            <h3 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
+            <h3 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
               <span className="text-theme-primary text-base mr-0.5">{currencySymbol}</span>
               {todayRevenue.toFixed(2)}
             </h3>
-            <div className="flex items-center gap-1.5 mt-1 text-[10px] font-semibold text-slate-500">
-              <span className="text-emerald-700">Cash: {todayCashRevenue.toFixed(0)}</span>
+            <div className="flex items-center gap-1.5 mt-1 text-[10px] font-semibold text-slate-500 dark:text-slate-400">
+              <span className="text-emerald-600 dark:text-emerald-400">Cash: {todayCashRevenue.toFixed(0)}</span>
               <span>•</span>
-              <span className="text-blue-700">Digital: {todayDigitalRevenue.toFixed(0)}</span>
+              <span className="text-blue-600 dark:text-blue-400">Digital: {todayDigitalRevenue.toFixed(0)}</span>
             </div>
           </div>
         </div>
 
         {/* Today's Orders Count */}
-        <div className="bg-white rounded-2xl sm:rounded-3xl p-4 sm:p-5 border border-slate-200/80 shadow-2xs flex flex-col justify-between">
+        <div className="bg-white dark:bg-[#111827] rounded-2xl sm:rounded-3xl p-4 sm:p-5 border border-slate-200/80 dark:border-slate-800 shadow-2xs flex flex-col justify-between">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold text-slate-500">Today's Orders</span>
-            <div className="w-8 h-8 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center font-bold">
+            <span className="text-xs font-bold text-slate-500 dark:text-slate-400">Today's Orders</span>
+            <div className="w-8 h-8 rounded-xl bg-blue-50 dark:bg-blue-950/50 text-blue-600 dark:text-blue-400 flex items-center justify-center font-bold">
               <ShoppingBag className="w-4 h-4" />
             </div>
           </div>
           <div className="mt-2">
-            <h3 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
+            <h3 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
               {todayOrdersCount} <span className="text-xs font-semibold text-slate-400">orders</span>
             </h3>
             <p className="text-[10px] font-semibold text-slate-400 mt-1">
@@ -762,21 +762,21 @@ export default function Dashboard({ onNavigate }: { onNavigate: (key: string) =>
         <button
           type="button"
           onClick={() => onNavigate('table:menu_items')}
-          className="bg-white rounded-2xl sm:rounded-3xl p-4 sm:p-5 border border-slate-200/80 shadow-2xs flex flex-col justify-between text-left hover:border-slate-300 transition native-press"
+          className="bg-white dark:bg-[#111827] rounded-2xl sm:rounded-3xl p-4 sm:p-5 border border-slate-200/80 dark:border-slate-800 shadow-2xs flex flex-col justify-between text-left hover:border-slate-300 dark:hover:border-slate-700 transition native-press"
         >
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold text-slate-500">Menu Items</span>
-            <div className="w-8 h-8 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center font-bold">
+            <span className="text-xs font-bold text-slate-500 dark:text-slate-400">Menu Items</span>
+            <div className="w-8 h-8 rounded-xl bg-purple-50 dark:bg-purple-950/50 text-purple-600 dark:text-purple-400 flex items-center justify-center font-bold">
               <UtensilsCrossed className="w-4 h-4" />
             </div>
           </div>
           <div className="mt-2">
-            <h3 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
+            <h3 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
               {totalMenuCount} <span className="text-xs font-semibold text-slate-400">items</span>
             </h3>
             <p className="text-[10px] font-semibold text-theme-primary mt-1 flex items-center gap-0.5">
               <span>Manage Menu</span>
-              <ChevronRight className="w-3 h-3" />
+              <ChevronRight className="w-3.5 h-3.5" />
             </p>
           </div>
         </button>
@@ -785,21 +785,21 @@ export default function Dashboard({ onNavigate }: { onNavigate: (key: string) =>
         <button
           type="button"
           onClick={() => onNavigate('table:dining_tables')}
-          className="bg-white rounded-2xl sm:rounded-3xl p-4 sm:p-5 border border-slate-200/80 shadow-2xs flex flex-col justify-between text-left hover:border-slate-300 transition native-press"
+          className="bg-white dark:bg-[#111827] rounded-2xl sm:rounded-3xl p-4 sm:p-5 border border-slate-200/80 dark:border-slate-800 shadow-2xs flex flex-col justify-between text-left hover:border-slate-300 dark:hover:border-slate-700 transition native-press"
         >
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold text-slate-500">Dining Tables</span>
-            <div className="w-8 h-8 rounded-xl bg-cyan-50 text-cyan-600 flex items-center justify-center font-bold">
+            <span className="text-xs font-bold text-slate-500 dark:text-slate-400">Dining Tables</span>
+            <div className="w-8 h-8 rounded-xl bg-cyan-50 dark:bg-cyan-950/50 text-cyan-600 dark:text-cyan-400 flex items-center justify-center font-bold">
               <Table2 className="w-4 h-4" />
             </div>
           </div>
           <div className="mt-2">
-            <h3 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
+            <h3 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
               {totalTablesCount} <span className="text-xs font-semibold text-slate-400">tables</span>
             </h3>
-            <p className="text-[10px] font-semibold text-cyan-700 mt-1 flex items-center gap-0.5">
+            <p className="text-[10px] font-semibold text-cyan-700 dark:text-cyan-400 mt-1 flex items-center gap-0.5">
               <span>QR & Tables</span>
-              <ChevronRight className="w-3 h-3" />
+              <ChevronRight className="w-3.5 h-3.5" />
             </p>
           </div>
         </button>
@@ -808,19 +808,19 @@ export default function Dashboard({ onNavigate }: { onNavigate: (key: string) =>
       {/* ========================================================================= */}
       {/* 4. LIVE SHORT ORDERS LIST (PROPER SHORT ORDER CARDS & FAST ACTION)         */}
       {/* ========================================================================= */}
-      <div id="live-short-orders" className="bg-white rounded-3xl border border-slate-200/80 p-4 sm:p-6 shadow-2xs space-y-4 scroll-mt-6">
+      <div id="live-short-orders" className="bg-white dark:bg-[#111827] rounded-3xl border border-slate-200/80 dark:border-slate-800 p-4 sm:p-6 shadow-2xs space-y-4 scroll-mt-6">
         {/* Header & Quick Filter Pills */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100 dark:border-slate-800">
           <div>
             <div className="flex items-center gap-2">
-              <div className="p-1.5 bg-theme-light rounded-lg text-theme-primary">
+              <div className="p-1.5 bg-blue-50 dark:bg-blue-950/40 rounded-lg text-blue-600 dark:text-blue-400">
                 <Receipt className="w-4 h-4" />
               </div>
-              <h2 className="text-base sm:text-lg font-black text-slate-900">
+              <h2 className="text-base sm:text-lg font-black text-slate-900 dark:text-white">
                 Live Short Orders
               </h2>
             </div>
-            <p className="text-xs text-slate-500 mt-0.5">
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
               Instant step-by-step processing for recent & active orders
             </p>
           </div>
@@ -845,8 +845,8 @@ export default function Dashboard({ onNavigate }: { onNavigate: (key: string) =>
                 }}
                 className={`px-3 py-1.5 rounded-xl text-xs font-bold transition native-press whitespace-nowrap ${
                   selectedOrderFilter === tab.id
-                    ? 'bg-slate-900 text-white shadow-xs'
-                    : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                    ? 'bg-slate-900 dark:bg-blue-600 text-white shadow-xs'
+                    : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
                 }`}
               >
                 {tab.label}
@@ -857,10 +857,10 @@ export default function Dashboard({ onNavigate }: { onNavigate: (key: string) =>
 
         {/* Short Orders Grid */}
         {filteredOrders.length === 0 ? (
-          <div className="py-12 text-center bg-slate-50/70 rounded-2xl border border-slate-100">
-            <ShoppingBag className="w-8 h-8 text-slate-300 mx-auto mb-2" />
-            <p className="text-xs font-bold text-slate-600">No {selectedOrderFilter !== 'all' ? selectedOrderFilter : ''} orders found.</p>
-            <p className="text-[11px] text-slate-400 mt-0.5">New orders from QR or staff will appear here live.</p>
+          <div className="py-12 text-center bg-slate-50/70 dark:bg-slate-800/40 rounded-2xl border border-slate-100 dark:border-slate-800">
+            <ShoppingBag className="w-8 h-8 text-slate-300 dark:text-slate-600 mx-auto mb-2" />
+            <p className="text-xs font-bold text-slate-600 dark:text-slate-300">No {selectedOrderFilter !== 'all' ? selectedOrderFilter : ''} orders found.</p>
+            <p className="text-[11px] text-slate-400 dark:text-slate-500 mt-0.5">New orders from QR or staff will appear here live.</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5">
@@ -874,17 +874,17 @@ export default function Dashboard({ onNavigate }: { onNavigate: (key: string) =>
               return (
                 <div
                   key={order.id}
-                  className="bg-white rounded-2xl border border-slate-200/90 p-4 shadow-2xs hover:shadow-md transition-all flex flex-col justify-between space-y-3"
+                  className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/90 dark:border-slate-800 p-4 shadow-2xs hover:shadow-md transition-all flex flex-col justify-between space-y-3"
                 >
                   {/* Top Bar: Order # + Table + Status */}
                   <div>
                     <div className="flex items-start justify-between gap-2 mb-2">
                       <div>
                         <div className="flex items-center gap-1.5">
-                          <span className="text-base font-black text-slate-900">
+                          <span className="text-base font-black text-slate-900 dark:text-white">
                             #{order.order_number}
                           </span>
-                          <span className="text-[11px] font-bold px-2 py-0.5 rounded-lg bg-slate-100 text-slate-700">
+                          <span className="text-[11px] font-bold px-2 py-0.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200/60 dark:border-slate-700">
                             Table {order.table_number || 'Walk-in'}
                           </span>
                         </div>
@@ -897,8 +897,8 @@ export default function Dashboard({ onNavigate }: { onNavigate: (key: string) =>
                       <span
                         className={`text-[10px] font-black px-2 py-0.5 rounded-full border ${
                           paymentStatus === 'paid'
-                            ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
-                            : 'bg-rose-50 text-rose-700 border-rose-200'
+                            ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800'
+                            : 'bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-300 border-rose-200 dark:border-rose-800'
                         }`}
                       >
                         {paymentStatus === 'paid' ? `Paid (${payMethod})` : 'Unpaid'}
@@ -906,7 +906,7 @@ export default function Dashboard({ onNavigate }: { onNavigate: (key: string) =>
                     </div>
 
                     {/* Short Items Summary */}
-                    <div className="bg-slate-50/80 rounded-xl p-2.5 border border-slate-100 text-xs text-slate-700 space-y-1">
+                    <div className="bg-slate-50/80 dark:bg-slate-800/60 rounded-xl p-2.5 border border-slate-100 dark:border-slate-800 text-xs text-slate-700 dark:text-slate-300 space-y-1">
                       {items.length > 0 ? (
                         <p className="font-semibold line-clamp-2 text-[11.5px] leading-snug">
                           {items.map((it) => `${it.quantity}x ${it.item_name}`).join(', ')}
@@ -914,8 +914,8 @@ export default function Dashboard({ onNavigate }: { onNavigate: (key: string) =>
                       ) : (
                         <p className="text-slate-400 italic text-[11px]">General Order Items</p>
                       )}
-                      <div className="flex items-center justify-between text-[11px] font-bold pt-1 border-t border-slate-200/60 text-slate-900">
-                        <span className="text-slate-500 font-normal">{itemsCount} item{itemsCount !== 1 ? 's' : ''}</span>
+                      <div className="flex items-center justify-between text-[11px] font-bold pt-1 border-t border-slate-200/60 dark:border-slate-700 text-slate-900 dark:text-white">
+                        <span className="text-slate-500 dark:text-slate-400 font-normal">{itemsCount} item{itemsCount !== 1 ? 's' : ''}</span>
                         <span>{currencySymbol} {Number(order.grand_total || 0).toFixed(2)}</span>
                       </div>
                     </div>
@@ -996,17 +996,17 @@ export default function Dashboard({ onNavigate }: { onNavigate: (key: string) =>
       {/* ========================================================================= */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
         {/* Hourly Shift Mini Chart (2 Cols) */}
-        <div className="lg:col-span-2 bg-white rounded-3xl border border-slate-200/80 shadow-2xs p-4 sm:p-6 flex flex-col justify-between">
+        <div className="lg:col-span-2 bg-white dark:bg-[#111827] rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-2xs p-4 sm:p-6 flex flex-col justify-between">
           <div>
-            <div className="flex items-center justify-between mb-3 border-b border-slate-100 pb-3">
+            <div className="flex items-center justify-between mb-3 border-b border-slate-100 dark:border-slate-800 pb-3">
               <div>
-                <h3 className="text-sm sm:text-base font-black text-slate-900 flex items-center gap-1.5">
-                  <Clock className="w-4 h-4 text-theme-primary" />
+                <h3 className="text-sm sm:text-base font-black text-slate-900 dark:text-white flex items-center gap-1.5">
+                  <Clock className="w-4 h-4 text-blue-600 dark:text-blue-400" />
                   Today's Peak Rush & Shift Distribution
                 </h3>
                 <p className="text-xs text-slate-400">Live order volume by shift times</p>
               </div>
-              <span className="text-xs font-bold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-xl border border-emerald-200">
+              <span className="text-xs font-bold text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/40 px-2.5 py-1 rounded-xl border border-emerald-200 dark:border-emerald-800">
                 Peak Shift Active
               </span>
             </div>
@@ -1018,7 +1018,7 @@ export default function Dashboard({ onNavigate }: { onNavigate: (key: string) =>
                 return (
                   <div key={idx} className="flex-1 flex flex-col items-center gap-1.5 group h-full justify-end relative">
                     {/* Tooltip */}
-                    <div className="opacity-0 group-hover:opacity-100 transition-all pointer-events-none absolute -top-12 z-20 bg-slate-900 text-white text-[10px] py-1 px-2 rounded-lg shadow-xl whitespace-nowrap">
+                    <div className="opacity-0 group-hover:opacity-100 transition-all pointer-events-none absolute -top-12 z-20 bg-slate-900 dark:bg-slate-800 text-white text-[10px] py-1 px-2 rounded-lg shadow-xl whitespace-nowrap border border-slate-700">
                       {currencySymbol} {slot.revenue.toFixed(0)} • {slot.ordersCount} ord
                     </div>
 
@@ -1034,12 +1034,12 @@ export default function Dashboard({ onNavigate }: { onNavigate: (key: string) =>
                         slot.isCurrent
                           ? 'bg-gradient-to-t from-emerald-600 to-teal-400 shadow-md ring-2 ring-emerald-300'
                           : slot.revenue > 0
-                          ? 'bg-theme-gradient opacity-90'
-                          : 'bg-slate-100'
+                          ? 'bg-blue-600 dark:bg-blue-500 opacity-90'
+                          : 'bg-slate-100 dark:bg-slate-800'
                       }`}
                     />
 
-                    <span className="text-[10px] font-bold text-slate-700 leading-none mt-1">
+                    <span className="text-[10px] font-bold text-slate-700 dark:text-slate-300 leading-none mt-1">
                       {slot.label}
                     </span>
                     <span className="text-[8.5px] text-slate-400 font-semibold truncate max-w-[50px]">
@@ -1051,11 +1051,11 @@ export default function Dashboard({ onNavigate }: { onNavigate: (key: string) =>
             </div>
           </div>
 
-          <div className="flex items-center justify-between text-xs text-slate-400 pt-3 border-t border-slate-100 mt-2">
+          <div className="flex items-center justify-between text-xs text-slate-400 pt-3 border-t border-slate-100 dark:border-slate-800 mt-2">
             <span>Tap bars for shift summary</span>
             <button
               onClick={() => onNavigate('reports')}
-              className="text-xs font-bold text-theme-primary hover:underline"
+              className="text-xs font-bold text-blue-600 dark:text-blue-400 hover:underline"
             >
               View Full Reports →
             </button>
@@ -1063,23 +1063,23 @@ export default function Dashboard({ onNavigate }: { onNavigate: (key: string) =>
         </div>
 
         {/* Quick App Shortcuts Tile (1 Col) */}
-        <div className="bg-white rounded-3xl border border-slate-200/80 shadow-2xs p-4 sm:p-6 flex flex-col justify-between">
+        <div className="bg-white dark:bg-[#111827] rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-2xs p-4 sm:p-6 flex flex-col justify-between">
           <div>
-            <div className="flex items-center gap-1.5 mb-3 pb-3 border-b border-slate-100">
-              <Zap className="w-4 h-4 text-theme-primary" />
-              <h3 className="text-sm sm:text-base font-black text-slate-900">
+            <div className="flex items-center gap-1.5 mb-3 pb-3 border-b border-slate-100 dark:border-slate-800">
+              <Zap className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+              <h3 className="text-sm sm:text-base font-black text-slate-900 dark:text-white">
                 Quick App Shortcuts
               </h3>
             </div>
 
             <div className="grid grid-cols-3 gap-2">
               {[
-                { label: 'Reports', icon: BarChart3, key: 'reports', color: 'text-blue-600' },
-                { label: 'Orders', icon: ShoppingBag, key: 'table:orders', color: 'text-emerald-600' },
-                { label: 'Tables & Rooms', icon: QrCode, key: 'table:dining_tables', color: 'text-cyan-600' },
-                { label: 'Add Item', icon: UtensilsCrossed, key: 'table:menu_items', color: 'text-purple-600' },
-                { label: 'Categories', icon: FolderTree, key: 'table:categories', color: 'text-amber-600' },
-                { label: 'Settings', icon: Store, key: 'table:restaurant_settings', color: 'text-rose-600' },
+                { label: 'Reports', icon: BarChart3, key: 'reports', color: 'text-blue-600 dark:text-blue-400' },
+                { label: 'Orders', icon: ShoppingBag, key: 'table:orders', color: 'text-emerald-600 dark:text-emerald-400' },
+                { label: 'Tables & Rooms', icon: QrCode, key: 'table:dining_tables', color: 'text-cyan-600 dark:text-cyan-400' },
+                { label: 'Add Item', icon: UtensilsCrossed, key: 'table:menu_items', color: 'text-purple-600 dark:text-purple-400' },
+                { label: 'Categories', icon: FolderTree, key: 'table:categories', color: 'text-amber-600 dark:text-amber-400' },
+                { label: 'Settings', icon: Store, key: 'table:restaurant_settings', color: 'text-rose-600 dark:text-rose-400' },
               ].map((q) => {
                 const Icon = q.icon;
                 return (
@@ -1090,12 +1090,12 @@ export default function Dashboard({ onNavigate }: { onNavigate: (key: string) =>
                       triggerHaptic('selection');
                       onNavigate(q.key);
                     }}
-                    className="flex flex-col items-center justify-center gap-1 p-2.5 bg-slate-50 hover:bg-slate-100 rounded-2xl transition border border-slate-100 hover:border-slate-200 native-press shadow-2xs"
+                    className="flex flex-col items-center justify-center gap-1 p-2.5 bg-slate-50 dark:bg-slate-800/60 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-2xl transition border border-slate-100 dark:border-slate-700 hover:border-slate-200 dark:hover:border-slate-600 native-press shadow-2xs"
                   >
-                    <div className="w-8 h-8 rounded-xl bg-white border border-slate-200 flex items-center justify-center shadow-xs">
+                    <div className="w-8 h-8 rounded-xl bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 flex items-center justify-center shadow-xs">
                       <Icon className={`w-4 h-4 ${q.color}`} />
                     </div>
-                    <span className="text-[10px] font-bold text-slate-700 text-center leading-tight">
+                    <span className="text-[10px] font-bold text-slate-700 dark:text-slate-200 text-center leading-tight">
                       {q.label}
                     </span>
                   </button>
@@ -1104,7 +1104,7 @@ export default function Dashboard({ onNavigate }: { onNavigate: (key: string) =>
             </div>
           </div>
 
-          <div className="pt-3 mt-3 border-t border-slate-100 text-center">
+          <div className="pt-3 mt-3 border-t border-slate-100 dark:border-slate-800 text-center">
             <p className="text-[10px] text-slate-400 font-medium">Dishgaze Restaurant v1.0 • Native App Sync</p>
           </div>
         </div>
@@ -1113,11 +1113,11 @@ export default function Dashboard({ onNavigate }: { onNavigate: (key: string) =>
       {/* ========================================================================= */}
       {/* 6. FEATURED MENU HIGHLIGHTS (2-by-2 Grid with fast In-Stock switch)        */}
       {/* ========================================================================= */}
-      <div className="bg-white rounded-3xl border border-slate-200/80 p-4 sm:p-6 shadow-2xs space-y-3">
+      <div className="bg-white dark:bg-[#111827] rounded-3xl border border-slate-200/80 dark:border-slate-800 p-4 sm:p-6 shadow-2xs space-y-3">
         <div className="flex items-center justify-between">
           <div>
-            <h3 className="text-sm sm:text-base font-black text-slate-900 flex items-center gap-1.5">
-              <Sparkles className="w-4 h-4 text-theme-primary" />
+            <h3 className="text-sm sm:text-base font-black text-slate-900 dark:text-white flex items-center gap-1.5">
+              <Sparkles className="w-4 h-4 text-blue-600 dark:text-blue-400" />
               Featured Menu & Fast Stock
             </h3>
             <p className="text-[11px] text-slate-400">1-tap toggle item availability</p>
@@ -1127,7 +1127,7 @@ export default function Dashboard({ onNavigate }: { onNavigate: (key: string) =>
               triggerHaptic('light');
               onNavigate('table:menu_items');
             }}
-            className="text-xs font-bold text-theme-primary hover:opacity-80 flex items-center gap-0.5 native-press"
+            className="text-xs font-bold text-blue-600 dark:text-blue-400 hover:opacity-80 flex items-center gap-0.5 native-press"
           >
             <span>All Menu Items</span>
             <ChevronRight className="w-3.5 h-3.5" />
@@ -1135,19 +1135,19 @@ export default function Dashboard({ onNavigate }: { onNavigate: (key: string) =>
         </div>
 
         {topMenuItems.length === 0 ? (
-          <div className="py-8 text-center bg-slate-50 rounded-2xl border border-slate-100">
-            <UtensilsCrossed className="w-8 h-8 text-slate-300 mx-auto mb-2" />
-            <p className="text-xs font-semibold text-slate-500">No menu items added yet.</p>
+          <div className="py-8 text-center bg-slate-50 dark:bg-slate-800/40 rounded-2xl border border-slate-100 dark:border-slate-800">
+            <UtensilsCrossed className="w-8 h-8 text-slate-300 dark:text-slate-600 mx-auto mb-2" />
+            <p className="text-xs font-semibold text-slate-500 dark:text-slate-400">No menu items added yet.</p>
           </div>
         ) : (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-2.5 sm:gap-4">
             {topMenuItems.map((item) => (
               <div
                 key={item.id}
-                className="bg-white rounded-2xl border border-slate-200/80 shadow-2xs overflow-hidden flex flex-col justify-between group relative"
+                className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-2xs overflow-hidden flex flex-col justify-between group relative"
               >
                 {/* Photo (16:10 aspect ratio) */}
-                <div className="relative aspect-[16/10] w-full bg-slate-100 overflow-hidden shrink-0">
+                <div className="relative aspect-[16/10] w-full bg-slate-100 dark:bg-slate-800 overflow-hidden shrink-0">
                   {item.image_url ? (
                     <img
                       src={item.image_url}
@@ -1155,8 +1155,8 @@ export default function Dashboard({ onNavigate }: { onNavigate: (key: string) =>
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                     />
                   ) : (
-                    <div className="w-full h-full bg-theme-light flex items-center justify-center">
-                      <UtensilsCrossed className="w-6 h-6 text-theme-primary" />
+                    <div className="w-full h-full bg-blue-50 dark:bg-blue-950/40 flex items-center justify-center">
+                      <UtensilsCrossed className="w-6 h-6 text-blue-600 dark:text-blue-400" />
                     </div>
                   )}
 
@@ -1166,7 +1166,7 @@ export default function Dashboard({ onNavigate }: { onNavigate: (key: string) =>
                       {item.category_name}
                     </span>
                     {item.is_featured && (
-                      <span className="text-[9px] font-black px-1.5 py-0.5 rounded-full bg-theme-gradient text-white shadow-xs flex items-center gap-0.5">
+                      <span className="text-[9px] font-black px-1.5 py-0.5 rounded-full bg-amber-500 text-white shadow-xs flex items-center gap-0.5">
                         <Flame className="w-2.5 h-2.5 fill-white" />
                       </span>
                     )}
@@ -1174,14 +1174,14 @@ export default function Dashboard({ onNavigate }: { onNavigate: (key: string) =>
 
                   {/* Price Tag */}
                   <div className="absolute bottom-1.5 right-1.5 bg-slate-950/90 text-white px-2 py-0.5 rounded-full text-[11px] font-black tracking-tight backdrop-blur-xs">
-                    <span className="text-theme-primary mr-0.5">{currencySymbol}</span>
+                    <span className="text-blue-400 mr-0.5">{currencySymbol}</span>
                     {item.price.toFixed(2)}
                   </div>
                 </div>
 
                 {/* Body & Fast Stock Toggle */}
                 <div className="p-2.5 flex-1 flex flex-col justify-between">
-                  <h4 className="font-bold text-slate-900 text-xs truncate mb-2">
+                  <h4 className="font-bold text-slate-900 dark:text-white text-xs truncate mb-2">
                     {item.name}
                   </h4>
 
@@ -1190,8 +1190,8 @@ export default function Dashboard({ onNavigate }: { onNavigate: (key: string) =>
                     onClick={() => handleToggleStock(item)}
                     className={`w-full flex items-center justify-center gap-1.5 text-[10px] font-bold py-1.5 rounded-xl border transition native-press ${
                       item.is_available
-                        ? 'bg-emerald-50 text-emerald-700 border-emerald-200/80 hover:bg-emerald-100'
-                        : 'bg-slate-100 text-slate-500 border-slate-200 hover:bg-slate-200'
+                        ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border-emerald-200/80 dark:border-emerald-800 hover:bg-emerald-100 dark:hover:bg-emerald-950/60'
+                        : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 border-slate-200 dark:border-slate-700 hover:bg-slate-200 dark:hover:bg-slate-700'
                     }`}
                   >
                     <span className={`w-1.5 h-1.5 rounded-full ${item.is_available ? 'bg-emerald-500' : 'bg-slate-400'}`} />
@@ -1209,75 +1209,75 @@ export default function Dashboard({ onNavigate }: { onNavigate: (key: string) =>
       {/* ========================================================================= */}
       {settlingOrder && (
         <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/70 backdrop-blur-xs animate-backdrop">
-          <div className="bg-white rounded-t-[28px] sm:rounded-3xl shadow-2xl w-full max-w-md p-5 sm:p-6 animate-bottom-sheet sm:animate-none pb-safe sm:pb-6">
-            <div className="w-12 h-1.5 bg-slate-300 rounded-full mx-auto mb-3 sm:hidden" />
+          <div className="bg-white dark:bg-[#111827] rounded-t-[28px] sm:rounded-3xl shadow-2xl w-full max-w-md p-5 sm:p-6 animate-bottom-sheet sm:animate-none pb-safe sm:pb-6 border-t sm:border border-slate-200 dark:border-slate-800">
+            <div className="w-12 h-1.5 bg-slate-300 dark:bg-slate-700 rounded-full mx-auto mb-3 sm:hidden" />
 
-            <div className="flex items-center justify-between pb-3 border-b border-slate-100 mb-4">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800 mb-4">
               <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center font-bold">
+                <div className="w-9 h-9 rounded-xl bg-amber-50 dark:bg-amber-950/50 text-amber-600 dark:text-amber-400 flex items-center justify-center font-bold">
                   <Wallet className="w-5 h-5" />
                 </div>
                 <div>
-                  <h3 className="text-base font-bold text-slate-900">
+                  <h3 className="text-base font-bold text-slate-900 dark:text-white">
                     Settle & Complete Order
                   </h3>
-                  <p className="text-xs text-slate-500">
+                  <p className="text-xs text-slate-500 dark:text-slate-400">
                     Order #{settlingOrder.order_number} • Table {settlingOrder.table_number || 'Walk-in'}
                   </p>
                 </div>
               </div>
               <button
                 onClick={() => setSettlingOrder(null)}
-                className="p-1.5 text-slate-400 hover:text-slate-700 rounded-full bg-slate-100"
+                className="p-1.5 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 rounded-full bg-slate-100 dark:bg-slate-800"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
 
-            <div className="bg-slate-50 rounded-2xl p-4 border border-slate-200/80 mb-4 text-center">
-              <span className="text-xs font-semibold text-slate-500">Total Amount to Collect</span>
-              <h2 className="text-2xl font-black text-slate-900 mt-1">
-                <span className="text-theme-primary text-lg mr-1">{currencySymbol}</span>
+            <div className="bg-slate-50 dark:bg-slate-800/60 rounded-2xl p-4 border border-slate-200/80 dark:border-slate-700 mb-4 text-center">
+              <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">Total Amount to Collect</span>
+              <h2 className="text-2xl font-black text-slate-900 dark:text-white mt-1">
+                <span className="text-blue-600 dark:text-blue-400 text-lg mr-1">{currencySymbol}</span>
                 {Number(settlingOrder.grand_total || 0).toFixed(2)}
               </h2>
             </div>
 
-            <p className="text-xs font-bold text-slate-700 mb-3">Select Payment Method:</p>
+            <p className="text-xs font-bold text-slate-700 dark:text-slate-300 mb-3">Select Payment Method:</p>
 
             <div className="grid grid-cols-2 gap-2.5 mb-3">
               <button
                 type="button"
                 onClick={() => handleSettleShortOrder(settlingOrder, 'cash', 'paid')}
-                className="flex items-center gap-2.5 p-3.5 rounded-2xl border border-emerald-200 bg-emerald-50 hover:bg-emerald-100 text-emerald-900 font-bold text-xs sm:text-sm transition native-press"
+                className="flex items-center gap-2.5 p-3.5 rounded-2xl border border-emerald-200 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-950/40 hover:bg-emerald-100 dark:hover:bg-emerald-950/60 text-emerald-900 dark:text-emerald-200 font-bold text-xs sm:text-sm transition native-press"
               >
-                <DollarSign className="w-5 h-5 text-emerald-600 shrink-0" />
+                <DollarSign className="w-5 h-5 text-emerald-600 dark:text-emerald-400 shrink-0" />
                 <div className="text-left">
                   <p className="font-bold">Cash</p>
-                  <span className="text-[10px] text-emerald-700 font-medium">Paid & Complete</span>
+                  <span className="text-[10px] text-emerald-700 dark:text-emerald-300 font-medium">Paid & Complete</span>
                 </div>
               </button>
 
               <button
                 type="button"
                 onClick={() => handleSettleShortOrder(settlingOrder, 'upi', 'paid')}
-                className="flex items-center gap-2.5 p-3.5 rounded-2xl border border-blue-200 bg-blue-50 hover:bg-blue-100 text-blue-900 font-bold text-xs sm:text-sm transition native-press"
+                className="flex items-center gap-2.5 p-3.5 rounded-2xl border border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-950/40 hover:bg-blue-100 dark:hover:bg-blue-950/60 text-blue-900 dark:text-blue-200 font-bold text-xs sm:text-sm transition native-press"
               >
-                <Smartphone className="w-5 h-5 text-blue-600 shrink-0" />
+                <Smartphone className="w-5 h-5 text-blue-600 dark:text-blue-400 shrink-0" />
                 <div className="text-left">
                   <p className="font-bold">UPI / QR</p>
-                  <span className="text-[10px] text-blue-700 font-medium">Paid & Complete</span>
+                  <span className="text-[10px] text-blue-700 dark:text-blue-300 font-medium">Paid & Complete</span>
                 </div>
               </button>
 
               <button
                 type="button"
                 onClick={() => handleSettleShortOrder(settlingOrder, 'card', 'paid')}
-                className="flex items-center gap-2.5 p-3.5 rounded-2xl border border-purple-200 bg-purple-50 hover:bg-purple-100 text-purple-900 font-bold text-xs sm:text-sm transition native-press"
+                className="flex items-center gap-2.5 p-3.5 rounded-2xl border border-purple-200 dark:border-purple-800 bg-purple-50 dark:bg-purple-950/40 hover:bg-purple-100 dark:hover:bg-purple-950/60 text-purple-900 dark:text-purple-200 font-bold text-xs sm:text-sm transition native-press"
               >
-                <CreditCard className="w-5 h-5 text-purple-600 shrink-0" />
+                <CreditCard className="w-5 h-5 text-purple-600 dark:text-purple-400 shrink-0" />
                 <div className="text-left">
                   <p className="font-bold">Card / POS</p>
-                  <span className="text-[10px] text-purple-700 font-medium">Paid & Complete</span>
+                  <span className="text-[10px] text-purple-700 dark:text-purple-300 font-medium">Paid & Complete</span>
                 </div>
               </button>
 
@@ -1289,12 +1289,12 @@ export default function Dashboard({ onNavigate }: { onNavigate: (key: string) =>
                     handleSettleShortOrder(settlingOrder, 'other', 'paid', note.trim());
                   }
                 }}
-                className="flex items-center gap-2.5 p-3.5 rounded-2xl border border-amber-200 bg-amber-50 hover:bg-amber-100 text-amber-900 font-bold text-xs sm:text-sm transition native-press"
+                className="flex items-center gap-2.5 p-3.5 rounded-2xl border border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-950/40 hover:bg-amber-100 dark:hover:bg-amber-950/60 text-amber-900 dark:text-amber-200 font-bold text-xs sm:text-sm transition native-press"
               >
-                <Wallet className="w-5 h-5 text-amber-600 shrink-0" />
+                <Wallet className="w-5 h-5 text-amber-600 dark:text-amber-400 shrink-0" />
                 <div className="text-left">
                   <p className="font-bold">Other Method</p>
-                  <span className="text-[10px] text-amber-700 font-medium">Custom</span>
+                  <span className="text-[10px] text-amber-700 dark:text-amber-300 font-medium">Custom</span>
                 </div>
               </button>
             </div>
@@ -1302,7 +1302,7 @@ export default function Dashboard({ onNavigate }: { onNavigate: (key: string) =>
             <button
               type="button"
               onClick={() => handleSettleShortOrder(settlingOrder, String(settlingOrder.payment_method || 'cash'), 'unpaid')}
-              className="w-full py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl text-xs font-semibold transition"
+              className="w-full py-2.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 rounded-xl text-xs font-semibold transition"
             >
               Keep Unpaid & Mark Complete
             </button>

@@ -1530,28 +1530,28 @@ export default function CrudPage({ table }: CrudPageProps) {
   // Render table view
   function renderTableView() {
     return (
-      <div className="overflow-x-auto">
+      <div className="overflow-x-auto bg-white dark:bg-[#111827] rounded-xl border border-slate-200 dark:border-slate-800 shadow-xs">
         <table className="w-full text-sm">
           <thead>
-            <tr className="bg-slate-50 border-b border-slate-200 text-left">
+            <tr className="bg-slate-50 dark:bg-slate-800/60 border-b border-slate-200 dark:border-slate-800 text-left">
               {listFields.map((f) => (
                 <th
                   key={f.key}
-                  className="px-4 py-3 font-semibold text-slate-600 whitespace-nowrap"
+                  className="px-4 py-3 font-semibold text-slate-600 dark:text-slate-300 whitespace-nowrap"
                 >
                   <button
                     onClick={() => toggleSort(f.key)}
-                    className="inline-flex items-center gap-1 hover:text-slate-900"
+                    className="inline-flex items-center gap-1 hover:text-slate-900 dark:hover:text-white"
                   >
                     {f.label}
                     <ArrowUpDown className="w-3 h-3 opacity-50" />
                   </button>
                 </th>
               ))}
-              <th className="px-4 py-3 font-semibold text-slate-600 text-right">Actions</th>
+              <th className="px-4 py-3 font-semibold text-slate-600 dark:text-slate-300 text-right">Actions</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-100">
+          <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
             {loading && (
               <tr>
                 <td colSpan={listFields.length + 1} className="px-4 py-12 text-center text-slate-400">
@@ -1568,9 +1568,9 @@ export default function CrudPage({ table }: CrudPageProps) {
             )}
             {!loading &&
               filtered.map((row) => (
-                <tr key={String(row.id)} className="hover:bg-slate-50/70 transition">
+                <tr key={String(row.id)} className="hover:bg-slate-50/70 dark:hover:bg-slate-800/40 transition">
                   {listFields.map((f) => (
-                    <td key={f.key} className="px-4 py-3 text-slate-700 align-middle">
+                    <td key={f.key} className="px-4 py-3 text-slate-700 dark:text-slate-200 align-middle">
                       <CellContent field={f} value={row[f.key]} fkOptions={fkOptions[f.key]} />
                     </td>
                   ))}
@@ -1972,11 +1972,11 @@ export default function CrudPage({ table }: CrudPageProps) {
     <div className="space-y-4">
       {/* Interactive Live Order Pipeline Stages Bar (When viewing Orders) */}
       {isOrderPage && (
-        <div className="bg-white rounded-2xl border border-slate-200/80 p-2.5 sm:p-3 shadow-2xs">
+        <div className="bg-white dark:bg-[#111827] rounded-2xl border border-slate-200/80 dark:border-slate-800 p-2.5 sm:p-3 shadow-2xs">
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-2">
-              <div className="w-2 h-2 rounded-full bg-theme-primary animate-ping" />
-              <h3 className="text-xs font-black text-slate-900 uppercase tracking-wider">
+              <div className="w-2 h-2 rounded-full bg-blue-600 dark:bg-blue-400 animate-ping" />
+              <h3 className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-wider">
                 Order Pipeline Stages
               </h3>
             </div>
@@ -1987,7 +1987,7 @@ export default function CrudPage({ table }: CrudPageProps) {
 
           <div className="grid grid-cols-2 sm:grid-cols-5 gap-1.5 sm:gap-2">
             {[
-              { id: 'all', label: 'All Orders', count: orderPipelineCounts.all, desc: 'Total', activeBg: 'bg-slate-900 text-white border-slate-900 ring-2 ring-slate-400' },
+              { id: 'all', label: 'All Orders', count: orderPipelineCounts.all, desc: 'Total', activeBg: 'bg-slate-900 dark:bg-blue-600 text-white border-slate-900 dark:border-blue-500 ring-2 ring-slate-400 dark:ring-blue-400' },
               { id: 'pending', label: '1. Pending', count: orderPipelineCounts.pending, desc: 'Needs Accept', activeBg: 'bg-amber-500 text-white border-amber-600 ring-2 ring-amber-400' },
               { id: 'preparing', label: '2. Kitchen', count: orderPipelineCounts.preparing, desc: 'In Prep', activeBg: 'bg-blue-600 text-white border-blue-700 ring-2 ring-blue-400' },
               { id: 'ready', label: '3. Ready', count: orderPipelineCounts.ready, desc: 'Ready / Served', activeBg: 'bg-purple-600 text-white border-purple-700 ring-2 ring-purple-400' },
@@ -2005,11 +2005,11 @@ export default function CrudPage({ table }: CrudPageProps) {
                   className={`p-2 sm:p-2.5 rounded-xl text-left transition-all duration-200 native-press border relative overflow-hidden cursor-pointer ${
                     isCurrent
                       ? `${st.activeBg} shadow-sm scale-[1.01]`
-                      : 'bg-slate-50 border-slate-200/90 hover:bg-slate-100/80 text-slate-800'
+                      : 'bg-slate-50 dark:bg-slate-800/60 border-slate-200/90 dark:border-slate-700 hover:bg-slate-100/80 dark:hover:bg-slate-800 text-slate-800 dark:text-slate-200'
                   }`}
                 >
                   <div className="flex items-center justify-between">
-                    <span className={`text-[10px] sm:text-[10.5px] font-bold truncate ${isCurrent ? 'text-white' : 'text-slate-600'}`}>
+                    <span className={`text-[10px] sm:text-[10.5px] font-bold truncate ${isCurrent ? 'text-white' : 'text-slate-600 dark:text-slate-300'}`}>
                       {st.label}
                     </span>
                     {st.id === 'pending' && st.count > 0 && (
@@ -2040,17 +2040,17 @@ export default function CrudPage({ table }: CrudPageProps) {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder={`Search ${config.label.toLowerCase()}…`}
-              className="w-full bg-white border border-slate-200 rounded-lg pl-10 pr-3 py-2 text-sm text-slate-700 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-theme-light focus:border-theme-primary"
+              className="w-full bg-white dark:bg-[#111827] border border-slate-200 dark:border-slate-700 rounded-lg pl-10 pr-3 py-2 text-sm text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
             />
           </div>
           {(isTablePage || isOrderPage) && (
-            <div className="flex bg-slate-100 rounded-lg p-1">
+            <div className="flex bg-slate-100 dark:bg-slate-800 rounded-lg p-1 border border-slate-200 dark:border-slate-700">
               <button
                 onClick={() => setViewMode('cards')}
                 className={`px-3 py-1.5 text-xs font-medium rounded-md transition ${
                   viewMode === 'cards'
-                    ? 'bg-white text-slate-800 shadow-sm'
-                    : 'text-slate-500 hover:text-slate-700'
+                    ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm'
+                    : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
                 }`}
               >
                 Cards
@@ -2059,8 +2059,8 @@ export default function CrudPage({ table }: CrudPageProps) {
                 onClick={() => setViewMode('table')}
                 className={`px-3 py-1.5 text-xs font-medium rounded-md transition ${
                   viewMode === 'table'
-                    ? 'bg-white text-slate-800 shadow-sm'
-                    : 'text-slate-500 hover:text-slate-700'
+                    ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm'
+                    : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
                 }`}
               >
                 Table
@@ -2078,10 +2078,10 @@ export default function CrudPage({ table }: CrudPageProps) {
                   triggerHaptic('light');
                   setShowRestaurantQRModal(true);
                 }}
-                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-theme-light border border-theme-border text-theme-primary hover:brightness-95 text-sm font-bold shadow-xs transition native-press"
+                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-900 text-blue-600 dark:text-blue-400 hover:brightness-95 text-sm font-bold shadow-xs transition native-press"
                 title="View & Print fixed 1 barcode for direct restaurant menu"
               >
-                <QrCode className="w-4 h-4 text-theme-primary" />
+                <QrCode className="w-4 h-4 text-blue-600 dark:text-blue-400" />
                 <span>Restaurant Main QR</span>
               </button>
               <button
@@ -2090,17 +2090,17 @@ export default function CrudPage({ table }: CrudPageProps) {
                   triggerHaptic('light');
                   setShowBulkQRPrint(true);
                 }}
-                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-white border border-slate-300 hover:bg-slate-50 text-slate-800 text-sm font-bold shadow-xs transition native-press"
+                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 text-sm font-bold shadow-xs transition native-press"
                 title="Print QR codes for all tables"
               >
-                <Printer className="w-4 h-4 text-slate-600" />
+                <Printer className="w-4 h-4 text-slate-600 dark:text-slate-400" />
                 <span>Print Table QRs</span>
               </button>
             </>
           )}
           <button
             onClick={openCreate}
-            className="inline-flex items-center gap-2 btn-theme-primary font-bold text-sm rounded-lg px-4 py-2 shadow-theme transition native-press"
+            className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-500 text-white font-bold text-sm rounded-lg px-4 py-2 shadow-sm transition native-press"
           >
             <Plus className="w-4 h-4" />
             Add {config.singular}
@@ -2109,14 +2109,14 @@ export default function CrudPage({ table }: CrudPageProps) {
       </div>
 
       {error && (
-        <div className="flex items-start gap-2 bg-red-50 border border-red-200 text-red-700 text-sm rounded-lg p-3">
+        <div className="flex items-start gap-2 bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900/50 text-red-700 dark:text-red-300 text-sm rounded-lg p-3">
           <AlertCircle className="w-4 h-4 mt-0.5 shrink-0" />
           <span>{error}</span>
         </div>
       )}
 
       {success && (
-        <div className="flex items-start gap-2 bg-emerald-50 border border-emerald-200 text-emerald-700 text-sm rounded-lg p-3">
+        <div className="flex items-start gap-2 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-900/50 text-emerald-700 dark:text-emerald-300 text-sm rounded-lg p-3">
           <CheckCircle className="w-4 h-4 mt-0.5 shrink-0" />
           <span>{success}</span>
         </div>
@@ -2131,15 +2131,15 @@ export default function CrudPage({ table }: CrudPageProps) {
           <CrudTableSkeleton rows={8} />
         )
       ) : filtered.length === 0 ? (
-        <div className="bg-white rounded-xl border border-slate-200 p-12 text-center">
-          <Table2 className="w-12 h-12 text-slate-300 mx-auto mb-3" />
-          <h3 className="text-lg font-semibold text-slate-700">No {config.label.toLowerCase()} found</h3>
-          <p className="text-sm text-slate-500 mt-1">
+        <div className="bg-white dark:bg-[#111827] rounded-xl border border-slate-200 dark:border-slate-800 p-12 text-center shadow-xs">
+          <Table2 className="w-12 h-12 text-slate-300 dark:text-slate-600 mx-auto mb-3" />
+          <h3 className="text-lg font-semibold text-slate-700 dark:text-white">No {config.label.toLowerCase()} found</h3>
+          <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
             Get started by adding your first {config.singular.toLowerCase()}.
           </p>
           <button
             onClick={openCreate}
-            className="mt-4 inline-flex items-center gap-2 btn-theme-primary font-bold text-sm rounded-lg px-4 py-2 shadow-theme transition"
+            className="mt-4 inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-500 text-white font-bold text-sm rounded-lg px-4 py-2 shadow-sm transition"
           >
             <Plus className="w-4 h-4" />
             Add {config.singular}
@@ -2152,7 +2152,7 @@ export default function CrudPage({ table }: CrudPageProps) {
             : renderTableView()}
           
           {totalCount > PAGE_SIZE && (
-            <div className="flex items-center justify-between px-4 py-3 bg-white rounded-xl border border-slate-200 text-sm text-slate-500">
+            <div className="flex items-center justify-between px-4 py-3 bg-white dark:bg-[#111827] rounded-xl border border-slate-200 dark:border-slate-800 text-sm text-slate-500 dark:text-slate-400 shadow-xs">
               <span>
                 {totalCount} total · page {page + 1} of {totalPages}
               </span>
@@ -2160,14 +2160,14 @@ export default function CrudPage({ table }: CrudPageProps) {
                 <button
                   onClick={() => setPage((p) => Math.max(0, p - 1))}
                   disabled={page === 0}
-                  className="p-1.5 rounded-md hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed"
+                  className="p-1.5 rounded-md hover:bg-slate-100 dark:hover:bg-slate-800 disabled:opacity-40 disabled:cursor-not-allowed text-slate-700 dark:text-slate-200"
                 >
                   <ChevronLeft className="w-4 h-4" />
                 </button>
                 <button
                   onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
                   disabled={page >= totalPages - 1}
-                  className="p-1.5 rounded-md hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed"
+                  className="p-1.5 rounded-md hover:bg-slate-100 dark:hover:bg-slate-800 disabled:opacity-40 disabled:cursor-not-allowed text-slate-700 dark:text-slate-200"
                 >
                   <ChevronRight className="w-4 h-4" />
                 </button>
@@ -2850,22 +2850,22 @@ export default function CrudPage({ table }: CrudPageProps) {
 
       {confirmDelete && (
         <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/60 backdrop-blur-xs animate-backdrop">
-          <div className="bg-white rounded-t-[28px] sm:rounded-2xl shadow-2xl w-full max-w-sm p-6 animate-bottom-sheet sm:animate-none pb-safe sm:pb-6">
-            <div className="w-12 h-1.5 bg-slate-300 rounded-full mx-auto mb-4 sm:hidden" />
+          <div className="bg-white dark:bg-[#111827] rounded-t-[28px] sm:rounded-2xl shadow-2xl w-full max-w-sm p-6 animate-bottom-sheet sm:animate-none pb-safe sm:pb-6 border border-slate-200 dark:border-slate-800">
+            <div className="w-12 h-1.5 bg-slate-300 dark:bg-slate-700 rounded-full mx-auto mb-4 sm:hidden" />
             <div className="flex items-center gap-3 mb-3">
-              <div className="w-10 h-10 rounded-xl bg-red-100 flex items-center justify-center shrink-0">
-                <Trash2 className="w-5 h-5 text-red-600" />
+              <div className="w-10 h-10 rounded-xl bg-red-100 dark:bg-red-950/50 flex items-center justify-center shrink-0">
+                <Trash2 className="w-5 h-5 text-red-600 dark:text-red-400" />
               </div>
-              <h3 className="text-base sm:text-lg font-bold text-slate-900">Delete {config.singular}?</h3>
+              <h3 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white">Delete {config.singular}?</h3>
             </div>
-            <p className="text-xs sm:text-sm text-slate-500 mb-5">
+            <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mb-5">
               This action cannot be undone. The record will be permanently removed.
             </p>
             <div className="flex justify-end gap-3">
               <button
                 onClick={() => { triggerHaptic('light'); setConfirmDelete(null); }}
                 disabled={deleting}
-                className="px-4 py-2.5 rounded-xl text-sm font-medium text-slate-600 hover:bg-slate-100 disabled:opacity-50 native-press"
+                className="px-4 py-2.5 rounded-xl text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 disabled:opacity-50 native-press"
               >
                 Cancel
               </button>
@@ -2922,75 +2922,75 @@ export default function CrudPage({ table }: CrudPageProps) {
       {/* QUICK 1-TAP SETTLE & COMPLETE MODAL */}
       {settlingOrder && (
         <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/70 backdrop-blur-xs animate-backdrop">
-          <div className="bg-white rounded-t-[28px] sm:rounded-3xl shadow-2xl w-full max-w-md p-5 sm:p-6 animate-bottom-sheet sm:animate-none pb-safe sm:pb-6">
-            <div className="w-12 h-1.5 bg-slate-300 rounded-full mx-auto mb-3 sm:hidden" />
+          <div className="bg-white dark:bg-[#111827] rounded-t-[28px] sm:rounded-3xl shadow-2xl w-full max-w-md p-5 sm:p-6 animate-bottom-sheet sm:animate-none pb-safe sm:pb-6 border border-slate-200 dark:border-slate-800">
+            <div className="w-12 h-1.5 bg-slate-300 dark:bg-slate-700 rounded-full mx-auto mb-3 sm:hidden" />
             
-            <div className="flex items-center justify-between pb-3 border-b border-slate-100 mb-4">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800 mb-4">
               <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center font-bold">
+                <div className="w-9 h-9 rounded-xl bg-amber-50 dark:bg-amber-950/50 text-amber-600 dark:text-amber-400 flex items-center justify-center font-bold">
                   <Wallet className="w-5 h-5" />
                 </div>
                 <div>
-                  <h3 className="text-base font-bold text-slate-900">
+                  <h3 className="text-base font-bold text-slate-900 dark:text-white">
                     Step 4: Collect Payment & Settle
                   </h3>
-                  <p className="text-xs text-slate-500">
+                  <p className="text-xs text-slate-500 dark:text-slate-400">
                     Order #{String(settlingOrder.order_number || '')} • Table {String(settlingOrder.table_number || 'Walk-in')}
                   </p>
                 </div>
               </div>
               <button
                 onClick={() => setSettlingOrder(null)}
-                className="p-1.5 text-slate-400 hover:text-slate-700 rounded-full bg-slate-100"
+                className="p-1.5 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 rounded-full bg-slate-100 dark:bg-slate-800"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
 
-            <div className="bg-slate-50 rounded-2xl p-4 border border-slate-200/80 mb-4 text-center">
-              <span className="text-xs font-semibold text-slate-500">Total Amount to Collect</span>
-              <h2 className="text-2xl font-black text-slate-900 mt-1">
-                <span className="text-theme-primary text-lg mr-1">{currencySymbol}</span>
+            <div className="bg-slate-50 dark:bg-slate-800/60 rounded-2xl p-4 border border-slate-200/80 dark:border-slate-700 mb-4 text-center">
+              <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">Total Amount to Collect</span>
+              <h2 className="text-2xl font-black text-slate-900 dark:text-white mt-1">
+                <span className="text-blue-600 dark:text-blue-400 text-lg mr-1">{currencySymbol}</span>
                 {Number(settlingOrder.grand_total || 0).toFixed(2)}
               </h2>
             </div>
 
-            <p className="text-xs font-bold text-slate-700 mb-3">Choose Payment Method to Complete Order:</p>
+            <p className="text-xs font-bold text-slate-700 dark:text-slate-300 mb-3">Choose Payment Method to Complete Order:</p>
 
             <div className="grid grid-cols-2 gap-2.5 mb-3">
               <button
                 type="button"
                 onClick={() => handleSettleAndComplete(settlingOrder, 'cash', 'paid')}
-                className="flex items-center gap-2.5 p-3.5 rounded-2xl border border-emerald-200 bg-emerald-50 hover:bg-emerald-100 text-emerald-900 font-bold text-xs sm:text-sm transition native-press"
+                className="flex items-center gap-2.5 p-3.5 rounded-2xl border border-emerald-200 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-950/40 hover:bg-emerald-100 dark:hover:bg-emerald-950/60 text-emerald-900 dark:text-emerald-200 font-bold text-xs sm:text-sm transition native-press"
               >
-                <DollarSign className="w-5 h-5 text-emerald-600 shrink-0" />
+                <DollarSign className="w-5 h-5 text-emerald-600 dark:text-emerald-400 shrink-0" />
                 <div className="text-left">
                   <p className="font-bold">Cash</p>
-                  <span className="text-[10px] text-emerald-700 font-medium">Paid & Complete</span>
+                  <span className="text-[10px] text-emerald-700 dark:text-emerald-300 font-medium">Paid & Complete</span>
                 </div>
               </button>
 
               <button
                 type="button"
                 onClick={() => handleSettleAndComplete(settlingOrder, 'upi', 'paid')}
-                className="flex items-center gap-2.5 p-3.5 rounded-2xl border border-blue-200 bg-blue-50 hover:bg-blue-100 text-blue-900 font-bold text-xs sm:text-sm transition native-press"
+                className="flex items-center gap-2.5 p-3.5 rounded-2xl border border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-950/40 hover:bg-blue-100 dark:hover:bg-blue-950/60 text-blue-900 dark:text-blue-200 font-bold text-xs sm:text-sm transition native-press"
               >
-                <Smartphone className="w-5 h-5 text-blue-600 shrink-0" />
+                <Smartphone className="w-5 h-5 text-blue-600 dark:text-blue-400 shrink-0" />
                 <div className="text-left">
                   <p className="font-bold">UPI / QR</p>
-                  <span className="text-[10px] text-blue-700 font-medium">Paid & Complete</span>
+                  <span className="text-[10px] text-blue-700 dark:text-blue-300 font-medium">Paid & Complete</span>
                 </div>
               </button>
 
               <button
                 type="button"
                 onClick={() => handleSettleAndComplete(settlingOrder, 'card', 'paid')}
-                className="flex items-center gap-2.5 p-3.5 rounded-2xl border border-purple-200 bg-purple-50 hover:bg-purple-100 text-purple-900 font-bold text-xs sm:text-sm transition native-press"
+                className="flex items-center gap-2.5 p-3.5 rounded-2xl border border-purple-200 dark:border-purple-800 bg-purple-50 dark:bg-purple-950/40 hover:bg-purple-100 dark:hover:bg-purple-950/60 text-purple-900 dark:text-purple-200 font-bold text-xs sm:text-sm transition native-press"
               >
-                <CreditCard className="w-5 h-5 text-purple-600 shrink-0" />
+                <CreditCard className="w-5 h-5 text-purple-600 dark:text-purple-400 shrink-0" />
                 <div className="text-left">
                   <p className="font-bold">Card / POS</p>
-                  <span className="text-[10px] text-purple-700 font-medium">Paid & Complete</span>
+                  <span className="text-[10px] text-purple-700 dark:text-purple-300 font-medium">Paid & Complete</span>
                 </div>
               </button>
 
@@ -3002,12 +3002,12 @@ export default function CrudPage({ table }: CrudPageProps) {
                     handleSettleAndComplete(settlingOrder, 'other', 'paid', note.trim());
                   }
                 }}
-                className="flex items-center gap-2.5 p-3.5 rounded-2xl border border-amber-200 bg-amber-50 hover:bg-amber-100 text-amber-900 font-bold text-xs sm:text-sm transition native-press"
+                className="flex items-center gap-2.5 p-3.5 rounded-2xl border border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-950/40 hover:bg-amber-100 dark:hover:bg-amber-950/60 text-amber-900 dark:text-amber-200 font-bold text-xs sm:text-sm transition native-press"
               >
-                <Wallet className="w-5 h-5 text-amber-600 shrink-0" />
+                <Wallet className="w-5 h-5 text-amber-600 dark:text-amber-400 shrink-0" />
                 <div className="text-left">
-                  <p className="font-bold">Other / Note</p>
-                  <span className="text-[10px] text-amber-700 font-medium">Custom Method</span>
+                  <p className="font-bold">Other Method</p>
+                  <span className="text-[10px] text-amber-700 dark:text-amber-300 font-medium">Custom</span>
                 </div>
               </button>
             </div>
@@ -3015,7 +3015,7 @@ export default function CrudPage({ table }: CrudPageProps) {
             <button
               type="button"
               onClick={() => handleSettleAndComplete(settlingOrder, String(settlingOrder.payment_method || 'cash'), 'unpaid')}
-              className="w-full py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl text-xs font-semibold transition"
+              className="w-full py-2.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 rounded-xl text-xs font-semibold transition"
             >
               Keep Unpaid & Mark Complete
             </button>

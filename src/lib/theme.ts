@@ -3,7 +3,7 @@
 
 import { supabase } from '@/lib/supabase';
 
-export type ThemeMode = 'light' | 'dark' | 'system';
+export type ThemeMode = 'light' | 'dark';
 
 export interface ThemeColors {
   primary_color: string;
@@ -34,26 +34,48 @@ export interface RestaurantThemeSettings extends ThemeColors {
   updated_at?: string;
 }
 
-// ── Default Design Token Palette ─────────────────────────────────────
+// ── Default Design Token Palette (Light - Default) ────────────────────
 export const DEFAULT_THEME_COLORS: ThemeColors = {
-  primary_color: '#16A34A',
-  secondary_color: '#0F172A',
-  accent_color: '#22C55E',
-  background_color: '#FFFFFF',
+  primary_color: '#2563EB',
+  secondary_color: '#F1F5F9',
+  accent_color: '#06B6D4',
+  background_color: '#F8FAFC',
   surface_color: '#FFFFFF',
   sidebar_color: '#FFFFFF',
   navbar_color: '#FFFFFF',
-  text_color: '#111827',
-  muted_text_color: '#6B7280',
-  border_color: '#E5E7EB',
-  button_color: '#16A34A',
-  button_hover_color: '#15803D',
-  success_color: '#22C55E',
-  warning_color: '#F59E0B',
-  danger_color: '#EF4444',
-  info_color: '#3B82F6',
+  text_color: '#0F172A',
+  muted_text_color: '#64748B',
+  border_color: '#E2E8F0',
+  button_color: '#2563EB',
+  button_hover_color: '#1D4ED8',
+  success_color: '#16A34A',
+  warning_color: '#D97706',
+  danger_color: '#DC2626',
+  info_color: '#0284C7',
   link_color: '#2563EB',
-  badge_color: '#16A34A',
+  badge_color: '#2563EB',
+};
+
+// ── Dark Design Token Palette (Production-Grade Dark UI) ─────────────
+export const DARK_THEME_COLORS: ThemeColors = {
+  primary_color: '#60A5FA',
+  secondary_color: '#1E293B',
+  accent_color: '#22D3EE',
+  background_color: '#0B1220',
+  surface_color: '#111827',
+  sidebar_color: '#111827',
+  navbar_color: '#111827',
+  text_color: '#F8FAFC',
+  muted_text_color: '#94A3B8',
+  border_color: '#334155',
+  button_color: '#60A5FA',
+  button_hover_color: '#3B82F6',
+  success_color: '#4ADE80',
+  warning_color: '#FBBF24',
+  danger_color: '#F87171',
+  info_color: '#38BDF8',
+  link_color: '#60A5FA',
+  badge_color: '#60A5FA',
 };
 
 export const COLOR_KEYS: (keyof ThemeColors)[] = [
@@ -252,63 +274,27 @@ export function deriveEffectiveColors(
     return { ...configured };
   }
 
-  // Dark mode intelligent adaptations:
-  // We preserve the admin's explicitly chosen colors while ensuring comfortable readability.
-  const bgLum = getRelativeLuminance(configured.background_color);
-  const surfaceLum = getRelativeLuminance(configured.surface_color);
-  const sidebarLum = getRelativeLuminance(configured.sidebar_color);
-  const navbarLum = getRelativeLuminance(configured.navbar_color);
-  const textLum = getRelativeLuminance(configured.text_color);
-
-  // Background: If light, adapt to dark slate canvas
-  const effectiveBg = bgLum > 0.2 ? '#0B0F19' : configured.background_color;
-  // Surface: If light, adapt to elevated card surface
-  const effectiveSurface = surfaceLum > 0.25 ? '#151D2E' : configured.surface_color;
-  // Sidebar: If light, adapt to dark sidebar
-  const effectiveSidebar = sidebarLum > 0.2 ? '#0F172A' : configured.sidebar_color;
-  // Navbar: If light, adapt to dark navbar
-  const effectiveNavbar = navbarLum > 0.2 ? '#0F172A' : configured.navbar_color;
-
-  // Text: If dark, invert to crisp light readable text
-  const effectiveText = textLum < 0.45 ? '#F8FAFC' : configured.text_color;
-  const effectiveMutedText = getRelativeLuminance(configured.muted_text_color) < 0.35
-    ? '#94A3B8'
-    : configured.muted_text_color;
-
-  // Border: If light on dark, adapt to subtle dark border
-  const effectiveBorder = getRelativeLuminance(configured.border_color) > 0.3
-    ? '#1E293B'
-    : configured.border_color;
-
-  // Accent & Brand Colors: If too dark to be seen on dark background, lighten them
-  const ensureDarkVisibility = (c: string) => {
-    const ratio = getContrastRatio(c, effectiveBg);
-    if (ratio < 3.0) {
-      return lightenColor(c, 35);
-    }
-    return c;
-  };
-
+  // Exact production Dark Theme tokens
   return {
     ...configured,
-    background_color: effectiveBg,
-    surface_color: effectiveSurface,
-    sidebar_color: effectiveSidebar,
-    navbar_color: effectiveNavbar,
-    text_color: effectiveText,
-    muted_text_color: effectiveMutedText,
-    border_color: effectiveBorder,
-    primary_color: ensureDarkVisibility(configured.primary_color),
-    secondary_color: ensureDarkVisibility(configured.secondary_color),
-    accent_color: ensureDarkVisibility(configured.accent_color),
-    button_color: ensureDarkVisibility(configured.button_color),
-    button_hover_color: ensureDarkVisibility(configured.button_hover_color),
-    success_color: ensureDarkVisibility(configured.success_color),
-    warning_color: ensureDarkVisibility(configured.warning_color),
-    danger_color: ensureDarkVisibility(configured.danger_color),
-    info_color: ensureDarkVisibility(configured.info_color),
-    link_color: ensureDarkVisibility(configured.link_color),
-    badge_color: ensureDarkVisibility(configured.badge_color),
+    background_color: '#0B1220',
+    surface_color: '#111827',
+    sidebar_color: '#111827',
+    navbar_color: '#111827',
+    text_color: '#F8FAFC',
+    muted_text_color: '#94A3B8',
+    border_color: '#334155',
+    primary_color: configured.primary_color === DEFAULT_THEME_COLORS.primary_color ? DARK_THEME_COLORS.primary_color : configured.primary_color,
+    secondary_color: DARK_THEME_COLORS.secondary_color,
+    accent_color: DARK_THEME_COLORS.accent_color,
+    button_color: configured.button_color === DEFAULT_THEME_COLORS.button_color ? DARK_THEME_COLORS.button_color : configured.button_color,
+    button_hover_color: DARK_THEME_COLORS.button_hover_color,
+    success_color: DARK_THEME_COLORS.success_color,
+    warning_color: DARK_THEME_COLORS.warning_color,
+    danger_color: DARK_THEME_COLORS.danger_color,
+    info_color: DARK_THEME_COLORS.info_color,
+    link_color: DARK_THEME_COLORS.link_color,
+    badge_color: DARK_THEME_COLORS.badge_color,
   };
 }
 
@@ -328,15 +314,25 @@ export function applyThemeToDOM(
 
   // 1. Centralized CSS Variables / Design Tokens (18 variables)
   root.style.setProperty('--color-primary', effective.primary_color);
+  root.style.setProperty('--color-primary-hover', effectiveMode === 'dark' ? '#3B82F6' : '#1D4ED8');
+  root.style.setProperty('--color-primary-soft', effectiveMode === 'dark' ? '#172554' : '#EFF6FF');
   root.style.setProperty('--color-secondary', effective.secondary_color);
   root.style.setProperty('--color-accent', effective.accent_color);
   root.style.setProperty('--color-background', effective.background_color);
   root.style.setProperty('--color-surface', effective.surface_color);
+  root.style.setProperty('--color-surface-secondary', effectiveMode === 'dark' ? '#1E293B' : '#F1F5F9');
+  root.style.setProperty('--color-surface-elevated', effectiveMode === 'dark' ? '#1E293B' : '#FFFFFF');
+  root.style.setProperty('--color-surface-hover', effectiveMode === 'dark' ? '#243244' : '#F8FAFC');
+  root.style.setProperty('--color-surface-active', effectiveMode === 'dark' ? '#293548' : '#E2E8F0');
   root.style.setProperty('--color-sidebar', effective.sidebar_color);
   root.style.setProperty('--color-navbar', effective.navbar_color);
   root.style.setProperty('--color-text', effective.text_color);
+  root.style.setProperty('--color-text-secondary', effectiveMode === 'dark' ? '#CBD5E1' : '#475569');
   root.style.setProperty('--color-muted-text', effective.muted_text_color);
+  root.style.setProperty('--color-text-placeholder', effectiveMode === 'dark' ? '#64748B' : '#94A3B8');
   root.style.setProperty('--color-border', effective.border_color);
+  root.style.setProperty('--color-border-light', effectiveMode === 'dark' ? '#1E293B' : '#F1F5F9');
+  root.style.setProperty('--color-focus-ring', effectiveMode === 'dark' ? '#60A5FA' : '#2563EB');
   root.style.setProperty('--color-button', effective.button_color);
   root.style.setProperty('--color-button-hover', effective.button_hover_color);
   root.style.setProperty('--color-success', effective.success_color);
