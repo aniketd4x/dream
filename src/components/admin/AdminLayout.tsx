@@ -1037,8 +1037,7 @@ export default function AdminLayout({ active, onNavigate, children }: AdminLayou
                   <User className="w-4 h-4 text-white" />
                 </div>
                 <div>
-                  <h3 className="text-base font-bold text-slate-900 dark:text-white">User Account</h3>
-                  <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">{restaurant?.name || 'Dishgaze POS'}</p>
+                  <h3 className="text-base font-bold text-slate-900 dark:text-white">{restaurant?.name || 'Dishgaze POS'}</h3>
                 </div>
               </div>
               <button
