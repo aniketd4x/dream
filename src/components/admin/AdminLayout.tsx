@@ -721,7 +721,7 @@ export default function AdminLayout({ active, onNavigate, children }: AdminLayou
                     🔔 Incoming Order
                   </span>
                   <span className="text-xs font-bold text-emerald-400">
-                    {restaurant?.currency_symbol || restaurant?.currency || 'AED'} {orderToast.grand_total.toFixed(2)}
+                    {restaurant?.currency_symbol || restaurant?.currency || '₹'} {orderToast.grand_total.toFixed(2)}
                   </span>
                 </div>
                 <h4 className="text-sm font-bold text-white mt-1 truncate">

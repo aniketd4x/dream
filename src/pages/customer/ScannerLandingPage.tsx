@@ -317,7 +317,7 @@ export function ScannerLandingPage() {
               className="hidden sm:inline-flex items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50 px-3.5 py-1.5 text-xs font-semibold text-emerald-700 transition hover:bg-emerald-100"
             >
               <span className="size-1.5 animate-pulse rounded-full bg-emerald-600" />
-              Demo Table T1
+              Table T1
             </Link>
             <Link
               to="/admin"
@@ -398,14 +398,14 @@ export function ScannerLandingPage() {
                 </button>
               </form>
 
-              {/* QUICK DEMO SHORTCUT */}
+              {/* QUICK MENU PREVIEW */}
               <div className="mt-4 pt-4 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
-                <span>Want to test without a QR?</span>
+                <span>Direct table preview:</span>
                 <Link
                   to="/menu/TBL-M12WSF9O"
                   className="font-bold text-[#0F766E] hover:underline"
                 >
-                  Open Demo Menu →
+                  Open Live Menu →
                 </Link>
               </div>
 

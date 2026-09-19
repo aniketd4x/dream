@@ -81,7 +81,7 @@ interface DashboardOrder {
 
 export default function Dashboard({ onNavigate }: { onNavigate: (key: string) => void }) {
   const { restaurant, loading: authLoading, refetchRestaurant } = useAuth();
-  const currencySymbol = restaurant?.currency_symbol || restaurant?.currency || 'AED';
+  const currencySymbol = restaurant?.currency_symbol || restaurant?.currency || '₹';
 
   // Live Operations State
   const [isOpen, setIsOpen] = useState(true);

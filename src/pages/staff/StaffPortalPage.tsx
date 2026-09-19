@@ -131,54 +131,7 @@ export default function StaffPortalPage() {
         }));
         setOrders(formattedOrders);
       } else {
-        // Mock fallback orders for demo
-        setOrders([
-          {
-            id: 'ord-101',
-            order_number: '#1042',
-            table_number: '2',
-            customer_name: 'Vikram',
-            total_amount: 850,
-            grand_total: 892.5,
-            order_status: 'pending',
-            payment_status: 'unpaid',
-            created_at: new Date(Date.now() - 5 * 60000).toISOString(),
-            items: [
-              { id: '1', item_name: 'Paneer Butter Masala', quantity: 2, unit_price: 280, food_type: 'veg' },
-              { id: '2', item_name: 'Garlic Naan', quantity: 4, unit_price: 60, food_type: 'veg' },
-              { id: '3', item_name: 'Fresh Lime Soda', quantity: 2, unit_price: 90, food_type: 'veg' },
-            ],
-          },
-          {
-            id: 'ord-102',
-            order_number: '#1041',
-            table_number: '1',
-            customer_name: 'Ananya',
-            total_amount: 450,
-            grand_total: 472.5,
-            order_status: 'preparing',
-            payment_status: 'unpaid',
-            created_at: new Date(Date.now() - 15 * 60000).toISOString(),
-            items: [
-              { id: '4', item_name: 'Chicken Tikka', quantity: 1, unit_price: 320, food_type: 'non_veg' },
-              { id: '5', item_name: 'Butter Roti', quantity: 2, unit_price: 35, food_type: 'veg' },
-            ],
-          },
-          {
-            id: 'ord-103',
-            order_number: '#1040',
-            table_number: '4',
-            customer_name: 'Rajesh',
-            total_amount: 320,
-            grand_total: 336,
-            order_status: 'ready',
-            payment_status: 'paid',
-            created_at: new Date(Date.now() - 25 * 60000).toISOString(),
-            items: [
-              { id: '6', item_name: 'Veg Biryani Special', quantity: 1, unit_price: 320, food_type: 'veg' },
-            ],
-          },
-        ]);
+        setOrders([]);
       }
 
       // 2. Fetch Room Service Requests
@@ -193,34 +146,11 @@ export default function StaffPortalPage() {
         setRoomRequests(
           reqsData.map((r: any) => ({
             ...r,
-            room_number: r.hotel_rooms?.room_number || r.room_number || '101',
+            room_number: r.hotel_rooms?.room_number || r.room_number || 'Room',
           }))
         );
       } else {
-        setRoomRequests([
-          {
-            id: 'req-1',
-            room_id: '101',
-            room_number: '101',
-            request_type: 'WATER',
-            description: '2 bottles of packaged mineral water',
-            priority: 'NORMAL',
-            status: 'NEW',
-            guest_name: 'Mr. Kapoor',
-            created_at: new Date(Date.now() - 8 * 60000).toISOString(),
-          },
-          {
-            id: 'req-2',
-            room_id: '102',
-            room_number: '102',
-            request_type: 'TOWEL',
-            description: '2 extra bath towels needed',
-            priority: 'HIGH',
-            status: 'IN_PROGRESS',
-            guest_name: 'Sarah Jenkins',
-            created_at: new Date(Date.now() - 18 * 60000).toISOString(),
-          },
-        ]);
+        setRoomRequests([]);
       }
 
       // 3. Fetch Hotel Rooms
@@ -233,12 +163,7 @@ export default function StaffPortalPage() {
       if (roomsData) {
         setRooms(roomsData);
       } else {
-        setRooms([
-          { id: '101', room_number: '101', room_name: 'Garden Deluxe', status: 'OCCUPIED', floor_number: 1, room_type: 'Deluxe' },
-          { id: '102', room_number: '102', room_name: 'Courtyard Suite', status: 'DIRTY', floor_number: 1, room_type: 'Suite' },
-          { id: '201', room_number: '201', room_name: 'Mountain Vista', status: 'CLEANING', floor_number: 2, room_type: 'Super Deluxe' },
-          { id: '202', room_number: '202', room_name: 'Family Suite', status: 'AVAILABLE', floor_number: 2, room_type: 'Family' },
-        ]);
+        setRooms([]);
       }
     } catch (err) {
       console.error('Error fetching staff operational data:', err);
@@ -443,7 +368,7 @@ export default function StaffPortalPage() {
               </span>
             </div>
             <p className="text-[10px] text-slate-500 dark:text-slate-400 truncate">
-              {restaurant?.name || 'Spice Garden'}
+              {restaurant?.name || 'Restaurant / Hotel'}
             </p>
           </div>
         </div>

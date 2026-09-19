@@ -48,7 +48,7 @@ interface MenuItem {
 
 export default function MenuItemPage() {
   const { restaurant } = useAuth();
-  const currencySymbol = restaurant?.currency_symbol || restaurant?.currency || 'AED';
+  const currencySymbol = restaurant?.currency_symbol || restaurant?.currency || '₹';
 
   const [items, setItems] = useState<MenuItem[]>([]);
   const [loading, setLoading] = useState(true);

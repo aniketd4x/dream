@@ -70,7 +70,7 @@ type FontStyle = 'thermal' | 'modern';
 
 export default function OrderPrint({ orderId, onClose }: OrderPrintProps) {
   const { restaurant: authRestaurant } = useAuth();
-  const currencySymbol = authRestaurant?.currency_symbol || authRestaurant?.currency || 'AED';
+  const currencySymbol = authRestaurant?.currency_symbol || authRestaurant?.currency || '₹';
   const [order, setOrder] = useState<OrderData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);

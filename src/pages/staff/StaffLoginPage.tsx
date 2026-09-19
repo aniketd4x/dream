@@ -38,28 +38,7 @@ export default function StaffLoginPage() {
     document.title = 'Staff Portal Sign In | Dishgaze';
   }, []);
 
-  // Quick Demo Staff Logins for instant verification
-  const handleQuickStaffLogin = async (demoMobile: string, demoRole: string) => {
-    triggerHaptic('medium');
-    setMobile(demoMobile);
-    setPassword('Staff@123');
-    setError(null);
-    setLoading(true);
 
-    const res = await staffSignIn(demoMobile, 'Staff@123');
-    setLoading(false);
-
-    if (res.error) {
-      triggerHaptic('alert');
-      setError(res.error);
-    } else {
-      triggerHaptic('success');
-      setSuccessMsg(`Welcome, ${res.staff?.full_name || demoRole}! Redirecting...`);
-      setTimeout(() => {
-        navigate('/staff');
-      }, 500);
-    }
-  };
 
   const handleSignIn = async (e: FormEvent) => {
     e.preventDefault();
@@ -222,72 +201,7 @@ export default function StaffLoginPage() {
             </button>
           </form>
 
-          {/* Quick 1-Click Demo Staff Logins */}
-          <div className="mt-6 pt-5 border-t border-slate-100 dark:border-slate-800">
-            <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider text-center mb-3">
-              1-Click Demo Staff Logins
-            </p>
-            <div className="grid grid-cols-2 gap-2">
-              <button
-                type="button"
-                onClick={() => handleQuickStaffLogin('9876543210', 'Waiter')}
-                className="p-2 rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 flex items-center gap-2 text-left transition native-press"
-              >
-                <div className="w-6 h-6 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 flex items-center justify-center shrink-0">
-                  <UtensilsCrossed className="w-3 h-3" />
-                </div>
-                <div className="min-w-0 flex-1">
-                  <p className="text-xs font-bold text-slate-800 dark:text-slate-200 truncate">Waiter</p>
-                  <p className="text-[10px] text-slate-400 font-mono">9876543210</p>
-                </div>
-              </button>
 
-              <button
-                type="button"
-                onClick={() => handleQuickStaffLogin('9876543211', 'Chef')}
-                className="p-2 rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 flex items-center gap-2 text-left transition native-press"
-              >
-                <div className="w-6 h-6 rounded-lg bg-amber-50 dark:bg-amber-950/40 text-amber-600 flex items-center justify-center shrink-0">
-                  <ChefHat className="w-3 h-3" />
-                </div>
-                <div className="min-w-0 flex-1">
-                  <p className="text-xs font-bold text-slate-800 dark:text-slate-200 truncate">Kitchen KDS</p>
-                  <p className="text-[10px] text-slate-400 font-mono">9876543211</p>
-                </div>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => handleQuickStaffLogin('9876543212', 'Room Service')}
-                className="p-2 rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 flex items-center gap-2 text-left transition native-press"
-              >
-                <div className="w-6 h-6 rounded-lg bg-cyan-50 dark:bg-cyan-950/40 text-cyan-600 flex items-center justify-center shrink-0">
-                  <BellRing className="w-3 h-3" />
-                </div>
-                <div className="min-w-0 flex-1">
-                  <p className="text-xs font-bold text-slate-800 dark:text-slate-200 truncate">Room Service</p>
-                  <p className="text-[10px] text-slate-400 font-mono">9876543212</p>
-                </div>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => handleQuickStaffLogin('9876543213', 'Housekeeping')}
-                className="p-2 rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 flex items-center gap-2 text-left transition native-press"
-              >
-                <div className="w-6 h-6 rounded-lg bg-purple-50 dark:bg-purple-950/40 text-purple-600 flex items-center justify-center shrink-0">
-                  <BedDouble className="w-3 h-3" />
-                </div>
-                <div className="min-w-0 flex-1">
-                  <p className="text-xs font-bold text-slate-800 dark:text-slate-200 truncate">Housekeeping</p>
-                  <p className="text-[10px] text-slate-400 font-mono">9876543213</p>
-                </div>
-              </button>
-            </div>
-            <p className="text-[10px] text-center text-slate-400 mt-2">
-              Default password: <span className="font-mono font-bold text-slate-600 dark:text-slate-300">Staff@123</span>
-            </p>
-          </div>
         </div>
       </main>
 

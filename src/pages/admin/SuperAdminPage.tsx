@@ -230,35 +230,14 @@ export default function SuperAdminPage({ initialTab = 'restaurants' }: SuperAdmi
         }
       });
 
-      // Fallback demo if list is empty
-      if (enriched.length === 0) {
-        enriched.push({
-          id: 'd3b07384-d113-4678-bb56-9a2c270c5387',
-          name: 'Spice Garden (Demo)',
-          slug: 'spice-garden',
-          owner_name: 'Admin User',
-          email: 'admin@resto.com',
-          mobile: '9876543210',
-          city: 'Mumbai',
-          currency: 'INR',
-          currency_symbol: '₹',
-          is_active: true,
-          is_verified: true,
-          logo_url: '/logo.png',
-          table_count: 5,
-          order_count: 1,
-          item_count: 8,
-        });
-      }
-
       setRestaurants(enriched);
 
       // Compute summary stats
       setPlatformStats({
         totalRestaurants: enriched.filter((r) => !r.is_archived).length,
         activeRestaurants: enriched.filter((r) => r.is_active && !r.is_archived).length,
-        totalTables: (tablesData || []).length || 5,
-        totalOrders: (ordersData || []).length || 1,
+        totalTables: (tablesData || []).length,
+        totalOrders: (ordersData || []).length,
       });
     } catch (err: any) {
       console.error('Failed to load restaurants for super admin:', err);
@@ -1754,7 +1733,7 @@ export default function SuperAdminPage({ initialTab = 'restaurants' }: SuperAdmi
                   <label className="block text-xs font-bold text-slate-700 mb-1">Currency Symbol</label>
                   <input
                     type="text"
-                    placeholder="₹ or AED or $"
+                    placeholder="₹ (INR)"
                     value={newForm.currency_symbol}
                     onChange={(e) => setNewForm({ ...newForm, currency_symbol: e.target.value })}
                     className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:bg-white focus:ring-2 focus:ring-emerald-500 focus:outline-none"

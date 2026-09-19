@@ -67,8 +67,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const isSuperAdmin = Boolean(
     user?.id === '7510736f-8c03-4562-b3bc-8f7e7fefddbb' ||
     user?.email?.toLowerCase() === 'akshay44x@gmail.com' ||
-    user?.email?.toLowerCase() === 'admin@resto.com' ||
-    user?.email?.toLowerCase().startsWith('admin@') ||
+    user?.username?.toLowerCase() === 'akshay44x' ||
     user?.role === 'super_admin' ||
     user?.role === 'superadmin' ||
     (user as any)?.role === 'super_admin' ||
@@ -175,18 +174,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           return { error: null };
         }
 
-        if (trimmedEmail.toLowerCase() === 'admin@resto.com' && password === 'Admin@123') {
-          const demoUser: User = {
-            id: 'd3b07384-d113-4678-bb56-9a2c270c5387',
-            email: 'admin@resto.com',
-            name: 'Spice Garden (Demo Admin)',
-            role: 'restaurant_admin',
-          };
-          setUser(demoUser);
-          localStorage.setItem('user', JSON.stringify(demoUser));
-          await fetchRestaurant(demoUser.id);
-          return { error: null };
-        }
         if (fetchError) {
           console.error('Database fetch error during login:', fetchError.message);
           return { error: 'Authentication service error. Please try again.' };
@@ -218,9 +205,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const isSuper = Boolean(
         restaurant.id === '7510736f-8c03-4562-b3bc-8f7e7fefddbb' ||
         restaurant.email?.toLowerCase() === 'akshay44x@gmail.com' ||
-        restaurant.username?.toLowerCase() === 'akshay44x' ||
-        restaurant.email?.toLowerCase() === 'admin@resto.com' ||
-        restaurant.email?.toLowerCase().startsWith('admin@')
+        restaurant.username?.toLowerCase() === 'akshay44x'
       );
 
       // Password is valid! Set session and update last_login
@@ -424,19 +409,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           return;
         }
 
-        if (restaurantId === 'd3b07384-d113-4678-bb56-9a2c270c5387' || user?.email === 'admin@resto.com') {
-          const demoRest = {
-            id: 'd3b07384-d113-4678-bb56-9a2c270c5387',
-            name: 'Spice Garden',
-            slug: 'spice-garden',
-            currency: 'INR',
-            currency_symbol: '₹',
-            logo_url: '/logo.png',
-            theme_color: '#0F766E',
-          };
-          setRestaurant(demoRest);
-          return;
-        }
         console.error('Error fetching restaurant:', error);
         setRestaurant(null);
         return;
@@ -456,8 +428,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           id: data.id,
           name: data.name,
           slug: data.slug || undefined,
-          currency: data.currency || 'AED',
-          currency_symbol: data.currency_symbol || 'AED',
+          currency: data.currency || 'INR',
+          currency_symbol: data.currency_symbol || '₹',
           logo_url: data.logo_url || undefined,
           theme_color: themeColor,
         });

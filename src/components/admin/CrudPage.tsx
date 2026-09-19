@@ -63,7 +63,7 @@ type Row = Record<string, unknown>;
 export default function CrudPage({ table }: CrudPageProps) {
   const config = TABLE_MAP[table];
   const { restaurant, loading: authLoading, isSuperAdmin } = useAuth();
-  const currencySymbol = restaurant?.currency_symbol || restaurant?.currency || 'AED';
+  const currencySymbol = restaurant?.currency_symbol || restaurant?.currency || '₹';
   const [rows, setRows] = useState<Row[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);

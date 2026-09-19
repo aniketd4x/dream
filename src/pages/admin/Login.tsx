@@ -75,24 +75,7 @@ export default function Login() {
     }
   };
 
-  // 1-Click Quick Restaurant Demo Login
-  const handleQuickDemoLogin = async () => {
-    triggerHaptic('medium');
-    setEmail('admin@resto.com');
-    setPassword('Admin@123');
-    setError(null);
-    setLoading(true);
 
-    const { error: signErr } = await signIn('admin@resto.com', 'Admin@123');
-    setLoading(false);
-
-    if (signErr) {
-      triggerHaptic('alert');
-      setError(signErr);
-    } else {
-      triggerHaptic('success');
-    }
-  };
 
   // Handle Sign In Submit
   async function handleSignIn(e: FormEvent) {
@@ -290,31 +273,6 @@ export default function Login() {
                     <span>Login as Super Admin</span>
                   </button>
                 </div>
-
-                {/* Restaurant Demo Quick Box */}
-                <div className="rounded-xl bg-emerald-500/10 border border-emerald-500/30 p-2.5">
-                  <div className="flex items-center justify-between mb-1">
-                    <div className="flex items-center gap-1.5 text-xs font-black text-emerald-900">
-                      <Store className="size-3.5 text-emerald-600" />
-                      <span>Restaurant Manager (Spice Garden)</span>
-                    </div>
-                    <span className="text-[10px] font-bold bg-emerald-200 text-emerald-900 px-1.5 py-0.5 rounded">
-                      Demo
-                    </span>
-                  </div>
-                  <p className="text-[11px] text-emerald-800 font-mono font-medium mb-2">
-                    admin@resto.com · Admin@123
-                  </p>
-                  <button
-                    type="button"
-                    onClick={handleQuickDemoLogin}
-                    disabled={loading}
-                    className="w-full inline-flex items-center justify-center gap-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 px-2.5 py-1.5 text-xs font-bold text-white shadow-xs active:scale-[0.98] transition disabled:opacity-50"
-                  >
-                    <Sparkles className="size-3" />
-                    <span>Login as Restaurant Staff</span>
-                  </button>
-                </div>
               </div>
             )}
 
@@ -349,7 +307,7 @@ export default function Login() {
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       required
-                      placeholder="akshay44x@gmail.com or admin@resto.com"
+                      placeholder="akshay44x@gmail.com or restaurant email"
                       autoComplete="username"
                       className="w-full rounded-xl border border-slate-200 bg-white pl-10 pr-4 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 outline-none transition focus:border-emerald-600 focus:ring-4 focus:ring-emerald-600/10"
                     />

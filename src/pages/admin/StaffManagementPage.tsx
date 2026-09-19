@@ -101,19 +101,7 @@ export default function StaffManagementPage() {
         .eq('restaurant_id', restaurant.id)
         .order('table_number', { ascending: true });
 
-      if (tablesData && tablesData.length > 0) {
-        setAvailableTables(tablesData);
-      } else {
-        // Fallback demo tables
-        setAvailableTables([
-          { id: '1', table_number: '1', table_name: 'Window Booth' },
-          { id: '2', table_number: '2', table_name: 'Garden Terrace' },
-          { id: '3', table_number: '3', table_name: 'Family Table' },
-          { id: '4', table_number: '4', table_name: 'Main Hall' },
-          { id: '5', table_number: '5', table_name: 'Bar Counter' },
-          { id: '6', table_number: '6', table_name: 'Private Dining' },
-        ]);
-      }
+      setAvailableTables(tablesData || []);
 
       // 3. Rooms
       const { data: roomsData } = await supabase
@@ -122,17 +110,7 @@ export default function StaffManagementPage() {
         .eq('restaurant_id', restaurant.id)
         .order('room_number', { ascending: true });
 
-      if (roomsData && roomsData.length > 0) {
-        setAvailableRooms(roomsData);
-      } else {
-        // Fallback demo rooms
-        setAvailableRooms([
-          { id: '101', room_number: '101', room_name: 'Deluxe Garden' },
-          { id: '102', room_number: '102', room_name: 'Courtyard Premier' },
-          { id: '201', room_number: '201', room_name: 'Mountain Suite' },
-          { id: '202', room_number: '202', room_name: 'Family Suite' },
-        ]);
-      }
+      setAvailableRooms(roomsData || []);
     } catch (err) {
       console.error('Error loading staff management data:', err);
     } finally {

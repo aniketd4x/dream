@@ -117,8 +117,8 @@ export default function SettingsPage() {
     cover_image_url: '',
     opening_time: '09:00',
     closing_time: '23:00',
-    currency: 'AED',
-    currency_symbol: 'AED',
+    currency: 'INR',
+    currency_symbol: '₹',
     rating: 4.5,
     total_reviews: 0,
     address: '',
@@ -249,8 +249,8 @@ export default function SettingsPage() {
           cover_image_url: form.cover_image_url.trim() || null,
           opening_time: form.opening_time,
           closing_time: form.closing_time,
-          currency: form.currency.trim() || 'AED',
-          currency_symbol: form.currency_symbol.trim() || 'AED',
+          currency: form.currency.trim() || 'INR',
+          currency_symbol: form.currency_symbol.trim() || '₹',
           rating: Number(form.rating),
           total_reviews: Number(form.total_reviews),
           address: form.address.trim(),
@@ -948,7 +948,7 @@ export default function SettingsPage() {
                 type="text"
                 value={form.currency}
                 onChange={(e) => setForm({ ...form, currency: e.target.value })}
-                placeholder="AED, USD, INR"
+                placeholder="INR, USD, EUR"
                 className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-sm font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-theme-light focus:border-theme-primary"
               />
             </div>
@@ -962,7 +962,7 @@ export default function SettingsPage() {
                 type="text"
                 value={form.currency_symbol}
                 onChange={(e) => setForm({ ...form, currency_symbol: e.target.value })}
-                placeholder="AED, $, â‚¹"
+                placeholder="₹, $, €"
                 className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-sm font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-theme-light focus:border-theme-primary"
               />
             </div>

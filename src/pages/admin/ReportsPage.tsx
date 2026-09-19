@@ -74,7 +74,7 @@ interface ReportMetrics {
 
 export default function ReportsPage() {
   const { restaurant } = useAuth();
-  const currencySymbol = restaurant?.currency_symbol || restaurant?.currency || 'AED';
+  const currencySymbol = restaurant?.currency_symbol || restaurant?.currency || '₹';
 
   const [period, setPeriod] = useState<PeriodMode>('daily');
   const [selectedDate, setSelectedDate] = useState<string>(() => {

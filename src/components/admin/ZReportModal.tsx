@@ -63,7 +63,7 @@ interface ZReportData {
 
 export default function ZReportModal({ onClose, initialDate }: ZReportModalProps) {
   const { restaurant } = useAuth();
-  const currencySymbol = restaurant?.currency_symbol || restaurant?.currency || 'AED';
+  const currencySymbol = restaurant?.currency_symbol || restaurant?.currency || '₹';
 
   const todayStr = new Date().toISOString().split('T')[0];
   const [selectedDate, setSelectedDate] = useState<string>(initialDate || todayStr);

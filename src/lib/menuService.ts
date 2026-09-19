@@ -32,185 +32,10 @@ const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12
 
 const round2 = (n: number) => Math.round(n * 100) / 100;
 
-export const DEMO_RESTAURANT: Restaurant = {
-  id: 'd3b07384-d113-4678-bb56-9a2c270c5387',
-  name: 'Spice Garden',
-  slug: 'spice-garden',
-  description: 'Contemporary artisanal Indian dining and royal culinary heritage.',
-  address: '42 Gourmet Avenue, MG Road',
-  city: 'Mumbai',
-  cover_image_url: null,
-  opening_time: '11:00:00',
-  closing_time: '23:30:00',
-  currency: 'INR',
-  currency_symbol: '₹',
-  rating: 4.9,
-  total_reviews: 1420,
-  primary_color: '#0F766E',
-  default_language: 'en',
-  is_active: true,
-  logo_url: '/logo.png',
-};
 
-export const DEMO_SETTINGS: RestaurantSettings = {
-  theme_color: '#0F766E',
-  gst_percent: 5,
-  service_charge: 0,
-  accept_orders: true,
-  restaurant_open: true,
-  whatsapp_number: '+919876543210',
-  support_number: '+919876543210',
-  instagram_url: null,
-  facebook_url: null,
-};
-
-export const DEMO_TABLE: DiningTable = {
-  id: 'a1111111-1111-1111-1111-111111111111',
-  restaurant_id: DEMO_RESTAURANT.id,
-  table_number: 'T1',
-  table_name: 'Window Seat T1',
-  capacity: 4,
-  is_active: true,
-  qr_token: 'TBL-M12WSF9O',
-};
-
-export const DEMO_CATEGORIES: Category[] = [
-  { id: 'c1', name: 'Starters & Appetizers', icon: '🥘', display_order: 1, description: null, image_url: null },
-  { id: 'c2', name: 'Main Course Curry', icon: '🍛', display_order: 2, description: null, image_url: null },
-  { id: 'c3', name: 'Biryani & Rice', icon: '🍚', display_order: 3, description: null, image_url: null },
-  { id: 'c4', name: 'Tandoori Breads', icon: '🫓', display_order: 4, description: null, image_url: null },
-  { id: 'c5', name: 'Beverages & Mocktails', icon: '🍹', display_order: 5, description: null, image_url: null },
-  { id: 'c6', name: 'Desserts', icon: '🍨', display_order: 6, description: null, image_url: null },
-];
-
-export const DEMO_MENU_ITEMS: MenuItem[] = [
-  {
-    id: 'm1',
-    category_id: 'c1',
-    name: 'Paneer Tikka Angara',
-    description: 'Smoked cottage cheese cubes marinated in Kashmiri red chili, hung curd, and stone-ground spices.',
-    price: 280,
-    food_type: 'veg',
-    preparation_time: 15,
-    is_featured: true,
-    is_recommended: true,
-    display_order: 1,
-    has_variant: false,
-    image_url: 'https://images.unsplash.com/photo-1599488615731-7e5c2823ff28?w=500&q=80',
-    variants: [],
-  },
-  {
-    id: 'm2',
-    category_id: 'c1',
-    name: 'Crispy Corn & Water Chestnut',
-    description: 'Golden tossed crispy sweet corn kernels seasoned with scallions and crushed black pepper.',
-    price: 220,
-    food_type: 'veg',
-    preparation_time: 12,
-    is_featured: false,
-    is_recommended: false,
-    display_order: 2,
-    has_variant: false,
-    image_url: 'https://images.unsplash.com/photo-1540420773420-3366772f4999?w=500&q=80',
-    variants: [],
-  },
-  {
-    id: 'm3',
-    category_id: 'c2',
-    name: 'Butter Paneer Masala',
-    description: 'Velvety slow-simmered tomato gravy infused with aromatic fenugreek and organic artisanal butter.',
-    price: 320,
-    food_type: 'veg',
-    preparation_time: 18,
-    is_featured: true,
-    is_recommended: true,
-    display_order: 1,
-    has_variant: false,
-    image_url: 'https://images.unsplash.com/photo-1631452180519-c014fe946bc7?w=500&q=80',
-    variants: [],
-  },
-  {
-    id: 'm4',
-    category_id: 'c2',
-    name: 'Dal Makhani Royal',
-    description: 'Black lentils slow-cooked overnight over charcoal, finished with churned white butter.',
-    price: 260,
-    food_type: 'veg',
-    preparation_time: 20,
-    is_featured: true,
-    is_recommended: false,
-    display_order: 2,
-    has_variant: false,
-    image_url: 'https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=500&q=80',
-    variants: [],
-  },
-  {
-    id: 'm5',
-    category_id: 'c3',
-    name: 'Hyderabadi Dum Biryani',
-    description: 'Long-grain royal Basmati layered with seasonal vegetables, caramelized onions, saffron & mint.',
-    price: 310,
-    food_type: 'veg',
-    preparation_time: 25,
-    is_featured: true,
-    is_recommended: true,
-    display_order: 1,
-    has_variant: false,
-    image_url: 'https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=500&q=80',
-    variants: [],
-  },
-  {
-    id: 'm6',
-    category_id: 'c4',
-    name: 'Garlic Butter Naan',
-    description: 'Fluffy clay-oven flatbread topped with toasted garlic flakes and brushed with golden butter.',
-    price: 65,
-    food_type: 'veg',
-    preparation_time: 8,
-    is_featured: false,
-    is_recommended: false,
-    display_order: 1,
-    has_variant: false,
-    image_url: 'https://images.unsplash.com/photo-1565557623262-b51c2513a641?w=500&q=80',
-    variants: [],
-  },
-  {
-    id: 'm7',
-    category_id: 'c5',
-    name: 'Fresh Mint Mojito',
-    description: 'Crushed fresh garden mint, zesty Key lime, sparkling mineral water, and raw cane sugar.',
-    price: 140,
-    food_type: 'veg',
-    preparation_time: 5,
-    is_featured: true,
-    is_recommended: false,
-    display_order: 1,
-    has_variant: false,
-    image_url: 'https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?w=500&q=80',
-    variants: [],
-  },
-  {
-    id: 'm8',
-    category_id: 'c6',
-    name: 'Gulab Jamun with Rabdi',
-    description: 'Warm saffron-scented milk dough dumplings dipped in cardamom syrup, topped with rich rabdi.',
-    price: 150,
-    food_type: 'veg',
-    preparation_time: 5,
-    is_featured: true,
-    is_recommended: true,
-    display_order: 1,
-    has_variant: false,
-    image_url: 'https://images.unsplash.com/photo-1601050690597-df0568f70950?w=500&q=80',
-    variants: [],
-  },
-];
 
 export async function resolveContext(identifier: string) {
   const cleanIdentifier = identifier.trim();
-
-  // Check demo token shortcut or unseeded database fallback
-  const isDemoToken = cleanIdentifier.toUpperCase() === 'TBL-M12WSF9O' || cleanIdentifier.toLowerCase() === 'demo';
 
   // Step A: Check if identifier is a Table QR Token
   let table: any = null;
@@ -243,6 +68,12 @@ export async function resolveContext(identifier: string) {
     if (!restaurant)
       throw new MenuError('RESTAURANT_INACTIVE', 'This restaurant is currently unavailable.');
 
+    const enrichedRestaurant = {
+      ...restaurant,
+      currency: restaurant.currency || 'INR',
+      currency_symbol: restaurant.currency_symbol || '₹',
+    };
+
     const { data: settings } = await supabase
       .from('restaurant_settings')
       .select(SETTINGS_COLS)
@@ -254,19 +85,8 @@ export async function resolveContext(identifier: string) {
       mode: 'table' as const,
       table: table as unknown as DiningTable,
       availableTables: [] as DiningTable[],
-      restaurant: restaurant as unknown as Restaurant,
+      restaurant: enrichedRestaurant as unknown as Restaurant,
       settings: (settings ?? null) as RestaurantSettings | null,
-    };
-  }
-
-  // Fallback for Demo Table T1 if database is unseeded
-  if (isDemoToken || cleanIdentifier.toUpperCase().startsWith('TBL-')) {
-    return {
-      mode: 'table' as const,
-      table: { ...DEMO_TABLE, qr_token: cleanIdentifier },
-      availableTables: [DEMO_TABLE],
-      restaurant: DEMO_RESTAURANT,
-      settings: DEMO_SETTINGS,
     };
   }
 
@@ -288,14 +108,6 @@ export async function resolveContext(identifier: string) {
     room = null;
   }
 
-  // Also check local cache or fallback for room tokens (RM-...)
-  if (!room && (cleanIdentifier.toUpperCase().startsWith('RM-') || cleanIdentifier.toUpperCase().includes('ROOM'))) {
-    const local = await getRoomByQrToken(cleanIdentifier);
-    if (local.room) {
-      room = local.room;
-    }
-  }
-
   if (room) {
     const { data: restaurant } = await supabase
       .from('restaurants')
@@ -305,7 +117,15 @@ export async function resolveContext(identifier: string) {
       .limit(1)
       .maybeSingle();
 
-    const rest = restaurant || DEMO_RESTAURANT;
+    if (!restaurant) {
+      throw new MenuError('RESTAURANT_INACTIVE', 'This hotel/restaurant is currently unavailable.');
+    }
+
+    const enrichedRestaurant = {
+      ...restaurant,
+      currency: restaurant.currency || 'INR',
+      currency_symbol: restaurant.currency_symbol || '₹',
+    };
 
     const { data: settings } = await supabase
       .from('restaurant_settings')
@@ -327,7 +147,7 @@ export async function resolveContext(identifier: string) {
       } as unknown as DiningTable,
       room,
       availableTables: [] as DiningTable[],
-      restaurant: rest as unknown as Restaurant,
+      restaurant: enrichedRestaurant as unknown as Restaurant,
       settings: (settings ?? null) as RestaurantSettings | null,
     };
   }
@@ -397,24 +217,6 @@ export async function loadMenu(identifier: string): Promise<MenuPayload> {
 
   const rawCategories = (categoriesRes.data ?? []) as unknown as Category[];
   const rawItems = itemsRes.data ?? [];
-
-  // Fallback to rich demo menu items if database is unseeded
-  if ((rawCategories.length === 0 && rawItems.length === 0) || categoriesRes.error || itemsRes.error) {
-    if (restaurant.id === DEMO_RESTAURANT.id || table?.qr_token?.toUpperCase().startsWith('TBL-')) {
-      return {
-        mode,
-        table: table ?? DEMO_TABLE,
-        availableTables: availableTables.length > 0 ? availableTables : [DEMO_TABLE],
-        restaurant: {
-          ...restaurant,
-          rating: restaurant.rating === null ? 4.9 : Number(restaurant.rating),
-        },
-        settings: settings ?? DEMO_SETTINGS,
-        categories: DEMO_CATEGORIES,
-        items: DEMO_MENU_ITEMS,
-      };
-    }
-  }
 
   if (categoriesRes.error) throw new MenuError('NETWORK', categoriesRes.error.message);
   if (itemsRes.error) throw new MenuError('NETWORK', itemsRes.error.message);
