@@ -39,6 +39,7 @@ import bcrypt from 'bcryptjs';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/auth';
 import { triggerHaptic } from '@/lib/haptics';
+import { getRestaurantDirectMenuUrl } from '@/lib/qrCanvasGenerator';
 
 export interface RestaurantRecord {
   id: string;
@@ -975,7 +976,7 @@ export default function SuperAdminPage({ initialTab = 'restaurants' }: SuperAdmi
 
                           {/* Live Menu Shortcut */}
                           <button
-                            onClick={() => window.open(`/menu/TBL-M12WSF9O`, '_blank')}
+                            onClick={() => window.open(getRestaurantDirectMenuUrl(r), '_blank')}
                             className="p-1.5 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-colors"
                             title="Preview Customer Digital Menu"
                           >

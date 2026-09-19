@@ -18,12 +18,15 @@ export interface RestaurantQRCardRenderParams {
 }
 
 /**
- * Returns the permanent direct digital menu URL for a restaurant.
+ * Returns the permanent direct digital menu URL for a restaurant using the dynamic base domain URL.
  */
-export function getRestaurantDirectMenuUrl(restaurant: { id: string; slug?: string }): string {
+export function getRestaurantDirectMenuUrl(restaurant?: { id?: string; slug?: string } | null): string {
   const baseUrl = getBaseUrl();
-  const identifier = restaurant.slug && restaurant.slug.trim() ? restaurant.slug.trim() : restaurant.id;
-  return `${baseUrl}/menu/${identifier}`;
+  if (!restaurant) {
+    return `${baseUrl}/menu`;
+  }
+  const identifier = restaurant.slug && restaurant.slug.trim() ? restaurant.slug.trim() : (restaurant.id || '');
+  return identifier ? `${baseUrl}/menu/${identifier}` : `${baseUrl}/menu`;
 }
 
 /**

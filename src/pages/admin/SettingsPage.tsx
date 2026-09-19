@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import {
   Store,
   Phone,
@@ -59,6 +59,11 @@ export default function SettingsPage() {
   const [showQRModal, setShowQRModal] = useState(false);
   const [copiedLink, setCopiedLink] = useState(false);
   const [activeTab, setActiveTab] = useState<'general' | 'theme' | 'security'>('general');
+
+  // Permanent direct menu link computed dynamically from base URL and restaurant slug/id
+  const permanentDirectMenuUrl = useMemo(() => {
+    return getRestaurantDirectMenuUrl(restaurant);
+  }, [restaurant]);
 
   // File Upload Helper (Supabase Storage + DataURL fallback)
   async function handleFileUpload(file: File, field: 'logo_url' | 'cover_image_url') {
@@ -730,14 +735,14 @@ export default function SettingsPage() {
 
                   <div className="bg-white p-3 rounded-2xl border border-[#E0D9CB] shadow-sm">
                     <QRCodeCanvas
-                      value={getRestaurantDirectMenuUrl(restaurant)}
+                      value={permanentDirectMenuUrl}
                       size={140}
                       bgColor="#ffffff"
                       fgColor="#0D3B36"
                       level="H"
                       includeMargin
                       imageSettings={{
-                        src: restaurant.logo_url || '/logo.png',
+                        src: restaurant?.logo_url || '/logo.png',
                         height: Math.round(140 * 0.22),
                         width: Math.round(140 * 0.22),
                         excavate: true,
@@ -746,7 +751,7 @@ export default function SettingsPage() {
                   </div>
                 </div>
                 <p className="text-xs font-black text-slate-900 tracking-tight">
-                  {form.name || restaurant.name}
+                  {form.name || restaurant?.name}
                 </p>
                 <p className="text-[10px] font-bold text-[#0F766E] tracking-widest uppercase mt-0.5">
                   OFFICIAL DIGITAL MENU
@@ -761,14 +766,13 @@ export default function SettingsPage() {
                   </label>
                   <div className="flex items-center gap-2">
                     <div className="flex-1 flex items-center bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-mono text-slate-700 select-all overflow-x-auto">
-                      {getRestaurantDirectMenuUrl(restaurant)}
+                      {permanentDirectMenuUrl}
                     </div>
                     <button
                       type="button"
                       onClick={async () => {
                         triggerHaptic('success');
-                        const url = getRestaurantDirectMenuUrl(restaurant);
-                        const ok = await copyTextToClipboard(url);
+                        const ok = await copyTextToClipboard(permanentDirectMenuUrl);
                         if (ok) {
                           setCopiedLink(true);
                           setTimeout(() => setCopiedLink(false), 2500);
@@ -781,7 +785,7 @@ export default function SettingsPage() {
                       <span>{copiedLink ? 'Copied!' : 'Copy'}</span>
                     </button>
                     <a
-                      href={getRestaurantDirectMenuUrl(restaurant)}
+                      href={permanentDirectMenuUrl}
                       target="_blank"
                       rel="noreferrer"
                       className="px-3 py-2 rounded-xl bg-theme-light text-theme-primary hover:brightness-95 text-xs font-bold transition native-press shrink-0 flex items-center gap-1.5"
@@ -815,8 +819,7 @@ export default function SettingsPage() {
                     type="button"
                     onClick={() => {
                       triggerHaptic('selection');
-                      const url = getRestaurantDirectMenuUrl(restaurant);
-                      const msg = `ðŸ½ï¸ *${form.name || restaurant.name}* - Official Digital Menu\n\nâœ¨ Browse our full menu, dishes, and prices directly on your phone:\nðŸ”— ${url}\n\n_Scan or tap the link to view our menu & place orders!_`;
+                      const msg = `🍽️ *${form.name || restaurant?.name || 'Restaurant'}* - Official Digital Menu\n\n✨ Browse our full menu, dishes, and prices directly on your phone:\n🔗 ${permanentDirectMenuUrl}\n\n_Scan or tap the link to view our menu & place orders!_`;
                       openWhatsAppShare(msg);
                     }}
                     className="flex items-center gap-2 p-3 rounded-xl border border-emerald-200 bg-emerald-50/60 hover:bg-emerald-100/60 text-emerald-900 transition native-press text-left"
